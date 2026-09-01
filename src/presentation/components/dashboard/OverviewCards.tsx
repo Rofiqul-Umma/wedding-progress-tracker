@@ -6,7 +6,7 @@ import { usePlan } from '@presentation/state/PlanStore';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { daysUntil } from '@domain/services/schedule';
 import {
-  spent,
+  totalSpent,
   totalBudget,
   budgetUsedPct,
 } from '@domain/services/budget';
@@ -76,13 +76,13 @@ export function OverviewCards() {
   const { t } = useTranslation();
   const { state } = usePlan();
   const { money, date } = useFormat();
-  const { wedding, budget, tasks, seserahan, shopping } = state;
+  const { wedding, budget, vendors, tasks, seserahan, shopping } = state;
 
   const dleft = daysUntil(wedding.date);
-  const sp = spent(budget);
+  const sp = totalSpent(budget, vendors);
   const tb = totalBudget(wedding);
   const rem = tb - sp;
-  const budPct = budgetUsedPct(wedding, budget);
+  const budPct = budgetUsedPct(wedding, budget, vendors);
 
   const countdown =
     dleft === null

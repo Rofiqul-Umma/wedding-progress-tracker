@@ -7,6 +7,8 @@ import {
   paidTotal,
   budgetUsedPct,
   vendorsTotal,
+  vendorsPaid,
+  totalSpent,
   categoryRollup,
   maxCategoryValue,
 } from './budget';
@@ -61,6 +63,33 @@ describe('budget service', () => {
   it('sums vendor costs', () => {
     const vendors = [{ cost: 1000 }, { cost: 500 }, { cost: 0 }] as Vendor[];
     expect(vendorsTotal(vendors)).toBe(1500);
+  });
+
+  it('counts money paid to vendors: full cost when paid, deposit when down payment', () => {
+    const vendors = [
+      { cost: 1000, status: 'paid', deposit: 0 },
+      { cost: 2000, status: 'deposit', deposit: 500 },
+      { cost: 800, status: 'booked', deposit: 0 },
+      { cost: 400, status: 'inquiry', deposit: 0 },
+    ] as Vendor[];
+    // 1000 (paid) + 500 (deposit) + 0 + 0
+    expect(vendorsPaid(vendors)).toBe(1500);
+  });
+
+  it('folds vendor payments into total spent, remaining, and used %', () => {
+    const budget = [item({ actual: 200 })];
+    const vendors = [
+      { cost: 1000, status: 'paid', deposit: 0 },
+      { cost: 2000, status: 'deposit', deposit: 300 },
+    ] as Vendor[];
+    // budget 200 + vendors (1000 + 300) = 1500
+    expect(totalSpent(budget, vendors)).toBe(1500);
+    expect(remaining(wedding, budget, vendors)).toBe(-500); // target 1000
+    expect(budgetUsedPct(wedding, budget, vendors)).toBe(100); // capped
+  });
+
+  it('treats total spent without vendors as budget-only', () => {
+    expect(totalSpent([item({ actual: 250 })])).toBe(250);
   });
 
   it('rolls categories up, sorts by actual desc, and flags over-estimate', () => {

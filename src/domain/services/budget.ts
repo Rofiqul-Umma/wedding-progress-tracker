@@ -5,14 +5,35 @@ export function spent(budget: BudgetItem[]): number {
   return budget.reduce((a, b) => a + (+b.actual || 0), 0);
 }
 
+/**
+ * Money actually paid to vendors: the full cost once a vendor is paid, the
+ * recorded down payment while a deposit is outstanding, nothing before that.
+ */
+export function vendorsPaid(vendors: Vendor[]): number {
+  return vendors.reduce((a, v) => {
+    if (v.status === 'paid') return a + (+v.cost || 0);
+    if (v.status === 'deposit') return a + (+(v.deposit ?? 0) || 0);
+    return a;
+  }, 0);
+}
+
+/** Total actually spent = budget line items + money paid to vendors. */
+export function totalSpent(budget: BudgetItem[], vendors: Vendor[] = []): number {
+  return spent(budget) + vendorsPaid(vendors);
+}
+
 /** The overall wedding budget target. */
 export function totalBudget(wedding: Wedding): number {
   return +wedding.budget || 0;
 }
 
-/** Budget remaining (negative means over budget). */
-export function remaining(wedding: Wedding, budget: BudgetItem[]): number {
-  return totalBudget(wedding) - spent(budget);
+/** Budget remaining (negative means over budget), vendor payments included. */
+export function remaining(
+  wedding: Wedding,
+  budget: BudgetItem[],
+  vendors: Vendor[] = [],
+): number {
+  return totalBudget(wedding) - totalSpent(budget, vendors);
 }
 
 /** Total already paid off. */
@@ -22,10 +43,14 @@ export function paidTotal(budget: BudgetItem[]): number {
     .reduce((a, b) => a + (+b.actual || 0), 0);
 }
 
-/** Percentage of budget used (0–100, capped). */
-export function budgetUsedPct(wedding: Wedding, budget: BudgetItem[]): number {
+/** Percentage of budget used (0–100, capped), vendor payments included. */
+export function budgetUsedPct(
+  wedding: Wedding,
+  budget: BudgetItem[],
+  vendors: Vendor[] = [],
+): number {
   const tb = totalBudget(wedding);
-  return tb > 0 ? Math.min(100, Math.round((spent(budget) / tb) * 100)) : 0;
+  return tb > 0 ? Math.min(100, Math.round((totalSpent(budget, vendors) / tb) * 100)) : 0;
 }
 
 /** Sum of all vendor costs (money committed). */

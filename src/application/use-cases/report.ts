@@ -1,6 +1,6 @@
 import type { PlanState } from '@domain/entities/types';
 import {
-  spent,
+  totalSpent,
   totalBudget,
   remaining,
   paidTotal,
@@ -233,11 +233,11 @@ export function buildReportStats(
   return [
     {
       labelKey: 'report.stat.budgetUsed',
-      value: `${fmt.money(spent(state.budget))} / ${fmt.money(totalBudget(state.wedding))}`,
+      value: `${fmt.money(totalSpent(state.budget, state.vendors))} / ${fmt.money(totalBudget(state.wedding))}`,
     },
     {
       labelKey: 'report.stat.remaining',
-      value: fmt.money(remaining(state.wedding, state.budget)),
+      value: fmt.money(remaining(state.wedding, state.budget, state.vendors)),
     },
     {
       labelKey: 'report.stat.paid',

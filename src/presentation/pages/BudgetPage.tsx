@@ -16,7 +16,7 @@ import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import {
-  spent,
+  totalSpent,
   totalBudget,
   paidTotal,
   categoryRollup,
@@ -47,7 +47,7 @@ export function BudgetPage() {
   const [filter, setFilter] = useState<BudgetFilter>('all');
   const [sort, setSort] = useState<BudgetSort>('amount-desc');
 
-  const sp = spent(state.budget);
+  const sp = totalSpent(state.budget, state.vendors);
   const tb = totalBudget(state.wedding);
   const rem = tb - sp;
   const rollup = categoryRollup(state.budget);
