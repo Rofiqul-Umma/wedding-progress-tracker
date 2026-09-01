@@ -127,7 +127,12 @@ export function Topbar() {
         </label>
         {inRoom && <RoomPresence />}
         {inRoom && (
-          <Button variant="ghost" icon="link" onClick={share}>
+          <Button
+            variant="ghost"
+            icon="link"
+            onClick={share}
+            className="max-[860px]:hidden"
+          >
             {t('room.share')}
           </Button>
         )}
