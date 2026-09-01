@@ -1,7 +1,7 @@
 import { Providers } from './providers';
 import { Sidebar } from '@presentation/components/layout/Sidebar';
 import { Topbar } from '@presentation/components/layout/Topbar';
-import { MobileNav } from '@presentation/components/layout/MobileNav';
+import { MobileDrawer } from '@presentation/components/layout/MobileDrawer';
 import { TaskDetail } from '@presentation/components/dashboard/TaskDetail';
 import { Modal } from '@presentation/components/ui/Modal';
 import { SettingsModal } from '@presentation/components/SettingsModal';
@@ -48,7 +48,7 @@ function Shell() {
           <div className="flex min-h-0 flex-1">
             <section
               key={page}
-              className="fade-in min-w-0 flex-1 overflow-auto px-[26px] pb-10 pt-6 max-[860px]:px-4 max-[860px]:pb-24 max-[860px]:pt-[18px]"
+              className="fade-in min-w-0 flex-1 overflow-auto px-[26px] pb-10 pt-6 max-[860px]:px-4 max-[860px]:pt-[18px]"
             >
               <Page />
             </section>
@@ -61,7 +61,7 @@ function Shell() {
         </main>
       </div>
 
-      <MobileNav />
+      <MobileDrawer />
 
       {form && <Modal form={form} onClose={closeForm} />}
       {settingsOpen && <SettingsModal onClose={closeSettings} />}

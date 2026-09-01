@@ -32,6 +32,7 @@ export const id = {
     seserahan: 'Seserahan',
     contacts: 'Kontak',
     reports: 'Laporan',
+    menu: 'Menu',
   },
   user: {
     role: 'Merencanakan bersama',

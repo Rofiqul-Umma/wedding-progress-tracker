@@ -28,6 +28,7 @@ export const en = {
     seserahan: 'Seserahan',
     contacts: 'Contacts',
     reports: 'Reports',
+    menu: 'Menu',
   },
   user: {
     role: 'Planning together',

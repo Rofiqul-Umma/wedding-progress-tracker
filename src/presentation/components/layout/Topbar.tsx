@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@presentation/components/ui/Icon';
 import { Button } from '@presentation/components/ui/Button';
+import { IconButton } from '@presentation/components/ui/IconButton';
 import { NotificationsPanel } from '@presentation/components/NotificationsPanel';
 import { RoomPresence } from '@presentation/components/RoomPresence';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useRoom } from '@presentation/state/RoomStore';
 import { useNav } from '@presentation/state/NavStore';
+import { useUi } from '@presentation/state/UiStore';
 import { useToast } from '@presentation/components/ui/Toast';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { useOpenAdd } from '@presentation/hooks/useOpenAdd';
@@ -22,6 +24,7 @@ export function Topbar() {
   const { state } = usePlan();
   const { enabled, status, copyLink } = useRoom();
   const { page, search, setSearch } = useNav();
+  const { openNav } = useUi();
   const { money } = useFormat();
   const openAdd = useOpenAdd();
   const toast = useToast();
@@ -97,7 +100,13 @@ export function Topbar() {
   }
 
   return (
-    <header className="flex flex-none items-center gap-4 border-b border-line px-[26px] py-[22px] max-[860px]:p-4 print:hidden">
+    <header className="flex flex-none items-center gap-4 border-b border-line px-[26px] py-[22px] max-[860px]:gap-2.5 max-[860px]:p-4 print:hidden">
+      <IconButton
+        icon="menu"
+        label={t('nav.menu')}
+        onClick={openNav}
+        className="hidden h-10 w-10 max-[860px]:grid"
+      />
       <div className="min-w-0">
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
         <p className="mt-[3px] truncate text-[13px] text-muted max-[460px]:hidden">

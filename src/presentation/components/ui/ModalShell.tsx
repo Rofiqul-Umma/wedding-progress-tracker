@@ -27,7 +27,7 @@ export function ModalShell({
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
-    const bg = ['app-shell', 'mobile-nav']
+    const bg = ['app-shell']
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => !!el);
     bg.forEach((el) => el.setAttribute('inert', ''));

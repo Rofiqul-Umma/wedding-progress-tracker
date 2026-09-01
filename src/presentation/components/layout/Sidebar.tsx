@@ -21,7 +21,11 @@ export function useNavCounts(): Record<PageId, number> {
   };
 }
 
-export function Sidebar() {
+/**
+ * Navigation content shared by the desktop rail and the mobile drawer.
+ * `onNavigate` lets the drawer close itself after a selection.
+ */
+export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { t } = useTranslation();
   const { state } = usePlan();
   const { page, go } = useNav();
@@ -33,8 +37,17 @@ export function Sidebar() {
     '',
   );
 
+  const navTo = (id: PageId) => {
+    go(id);
+    onNavigate?.();
+  };
+  const toSettings = () => {
+    openSettings();
+    onNavigate?.();
+  };
+
   return (
-    <aside className="flex w-[232px] flex-none flex-col border-r border-line px-[18px] pb-5 pt-[26px] max-[860px]:hidden print:hidden">
+    <div className="flex h-full flex-col px-[18px] pb-5 pt-[26px]">
       <div className="px-2 pb-[26px] text-[20px] font-extrabold tracking-tight">
         EVER<b className="text-ink">MORE</b>
       </div>
@@ -46,7 +59,7 @@ export function Sidebar() {
             <button
               key={p.id}
               type="button"
-              onClick={() => go(p.id)}
+              onClick={() => navTo(p.id)}
               className={cn(
                 'flex w-full items-center gap-3 rounded-xl px-3.5 py-[11px] text-left text-sm font-semibold transition-colors duration-150 ease-planner',
                 active
@@ -75,7 +88,7 @@ export function Sidebar() {
         <div className="flex items-center gap-[11px] rounded-xl p-2">
           <button
             type="button"
-            onClick={openSettings}
+            onClick={toSettings}
             title={t('user.settingsTitle')}
             className="grid h-[34px] w-[34px] flex-none place-items-center rounded-full bg-ink text-sm font-bold text-white"
           >
@@ -88,13 +101,22 @@ export function Sidebar() {
         </div>
         <button
           type="button"
-          onClick={openSettings}
+          onClick={toSettings}
           className="flex w-full items-center gap-3 rounded-xl px-3.5 py-[11px] text-left text-sm font-semibold text-muted transition-colors hover:bg-panel hover:text-ink"
         >
           <Icon name="settings" />
           <span className="flex-1">{t('common.settings')}</span>
         </button>
       </div>
+    </div>
+  );
+}
+
+/** Fixed navigation rail shown on wide viewports. */
+export function Sidebar() {
+  return (
+    <aside className="w-[232px] flex-none border-r border-line max-[860px]:hidden print:hidden">
+      <SidebarContent />
     </aside>
   );
 }

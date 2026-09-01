@@ -119,6 +119,17 @@
 .fade-in {
   animation: fade 0.32s var(--ease-planner);
 }
+@keyframes drawerIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.drawer-in {
+  animation: drawerIn 0.26s var(--ease-planner);
+}
 @keyframes contactFlash {
   0% {
     box-shadow: 0 0 0 0 rgba(199, 242, 63, 0);
