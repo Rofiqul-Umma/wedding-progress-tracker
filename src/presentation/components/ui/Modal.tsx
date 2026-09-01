@@ -73,16 +73,18 @@ export function Modal({ form, onClose }: ModalProps) {
           }
         }}
       >
-        {form.fields.map((f) => (
-          <FormField
-            key={f.name}
-            field={f}
-            value={values[f.name] ?? ''}
-            checked={checks[f.name] ?? false}
-            onValue={(name, val) => setValues((s) => ({ ...s, [name]: val }))}
-            onCheck={(name, val) => setChecks((s) => ({ ...s, [name]: val }))}
-          />
-        ))}
+        {form.fields
+          .filter((f) => !f.showWhen || f.showWhen(values))
+          .map((f) => (
+            <FormField
+              key={f.name}
+              field={f}
+              value={values[f.name] ?? ''}
+              checked={checks[f.name] ?? false}
+              onValue={(name, val) => setValues((s) => ({ ...s, [name]: val }))}
+              onCheck={(name, val) => setChecks((s) => ({ ...s, [name]: val }))}
+            />
+          ))}
       </div>
       <div className="flex justify-end gap-2.5 px-6 pb-[22px] pt-3.5">
         <Button variant="ghost" onClick={onClose}>

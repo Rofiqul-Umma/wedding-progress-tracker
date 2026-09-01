@@ -47,6 +47,15 @@ export function useForms() {
         type: 'select',
         value: v?.status ?? 'inquiry',
         options: VENDOR_STATUSES.map((s) => ({ value: s, label: t(`status.vendor.${s}`) })),
+        half: true,
+      },
+      {
+        name: 'deposit',
+        label: t('forms.vendor.deposit'),
+        type: 'number',
+        value: v?.deposit,
+        half: true,
+        showWhen: (values) => values.status === 'deposit',
       },
     ];
     if (hasContacts) {
@@ -78,11 +87,14 @@ export function useForms() {
       fields,
       submit: (values) => {
         if (!values.name.trim()) return t('forms.vendor.errName');
+        const status = values.status as Vendor['status'];
         const data: Omit<Vendor, 'id'> = {
           name: values.name,
           category: values.category,
           cost: numOr(values.cost),
-          status: values.status as Vendor['status'],
+          status,
+          // Only a down-payment vendor carries a deposit amount.
+          deposit: status === 'deposit' ? numOr(values.deposit) : 0,
           contactId: hasContacts ? values.contactId : v?.contactId ?? '',
           contact: values.contact,
           phone: values.phone,

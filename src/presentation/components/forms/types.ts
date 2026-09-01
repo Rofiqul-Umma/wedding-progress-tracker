@@ -15,6 +15,9 @@ export interface FieldOption {
   label: string;
 }
 
+export type FormValues = Record<string, string>;
+export type FormChecks = Record<string, boolean>;
+
 export interface Field {
   name: string;
   label: string;
@@ -24,10 +27,13 @@ export interface Field {
   options?: FieldOption[];
   /** Render at half width so two fields share a row. */
   half?: boolean;
+  /**
+   * Optional predicate over the live form values: when it returns false the
+   * field is hidden (e.g. a down-payment amount that only applies to a certain
+   * status). Fields without a predicate are always shown.
+   */
+  showWhen?: (values: FormValues) => boolean;
 }
-
-export type FormValues = Record<string, string>;
-export type FormChecks = Record<string, boolean>;
 
 export interface FormDescriptor {
   eyebrow: string;

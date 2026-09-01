@@ -28,6 +28,7 @@ type VendorSort = 'cost-desc' | 'cost-asc' | 'name' | 'cat';
 
 const STATUS_CHIP: Record<VendorStatus, ChipVariant> = {
   paid: 'dark',
+  deposit: 'warn',
   booked: 'lime',
   inquiry: 'gray',
 };
@@ -82,12 +83,14 @@ export function VendorsPage() {
     all: state.vendors.length,
     inquiry: state.vendors.filter((v) => v.status === 'inquiry').length,
     booked: state.vendors.filter((v) => v.status === 'booked').length,
+    deposit: state.vendors.filter((v) => v.status === 'deposit').length,
     paid: state.vendors.filter((v) => v.status === 'paid').length,
   };
   const segments: Segment<VendorFilter>[] = [
     { value: 'all', label: t('common.all'), count: counts.all },
     { value: 'inquiry', label: t('status.vendor.inquiry'), count: counts.inquiry },
     { value: 'booked', label: t('status.vendor.booked'), count: counts.booked },
+    { value: 'deposit', label: t('status.vendor.deposit'), count: counts.deposit },
     { value: 'paid', label: t('status.vendor.paid'), count: counts.paid },
   ];
 
@@ -164,6 +167,11 @@ export function VendorsPage() {
                       {t(`status.vendor.${v.status}`)}
                     </Chip>
                   </div>
+                  {v.status === 'deposit' && (v.deposit ?? 0) > 0 && (
+                    <div className="mt-[5px] text-[12px] font-bold text-warn tnum">
+                      {t('vendors.depositPaid', { amount: money(v.deposit || 0) })}
+                    </div>
+                  )}
                 </div>
                 <RowActions
                   onEdit={() => openForm(vendorForm(v))}

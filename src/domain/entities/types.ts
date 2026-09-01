@@ -28,6 +28,8 @@ export interface Vendor {
   email: string;
   cost: number;
   status: VendorStatus;
+  /** Amount paid as a down payment (only meaningful when status is 'deposit'). */
+  deposit?: number;
   notes: string;
   /** Optional link to a Contact entity. */
   contactId?: string;

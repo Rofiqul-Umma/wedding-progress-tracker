@@ -1,9 +1,10 @@
 /** Vendor booking status. */
-export type VendorStatus = 'inquiry' | 'booked' | 'paid';
+export type VendorStatus = 'inquiry' | 'booked' | 'deposit' | 'paid';
 
 export const VENDOR_STATUSES: readonly VendorStatus[] = [
   'inquiry',
   'booked',
+  'deposit',
   'paid',
 ] as const;
 
