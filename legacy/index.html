@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Evermore — Wedding Planner</title>
+<meta name="description" content="Plan your wedding — timeline, vendors, budget, tasks, seserahan and contacts, all on your device." />
+<meta name="theme-color" content="#ffffff" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Evermore" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-25..0&display=block" rel="stylesheet" />
+<style>
+  /* ============================================================
+     Evermore — KEEPSGOAL-style planner
+     ============================================================ */
+  :root {
+    --bg:        #E8E8E4;
+    --app:       #FFFFFF;
+    --panel:     #F4F4F1;
+    --panel-2:   #EFEFEB;
+    --line:      #ECECE7;
+    --line-2:    #E4E4DE;
+
+    --ink:       #17181A;
+    --ink-2:     #2C2E31;
+    --muted:     #8B8E88;
+    --faint:     #B2B5AE;
+
+    --lime:      #C7F23F;
+    --lime-2:    #B7E634;
+    --lime-soft: #EAF9C0;
+    --lime-ink:  #3C4A0C;
+
+    --ok:   #2F9E44;  --ok-soft:  #E6F4E6;
+    --info: #3D74DA;  --info-soft:#E8EFFC;
+    --warn: #C98A2C;  --warn-soft:#FAF0D9;
+    --bad:  #D9564F;  --bad-soft: #FBE8E7;
+
+    --shadow-sm: 0 1px 2px rgba(20,22,20,.04);
+    --shadow-md: 0 10px 30px -14px rgba(20,22,20,.22);
+    --shadow-lg: 0 40px 80px -30px rgba(20,22,20,.45);
+    --radius: 16px;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background: var(--app); color: var(--ink);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  h1,h2,h3,h4 { margin: 0; font-weight: 700; letter-spacing: -0.018em; }
+  button { font-family: inherit; cursor: pointer; }
+  input, select, textarea { font-family: inherit; }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--lime); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  .msi {
+    font-family: 'Material Symbols Rounded'; font-weight: normal; font-style: normal;
+    font-size: 20px; line-height: 1; display: inline-flex; white-space: nowrap; direction: ltr; flex: none;
+    -webkit-font-smoothing: antialiased; user-select: none;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; vertical-align: middle;
+  }
+  .msi.fill { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
+
+  /* ---------- App shell ---------- */
+  .app {
+    width: 100%; height: 100vh; background: var(--app);
+    display: flex; overflow: hidden;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar { width: 232px; flex: none; border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 26px 18px 20px; }
+  .brand { font-size: 20px; font-weight: 800; letter-spacing: -.02em; padding: 0 8px 26px; }
+  .brand b { color: var(--ink); }
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav-link {
+    display: flex; align-items: center; gap: 12px; border: 0; background: transparent; width: 100%;
+    color: var(--muted); font-size: 14px; font-weight: 600; padding: 11px 14px; border-radius: 12px; text-align: left;
+    transition: background .16s var(--ease), color .16s var(--ease);
+  }
+  .nav-link .msi { font-size: 20px; }
+  .nav-link .nl-label { flex: 1; }
+  .nav-link:hover { background: var(--panel); color: var(--ink); }
+  .nav-link.active { background: var(--lime); color: var(--ink); font-weight: 700; box-shadow: var(--shadow-sm); }
+  .nav-link .nb { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--panel); padding: 1px 8px; border-radius: 999px; }
+  .nav-link.active .nb { color: var(--lime-ink); background: rgba(0,0,0,.08); }
+
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-top: 16px; }
+  .user { display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 12px; }
+  .avatar-me { width: 34px; height: 34px; border-radius: 50%; flex: none; border: 0; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 700; font-size: 14px; }
+  .user .u-name { font-size: 13.5px; font-weight: 700; }
+  .user .u-role { font-size: 11.5px; color: var(--faint); }
+
+  /* ---------- Main ---------- */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar { display: flex; align-items: center; gap: 16px; padding: 22px 26px; border-bottom: 1px solid var(--line); flex: none; }
+  .tb-title { min-width: 0; }
+  .tb-title h1 { font-size: 24px; }
+  .tb-title p { margin: 3px 0 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tb-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .search { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid transparent; border-radius: 12px; padding: 9px 13px; width: 220px; transition: border-color .15s, background .15s; }
+  .search:focus-within { border-color: var(--ink); background: #fff; }
+  .search .msi { font-size: 19px; color: var(--faint); }
+  .search input { border: 0; background: transparent; outline: none; font-size: 13.5px; width: 100%; }
+  .ic-btn { width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--app); display: grid; place-items: center; color: var(--muted); position: relative; transition: background .15s, color .15s; }
+  .ic-btn:hover { background: var(--panel); color: var(--ink); }
+  .ic-btn.sm { width: 32px; height: 32px; border-radius: 9px; }
+  .ic-btn .msi { font-size: 20px; }
+  .ic-btn.sm .msi { font-size: 18px; }
+  .badge-dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--bad); border: 2px solid #fff; }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-2); background: var(--app); color: var(--ink); padding: 11px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; transition: transform .12s var(--ease), background .18s, box-shadow .18s, border-color .18s; }
+  .btn:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn .msi { font-size: 19px; }
+  .btn-primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .btn-primary:hover { background: #000; }
+  .btn-lime { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+  .btn-lime:hover { background: var(--lime-2); }
+  .btn-ghost { background: transparent; }
+  .btn-ghost:hover { background: var(--panel); box-shadow: none; transform: none; }
+  .btn-sm { padding: 9px 13px; font-size: 13px; }
+
+  /* ---------- Work area ---------- */
+  .work { flex: 1; min-height: 0; display: flex; }
+  .center { flex: 1; min-width: 0; overflow: auto; padding: 24px 26px 40px; }
+  .detail { width: 306px; flex: none; border-left: 1px solid var(--line); overflow: auto; padding: 24px 22px 32px; }
+
+  /* ---------- Overview cards ---------- */
+  .ov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); gap: 14px; margin-bottom: 22px; }
+  .ov-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--app); display: flex; flex-direction: column; gap: 9px; box-shadow: var(--shadow-sm); }
+  .ov-card.hero { background: var(--lime); border-color: var(--lime); }
+  .ov-top { display: flex; align-items: center; gap: 9px; }
+  .ov-ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--panel); color: var(--ink); }
+  .ov-ic .msi { font-size: 18px; }
+  .ov-card.hero .ov-ic { background: rgba(0,0,0,.10); color: var(--lime-ink); }
+  .ov-l { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .ov-card.hero .ov-l { color: var(--lime-ink); }
+  .ov-val { font-size: 26px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+  .ov-bar { height: 7px; border-radius: 999px; background: var(--panel); overflow: hidden; }
+  .ov-card.hero .ov-bar { background: rgba(0,0,0,.12); }
+  .ov-bar > span { display: block; height: 100%; border-radius: 999px; transition: width .6s var(--ease); }
+  .ov-sub { font-size: 12px; color: var(--faint); font-weight: 600; margin-top: auto; }
+  .ov-card.hero .ov-sub { color: var(--lime-ink); }
+
+  /* ---------- Stat strip ---------- */
+  .strip { display: flex; flex-wrap: wrap; gap: 14px 40px; padding-bottom: 18px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .st { display: flex; flex-direction: column; gap: 4px; min-width: 90px; }
+  .st-l { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .st-v { font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+
+  /* ---------- List head + timeline rows ---------- */
+  .lst-head { display: grid; grid-template-columns: 96px 1fr 128px 118px; gap: 12px; padding: 0 14px; margin: 18px 0 6px; }
+  .lst-head span { font-size: 12px; color: var(--faint); font-weight: 600; }
+  .grp-title { font-size: 16px; font-weight: 700; margin: 16px 0 4px; }
+  .lst-row { display: grid; grid-template-columns: 96px 1fr 128px 118px; gap: 12px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0; padding: 12px 14px; border-radius: 14px; transition: background .15s var(--ease); }
+  .lst-row:hover { background: var(--panel); }
+  .lst-row.sel { background: var(--ink); }
+  .lc-time { font-size: 12.5px; color: var(--faint); font-weight: 600; }
+  .lc-main { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .badge { width: 36px; height: 36px; border-radius: 11px; flex: none; display: grid; place-items: center; }
+  .badge .msi { font-size: 19px; }
+  .lc-txt { min-width: 0; display: block; }
+  .lc-name { display: block; font-size: 14.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lc-sub { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lc-due, .lc-target { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lst-row.sel .lc-name { color: #fff; }
+  .lst-row.sel .lc-sub, .lst-row.sel .lc-time, .lst-row.sel .lc-due, .lst-row.sel .lc-target { color: rgba(255,255,255,.66); }
+
+  /* ---------- Generic rows / cards (vendors, budget, tasks, contacts) ---------- */
+  .card { background: var(--app); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .card-pad { padding: 20px; }
+  .card-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px 10px; }
+  .card-head h3 { font-size: 15px; }
+  .card-head .cnt { font-size: 13px; color: var(--faint); font-weight: 700; }
+
+  .row { display: flex; align-items: center; gap: 13px; padding: 13px 18px; border-top: 1px solid var(--line); }
+  .row:first-child { border-top: 0; }
+  .row:hover { background: var(--panel); }
+  .avatar { width: 40px; height: 40px; border-radius: 11px; flex: none; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+  .avatar .msi { font-size: 19px; }
+  .grow { flex: 1; min-width: 0; }
+  .r-title { font-weight: 700; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .r-meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .r-right { text-align: right; flex: none; }
+  .amt { font-weight: 800; font-size: 15px; }
+  .r-sub { font-size: 12px; color: var(--faint); margin-top: 2px; }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 4px 11px; border-radius: 999px; white-space: nowrap; }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .chip-lime { background: var(--lime-soft); color: var(--lime-ink); }
+  .chip-dark { background: var(--ink); color: #fff; }
+  .chip-gray { background: var(--panel); color: var(--muted); }
+  .chip-ok   { background: var(--ok-soft);   color: var(--ok); }
+  .chip-info { background: var(--info-soft); color: var(--info); }
+  .chip-warn { background: var(--warn-soft); color: var(--warn); }
+  .chip-bad  { background: var(--bad-soft);  color: var(--bad); }
+
+  .ses-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .list-controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin: 18px 0 6px; }
+  .sort-sel { display: inline-flex; align-items: center; gap: 8px; }
+  .sort-sel label { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .sort-sel select { border: 1px solid var(--line-2); background: var(--app); border-radius: 10px; padding: 8px 11px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; transition: border-color .15s; }
+  .sort-sel select:focus { outline: none; border-color: var(--ink); }
+  .segmented { display: inline-flex; gap: 4px; padding: 4px; background: var(--panel); border-radius: 12px; }
+  .seg { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border: 0; background: transparent; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .15s var(--ease); }
+  .seg:hover { color: var(--ink); }
+  .seg.on { background: var(--app); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .seg-c { min-width: 18px; height: 18px; padding: 0 5px; display: inline-grid; place-items: center; border-radius: 999px; background: var(--panel-2); color: var(--muted); font-size: 11px; font-weight: 700; }
+  .seg.on .seg-c { background: var(--lime-soft); color: var(--lime-ink); }
+  .prog-inline { display: flex; align-items: center; gap: 12px; margin: 4px 0 8px; flex: 0 1 300px; min-width: 180px; }
+  .prog-inline .bar { flex: 1; height: 9px; border-radius: 999px; background: var(--panel); overflow: hidden; }
+  .prog-inline .bar span { display: block; height: 100%; border-radius: 999px; transition: width .4s var(--ease); }
+  .prog-pct { font-size: 13px; font-weight: 700; color: var(--ink); flex: none; }
+  .grp-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--panel); color: var(--muted); font-size: 11px; font-weight: 700; vertical-align: middle; margin-left: 4px; }
+  .ses-status { border: 0; background: transparent; padding: 0; cursor: pointer; border-radius: 999px; transition: transform .12s var(--ease); }
+  .ses-status:hover { transform: translateY(-1px); }
+  .ses-status:hover .chip { box-shadow: 0 2px 6px rgba(0,0,0,.1); }
+
+  .icon-btn { width: 32px; height: 32px; display: grid; place-items: center; flex: none; border-radius: 9px; border: 0; background: transparent; color: var(--faint); transition: background .15s, color .15s; }
+  .icon-btn:hover { background: var(--panel-2); color: var(--ink); }
+  .icon-btn.danger:hover { background: var(--bad-soft); color: var(--bad); }
+  .icon-btn .msi { font-size: 18px; }
+  .row-actions { display: flex; gap: 2px; opacity: 0; transition: opacity .15s; }
+  .row:hover .row-actions, .contact:hover .row-actions { opacity: 1; }
+
+  .check { width: 22px; height: 22px; padding: 0; font: inherit; border-radius: 7px; border: 2px solid var(--line-2); flex: none; display: grid; place-items: center; background: var(--app); color: transparent; cursor: pointer; transition: all .16s var(--ease); }
+  .check:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .check:hover { border-color: var(--ink); }
+  .check.done { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+  .check .msi { font-size: 16px; }
+  .task-done .r-title { color: var(--faint); text-decoration: line-through; }
+  .due { font-size: 12px; font-weight: 700; }
+  .due.soon { color: var(--warn); } .due.over { color: var(--bad); } .due.ok { color: var(--faint); } .due.done { color: var(--ok); }
+
+  .cols { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; align-items: start; }
+  .bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .bar > span { display: block; height: 100%; border-radius: 999px; transition: width .6s var(--ease); }
+  .catrow { margin-bottom: 15px; }
+  .catrow .t { display: flex; align-items: baseline; gap: 8px; margin-bottom: 7px; }
+  .catrow .t .nm { font-weight: 700; font-size: 13.5px; }
+  .catrow .t .vv { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .cat-over { font-size: 11.5px; color: var(--bad); font-weight: 700; margin-top: 5px; }
+  .cat-under { font-size: 11.5px; color: var(--ok); font-weight: 600; margin-top: 5px; }
+
+  .contacts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .contact { padding: 18px; position: relative; }
+  .contact .top { display: flex; align-items: center; gap: 12px; }
+  .contact .nm { font-weight: 700; font-size: 15px; }
+  .contact .rl { font-size: 12px; color: var(--lime-ink); font-weight: 700; margin-top: 1px; }
+  .contact .ln { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--muted); margin-top: 9px; }
+  .contact .ln a:hover { color: var(--ink); }
+  .contact .ln .msi { font-size: 17px; color: var(--faint); }
+  .contact .note { font-size: 12.5px; color: var(--faint); margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+  .contact .row-actions { position: absolute; top: 12px; right: 10px; }
+  .contact.flash { animation: contactFlash 1.8s var(--ease); }
+  @keyframes contactFlash { 0%{box-shadow:0 0 0 0 rgba(199,242,63,0);} 18%{box-shadow:0 0 0 3px var(--lime);} 78%{box-shadow:0 0 0 3px var(--lime);} 100%{box-shadow:0 0 0 0 rgba(199,242,63,0);} }
+  .link-contact { display: inline-flex; align-items: center; gap: 3px; border: 0; background: none; padding: 0; font: inherit; font-size: 12.5px; color: var(--info); font-weight: 700; cursor: pointer; vertical-align: baseline; }
+  .link-contact .msi { font-size: 15px; }
+  .link-contact:hover { text-decoration: underline; }
+
+  .empty { text-align: center; padding: 46px 24px; color: var(--faint); }
+  .empty .ei { width: 54px; height: 54px; border-radius: 16px; background: var(--lime-soft); color: var(--lime-ink); display: grid; place-items: center; margin: 0 auto 14px; }
+  .empty .ei .msi { font-size: 25px; }
+  .empty h3 { font-size: 16px; color: var(--muted); }
+  .empty p { font-size: 14px; margin: 6px 0 16px; }
+  .empty-row { text-align: center; color: var(--faint); font-size: 13.5px; padding: 22px 14px; }
+
+  /* ---------- Detail panel ---------- */
+  .dt-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .dt-head h3 { font-size: 18px; }
+  .dt-field { display: grid; gap: 5px; margin-bottom: 16px; }
+  .dt-l { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .dt-v { font-size: 15px; font-weight: 700; }
+  .dt-v.sm { font-size: 13.5px; font-weight: 600; }
+  .dt-namerow { display: flex; align-items: center; gap: 8px; }
+  .dt-namerow .dt-v { flex: 1; }
+  .dt-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .dt-prog { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 4px; }
+  .dt-pname { font-size: 16px; font-weight: 700; margin: 10px 0 10px; }
+  .dt-badges { display: flex; gap: 8px; margin-bottom: 14px; }
+  .dt-count { display: flex; align-items: baseline; gap: 9px; margin: 8px 0 2px; }
+  .dt-count-num { font-size: 42px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+  .dt-count-lbl { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .dt-count.done .dt-count-num { color: var(--ok); }
+  .dt-count.over .dt-count-num { color: var(--bad); }
+  .dt-count.soon .dt-count-num { color: var(--warn); }
+  .dt-note { font-size: 12.5px; color: var(--faint); margin: 11px 0 0; }
+
+  /* ---------- Modal ---------- */
+  .overlay { position: fixed; inset: 0; background: rgba(20,22,20,.42); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 20px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+  .modal { background: var(--app); border-radius: 20px; width: min(520px,100%); box-shadow: var(--shadow-lg); max-height: 90vh; overflow: auto; transform: translateY(12px) scale(.98); transition: transform .24s var(--ease); }
+  .overlay.open .modal { transform: none; }
+  .modal-lg { width: min(560px, 100%); }
+  .modal-head { padding: 22px 24px 4px; }
+  .modal-head .eyebrow { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--lime-ink); font-weight: 700; }
+  .modal-head h3 { font-size: 22px; margin-top: 5px; }
+  .modal-body { padding: 16px 24px 8px; display: grid; gap: 14px; }
+  .modal-foot { padding: 14px 24px 22px; display: flex; gap: 10px; justify-content: flex-end; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .field input, .field select, .field textarea { width: 100%; padding: 11px 13px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); color: var(--ink); font-size: 14.5px; transition: border-color .15s, box-shadow .15s, background .15s; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(23,24,26,.08); background: #fff; }
+  .field textarea { resize: vertical; min-height: 74px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .set-sec { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px; display: grid; gap: 12px; }
+  .set-sec:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+  .set-title { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .set-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .set-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .set-note { font-size: 12px; color: var(--faint); margin: 2px 0 0; }
+  .btn-danger-ghost { color: var(--bad); border-color: #F0D2D0; background: transparent; }
+  .btn-danger-ghost:hover { background: var(--bad-soft); box-shadow: none; }
+
+  /* ---------- Notifications ---------- */
+  .notif-wrap { position: relative; }
+  .notif-panel { position: absolute; top: 50px; right: 0; width: 328px; background: var(--app); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-lg); z-index: 60; overflow: hidden; }
+  .notif-panel[hidden] { display: none; }
+  .np-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--line); }
+  .np-head span { font-size: 12px; color: var(--muted); background: var(--panel); padding: 2px 9px; border-radius: 999px; }
+  .np-item { display: flex; gap: 11px; align-items: center; width: 100%; text-align: left; background: none; border: 0; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .np-item:last-child { border-bottom: 0; }
+  .np-item:hover { background: var(--panel); }
+  .np-ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none; }
+  .np-ic .msi { font-size: 18px; }
+  .np-ic.bad { background: var(--bad-soft); color: var(--bad); }
+  .np-ic.warn { background: var(--warn-soft); color: var(--warn); }
+  .np-ic.info { background: var(--info-soft); color: var(--info); }
+  .np-t { font-weight: 700; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .np-m { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .np-empty { padding: 28px 16px; text-align: center; color: var(--faint); font-size: 13.5px; }
+
+  /* ---------- Toast ---------- */
+  .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg); z-index: 200; opacity: 0; pointer-events: none; transition: all .28s var(--ease); display: flex; align-items: center; gap: 10px; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast .msi { font-size: 18px; color: var(--lime); }
+  .toast-action { border: 0; background: var(--lime); color: var(--ink); font-weight: 700; font-size: 13px; padding: 6px 13px; border-radius: 9px; margin-left: 6px; transition: background .15s; }
+  .toast-action:hover { background: var(--lime-2); }
+  .toast-action[hidden] { display: none; }
+
+  /* ---------- Mobile ---------- */
+  .mobile-nav { display: none; }
+  @media (max-width: 1040px) {
+    .detail { display: none; }
+  }
+  @media (max-width: 860px) {
+    body { padding: 0; }
+    .app { height: 100vh; border-radius: 0; }
+    .sidebar { display: none; }
+    .lst-head { grid-template-columns: 70px 1fr 88px; }
+    .lst-head span:nth-child(4), .lc-target { display: none; }
+    .lst-row { grid-template-columns: 70px 1fr 88px; }
+    .center { padding: 18px 16px 96px; }
+    .topbar { padding: 16px; }
+    .search { width: 150px; }
+    .cols { grid-template-columns: 1fr; }
+    .grid2 { grid-template-columns: 1fr; }
+    .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; background: rgba(255,255,255,.97); backdrop-filter: blur(10px); padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+    .mobile-nav button { flex: 1; background: none; border: 0; color: var(--faint); display: grid; justify-items: center; gap: 3px; font-size: 10px; font-weight: 700; padding: 6px 2px; border-radius: 10px; }
+    .mobile-nav button.active { color: var(--ink); }
+    .mobile-nav button.active .msi { color: var(--lime-2); }
+    .mobile-nav button .msi { font-size: 23px; }
+  }
+  @media (max-width: 460px) { .tb-title p { display: none; } .search { display: none; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  .fade-in { animation: fade .32s var(--ease); }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">EVER<b>MORE</b></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="user">
+        <button class="avatar-me" id="avatarMe" title="Settings &amp; profile">A</button>
+        <div class="grow"><div class="u-name" id="userName">Amara Elma</div><div class="u-role">Planning together</div></div>
+      </div>
+      <button class="nav-link" id="settingsBtn"><span class="msi">settings</span><span class="nl-label">Settings</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="tb-title"><h1 id="pageTitle">Wedding Timeline</h1><p id="pageSub"></p></div>
+      <div class="tb-actions">
+        <label class="search"><span class="msi">search</span><input id="search" type="search" placeholder="Search" aria-label="Search this page" /></label>
+        <div class="notif-wrap">
+          <button class="ic-btn" id="notifBtn" title="Notifications"><span class="msi">notifications</span><span class="badge-dot" id="notifDot" hidden></span></button>
+          <div class="notif-panel" id="notifPanel" hidden></div>
+        </div>
+        <button class="btn btn-primary" id="addBtn"><span class="msi">add</span><span id="addLabel">Add task</span></button>
+      </div>
+    </header>
+    <div class="work">
+      <section class="center" id="view"></section>
+      <aside class="detail" id="detail"></aside>
+    </div>
+  </main>
+</div>
+
+<nav class="mobile-nav" id="mobileNav"></nav>
+
+<div class="overlay" id="overlay" inert>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal-head"><div class="eyebrow" id="mEyebrow">New</div><h3 id="mTitle">Title</h3></div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="mCancel">Cancel</button>
+      <button class="btn btn-primary" id="mSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="setOverlay" inert>
+  <div class="modal modal-lg" role="dialog" aria-modal="true" aria-label="Settings">
+    <div class="modal-head"><div class="eyebrow">Settings</div><h3>Preferences &amp; details</h3></div>
+    <div class="modal-body" id="setBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="setClose">Close</button>
+      <button class="btn btn-primary" id="setSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"><span class="msi" id="toastIcon">check_circle</span><span id="toastMsg"></span><button class="toast-action" id="toastAction" hidden>Undo</button></div>
+
+<script>
+/* =====================================================================
+   Evermore — state, persistence, rendering
+   ===================================================================== */
+const $ = (s, r=document) => r.querySelector(s);
+const CURRENCIES = [
+  { code:'USD', label:'US Dollar ($)' }, { code:'EUR', label:'Euro (€)' },
+  { code:'GBP', label:'British Pound (£)' }, { code:'CAD', label:'Canadian Dollar (C$)' },
+  { code:'AUD', label:'Australian Dollar (A$)' }, { code:'SGD', label:'Singapore Dollar (S$)' },
+  { code:'INR', label:'Indian Rupee (₹)' }, { code:'JPY', label:'Japanese Yen (¥)' },
+  { code:'IDR', label:'Indonesian Rupiah (Rp)' },
+];
+function money(n){
+  const cur = (state && state.settings && state.settings.currency) || 'USD';
+  try { return new Intl.NumberFormat('en-US', { style:'currency', currency:cur, maximumFractionDigits:0 }).format(Math.round(+n||0)); }
+  catch(e){ return '$' + Math.round(+n||0).toLocaleString('en-US'); }
+}
+const uid = () => Math.random().toString(36).slice(2, 9);
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const I = (name, cls='') => `<span class="msi ${cls}">${name}</span>`;
+function nowTime(){ try { return new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); } catch(e){ return '09:05 AM'; } }
+const STORE = 'evermore.v2';
+
+const ICON = { dashboard:'timeline', vendors:'storefront', budget:'account_balance_wallet', tasks:'checklist', seserahan:'redeem', contacts:'contacts' };
+const CAT_ICON = { Catering:'restaurant', Attire:'checkroom', Venue:'location_on', Stationery:'mail', Planning:'event_note', Music:'music_note', Photography:'photo_camera', Florals:'local_florist', Property:'home', Business:'work',
+  Ibadah:'auto_stories', Kecantikan:'spa', Busana:'checkroom', Makanan:'lunch_dining', Aksesoris:'diamond' };
+const iconFor = c => CAT_ICON[c] || 'flag';
+
+function seed() {
+  const yr = new Date().getFullYear() + 1;
+  const d = m => `${yr}-${String(m).padStart(2,'0')}`;
+  return {
+    settings: { currency: 'USD' },
+    wedding: { p1: 'Amara', p2: 'Julian', date: `${yr}-09-14`, venue: 'The Ivy Barn, Sonoma', budget: 42000 },
+    vendors: [
+      { id: uid(), name: 'The Ivy Barn', category: 'Venue', contact: 'Reneé Adler', phone: '(707) 555-0182', email: 'events@ivybarn.co', cost: 14500, status: 'paid', notes: 'Includes tables, chairs, and 11pm curfew.' },
+      { id: uid(), name: 'Wildflower & Vine', category: 'Florals', contact: 'Mina Okafor', phone: '(415) 555-2231', email: 'hello@wildflowervine.com', cost: 3800, status: 'booked', notes: 'Seasonal dahlias + ranunculus.' },
+      { id: uid(), name: 'Golden Hour Films', category: 'Photography', contact: 'Theo Marsh', phone: '(510) 555-7744', email: 'theo@goldenhourfilms.com', cost: 5200, status: 'booked', notes: '8 hrs coverage + engagement session.' },
+      { id: uid(), name: 'Copper Spoon Catering', category: 'Catering', contact: 'Dev Patel', phone: '(707) 555-9910', email: 'events@copperspoon.com', cost: 9600, status: 'inquiry', notes: 'Tasting scheduled. Family-style menu.' },
+      { id: uid(), name: 'Neon Meadow DJ', category: 'Music', contact: 'Sam Rivera', phone: '(408) 555-3320', email: 'book@neonmeadow.dj', cost: 2200, status: 'booked', notes: 'Ceremony + reception.' },
+    ],
+    budget: [
+      { id: uid(), category: 'Venue', item: 'Ivy Barn rental', estimated: 14500, actual: 14500, paid: true },
+      { id: uid(), category: 'Catering', item: 'Dinner + service', estimated: 10000, actual: 9600, paid: false },
+      { id: uid(), category: 'Photography', item: 'Golden Hour Films', estimated: 5000, actual: 5200, paid: false },
+      { id: uid(), category: 'Florals', item: 'Wildflower & Vine', estimated: 4000, actual: 3800, paid: false },
+      { id: uid(), category: 'Attire', item: 'Dress + suit + alterations', estimated: 3800, actual: 3400, paid: true },
+      { id: uid(), category: 'Music', item: 'Neon Meadow DJ', estimated: 2200, actual: 2200, paid: false },
+      { id: uid(), category: 'Stationery', item: 'Invites + signage', estimated: 1200, actual: 950, paid: true },
+      { id: uid(), category: 'Cake', item: 'Three-tier + tasting', estimated: 900, actual: 0, paid: false },
+    ],
+    tasks: [
+      { id: uid(), title: 'Send save-the-dates', due: `${d(3)}-15`, done: true,  cat: 'Stationery', created: '09:05 AM' },
+      { id: uid(), title: 'Book catering tasting', due: `${d(4)}-02`, done: false, cat: 'Catering',   created: '10:20 AM' },
+      { id: uid(), title: 'Order wedding bands', due: `${d(4)}-20`, done: false, cat: 'Attire',     created: '08:45 AM' },
+      { id: uid(), title: 'Finalize guest list', due: `${d(5)}-10`, done: false, cat: 'Planning',   created: '11:30 AM' },
+      { id: uid(), title: 'Send formal invitations', due: `${d(6)}-01`, done: false, cat: 'Stationery', created: '02:10 PM' },
+      { id: uid(), title: 'First dress fitting', due: `${d(7)}-12`, done: false, cat: 'Attire',     created: '09:50 AM' },
+      { id: uid(), title: 'Confirm final headcount', due: `${d(8)}-14`, done: false, cat: 'Venue',   created: '04:15 PM' },
+    ],
+    seserahan: [
+      { id: uid(), name: 'Seperangkat alat sholat', category: 'Ibadah', qty: 1, cost: 0, status: 'finished', notes: 'Mukena, sajadah & Al-Qur’an' },
+      { id: uid(), name: 'Kosmetik & skincare', category: 'Kecantikan', qty: 1, cost: 320, status: 'onProgress', notes: 'Full make-up + skincare set' },
+      { id: uid(), name: 'Sepatu & sandal', category: 'Busana', qty: 2, cost: 180, status: 'pending', notes: '1 heels, 1 flat' },
+      { id: uid(), name: 'Tas tangan', category: 'Aksesoris', qty: 1, cost: 140, status: 'finished', notes: 'Hand bag for daily use' },
+      { id: uid(), name: 'Kebaya & batik', category: 'Busana', qty: 2, cost: 260, status: 'onProgress', notes: 'For the akad & reception' },
+      { id: uid(), name: 'Parfum', category: 'Kecantikan', qty: 1, cost: 90, status: 'pending', notes: '' },
+      { id: uid(), name: 'Buah-buahan segar', category: 'Makanan', qty: 1, cost: 40, status: 'pending', notes: 'Seasonal fruit arrangement' },
+      { id: uid(), name: 'Perhiasan (cincin & kalung)', category: 'Aksesoris', qty: 1, cost: 0, status: 'pending', notes: 'Handled by the family' },
+      { id: uid(), name: 'Kue tradisional', category: 'Makanan', qty: 1, cost: 55, status: 'finished', notes: 'Assorted traditional sweets' },
+    ],
+    contacts: [
+      { id: uid(), name: 'Reneé Adler', role: 'Venue Coordinator', phone: '(707) 555-0182', email: 'renee@ivybarn.co', notes: 'Best reached mornings. Handles day-of logistics.' },
+      { id: uid(), name: 'Pastor Elena Cruz', role: 'Officiant', phone: '(707) 555-6621', email: 'elena.cruz@gracechapel.org', notes: 'Rehearsal the evening before at 5pm.' },
+      { id: uid(), name: 'Mom (Diane)', role: 'Family / Helper', phone: '(707) 555-0043', email: 'diane.h@email.com', notes: 'Coordinating the rehearsal dinner.' },
+    ],
+  };
+}
+
+let state = load();
+function load() { try { const raw = localStorage.getItem(STORE); if (raw) return migrate(JSON.parse(raw)); } catch (e) {} const s = seed(); save(s); return s; }
+function save(s = state) { try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} }
+function migrate(s) {
+  s = s || {};
+  s.settings = s.settings || {};
+  if (!s.settings.currency) s.settings.currency = 'USD';
+  s.wedding = s.wedding || {};
+  ['vendors','budget','tasks','seserahan','contacts'].forEach(k => { if (!Array.isArray(s[k])) s[k] = []; });
+  return s;
+}
+
+/* ---- derived ---- */
+const CAT_COLORS = ['#2F9E44','#3D74DA','#C98A2C','#D9564F','#6B5B95','#12876A','#B4657A','#4E7CA1'];
+function catColor(name) { let h = 0; for (const c of (name||'')) h = (h*31 + c.charCodeAt(0)) % CAT_COLORS.length; return CAT_COLORS[h]; }
+function daysUntil(dateStr) { if (!dateStr) return null; const t = new Date(dateStr+'T00:00:00'); const n = new Date(); n.setHours(0,0,0,0); return Math.round((t-n)/86400000); }
+function fmtDate(s, o={month:'short',day:'numeric',year:'numeric'}) { return s ? new Date(s+'T00:00:00').toLocaleDateString('en-US', o) : ''; }
+const spent = () => state.budget.reduce((a,b)=>a+(+b.actual||0),0);
+const totalBudget = () => +state.wedding.budget || 0;
+const vendorsTotal = () => state.vendors.reduce((a,v)=>a+(+v.cost||0),0);
+const vendorsBooked = () => state.vendors.filter(v => v.status !== 'inquiry').length;
+const tasksDone = () => state.tasks.filter(t => t.done).length;
+const openTasks = () => state.tasks.filter(t => !t.done).length;
+const sesDone = () => state.seserahan.filter(i => i.status === 'finished').length;
+const sesOpen = () => state.seserahan.filter(i => i.status !== 'finished').length;
+const SES_ORDER = ['pending','onProgress','finished'];
+const SES_STATUS = { pending:['Pending','chip-gray'], onProgress:['On Progress','chip-warn'], finished:['Finished','chip-lime'] };
+const SES_LABELS = { pending:'Pending', onProgress:'On Progress', finished:'Finished' };
+
+/* =====================================================================
+   Navigation
+   ===================================================================== */
+const PAGES = [
+  { id:'dashboard', label:'Goal Timeline', icon:ICON.dashboard },
+  { id:'vendors',   label:'Vendors',   icon:ICON.vendors },
+  { id:'budget',    label:'Budget',    icon:ICON.budget },
+  { id:'tasks',     label:'Tasks',     icon:ICON.tasks },
+  { id:'seserahan', label:'Seserahan', icon:ICON.seserahan },
+  { id:'contacts',  label:'Contacts',  icon:ICON.contacts },
+];
+let current = 'dashboard';
+let selectedTaskId = null;
+let seserahanFilter = 'all';
+let vendorFilter = 'all', vendorSort = 'cost-desc';
+let budgetFilter = 'all', budgetSort = 'amount-desc';
+let highlightContactId = null;
+const VENDOR_SORTS = [['cost-desc','Cost: high → low'],['cost-asc','Cost: low → high'],['name','Name A → Z'],['cat','Category']];
+const BUDGET_SORTS = [['amount-desc','Amount: high → low'],['amount-asc','Amount: low → high'],['name','Name A → Z'],['cat','Category']];
+function sortOpts(opts, cur){ return opts.map(([v,l])=>`<option value="${v}" ${v===cur?'selected':''}>${l}</option>`).join(''); }
+function vendorCmp(k){ return { 'cost-desc':(a,b)=>(+b.cost||0)-(+a.cost||0), 'cost-asc':(a,b)=>(+a.cost||0)-(+b.cost||0), 'name':(a,b)=>(a.name||'').localeCompare(b.name||''), 'cat':(a,b)=>(a.category||'').localeCompare(b.category||'') }[k] || (()=>0); }
+function budgetCmp(k){ return { 'amount-desc':(a,b)=>(+b.actual||0)-(+a.actual||0), 'amount-asc':(a,b)=>(+a.actual||0)-(+b.actual||0), 'name':(a,b)=>(a.item||'').localeCompare(b.item||''), 'cat':(a,b)=>(a.category||'').localeCompare(b.category||'') }[k] || (()=>0); }
+
+function renderNav() {
+  const counts = { vendors: state.vendors.length, budget: state.budget.length, tasks: openTasks(), seserahan: sesOpen(), contacts: state.contacts.length };
+  $('#nav').innerHTML = PAGES.map(p => `
+    <button class="nav-link ${p.id===current?'active':''}" data-page="${p.id}">${I(p.icon)}<span class="nl-label">${p.label}</span>${counts[p.id]?`<span class="nb">${counts[p.id]}</span>`:''}</button>`).join('');
+  $('#mobileNav').innerHTML = PAGES.map(p => `
+    <button class="${p.id===current?'active':''}" data-page="${p.id}">${I(p.icon)}${p.label.replace('Goal ','')}</button>`).join('');
+  document.querySelectorAll('[data-page]').forEach(b => b.onclick = () => go(b.dataset.page));
+}
+function go(page) { current = page; renderNav(); render(); const c = $('#view'); if (c) c.scrollTop = 0; if ($('#search')) $('#search').value=''; }
+
+/* =====================================================================
+   Render
+   ===================================================================== */
+function setTopbar() {
+  const w = state.wedding;
+  const map = {
+    dashboard: ['Goal Timeline', `${greeting()}, ${esc(w.p1)} &amp; ${esc(w.p2)}`, 'Add task'],
+    vendors:   ['Vendors', `${state.vendors.length} vendors · ${money(vendorsTotal())} committed`, 'Add vendor'],
+    budget:    ['Budget', 'Where every dollar goes', 'Add expense'],
+    tasks:     ['Tasks', `${openTasks()} open of ${state.tasks.length}`, 'Add task'],
+    seserahan: ['Seserahan', `${sesDone()} of ${state.seserahan.length} trays prepared`, 'Add item'],
+    contacts:  ['Contacts', `${state.contacts.length} important people`, 'Add contact'],
+  };
+  const [t,s,a] = map[current] || map.dashboard;
+  $('#pageTitle').innerHTML = t; $('#pageSub').innerHTML = s; $('#addLabel').textContent = a;
+}
+function render() {
+  setTopbar();
+  const v = $('#view'); v.className = 'center fade-in';
+  const d = $('#detail');
+  if (current==='dashboard') {
+    if (!state.tasks.some(t=>t.id===selectedTaskId)) { const p = state.tasks.find(t=>!t.done) || state.tasks[0]; selectedTaskId = p ? p.id : null; }
+    v.innerHTML = renderDashboard();
+    d.style.display = ''; d.innerHTML = renderDetail();
+  } else {
+    d.style.display = 'none'; d.innerHTML = '';
+    if (current==='vendors') v.innerHTML = renderVendors();
+    else if (current==='budget') v.innerHTML = renderBudget();
+    else if (current==='tasks') v.innerHTML = renderTasks();
+    else if (current==='seserahan') v.innerHTML = renderSeserahan();
+    else if (current==='contacts') v.innerHTML = renderContacts();
+  }
+  $('#avatarMe').textContent = (state.wedding.p1||'A')[0];
+  $('#userName').textContent = `${state.wedding.p1||'Partner'} & ${state.wedding.p2||''}`.replace(/ & $/,'');
+  bindView(); bindDetail(); renderNotifs();
+}
+function greeting() { const h = new Date().getHours(); return h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening'; }
+function statusChip(s) { const map = { paid:['chip-dark','Paid'], booked:['chip-lime','Booked'], inquiry:['chip-gray','Inquiry'] }; const [cls,lbl] = map[s] || map.inquiry; return `<span class="chip ${cls}">${lbl}</span>`; }
+function statStrip(items){ return `<div class="strip">${items.map(([l,v])=>`<div class="st"><span class="st-l">${l}</span><span class="st-v tnum">${v}</span></div>`).join('')}</div>`; }
+function emptyRow(txt){ return `<div class="empty-row">${txt}</div>`; }
+
+/* ---------- Dashboard (timeline) ---------- */
+function overviewCards() {
+  const w = state.wedding, dleft = daysUntil(w.date);
+  const sp = spent(), tb = totalBudget(), rem = tb - sp;
+  const budPct = tb>0 ? Math.min(100, Math.round(sp/tb*100)) : 0;
+  const tD = tasksDone(), tT = state.tasks.length, taskPct = tT ? Math.round(tD/tT*100) : 0;
+  const sf = sesDone(), sT = state.seserahan.length, sesPct = sT ? Math.round(sf/sT*100) : 0;
+  const countVal = dleft>0 ? `${dleft} days` : (dleft===0 ? 'Today! ♥' : (dleft===null?'Set date':'Married ♥'));
+  return `<div class="ov-grid">
+    <div class="ov-card hero">
+      <div class="ov-top"><span class="ov-ic">${I('favorite')}</span><span class="ov-l">Countdown</span></div>
+      <div class="ov-val tnum">${countVal}</div>
+      <div class="ov-sub">${w.date?fmtDate(w.date):'Add your wedding date in Settings'}</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-ic">${I('account_balance_wallet')}</span><span class="ov-l">Budget used</span></div>
+      <div class="ov-val tnum">${budPct}%</div>
+      <div class="ov-bar"><span style="width:${budPct}%;background:${rem<0?'var(--bad)':'var(--lime-2)'}"></span></div>
+      <div class="ov-sub">${money(sp)} of ${money(tb)}${rem<0?` · ${money(-rem)} over`:''}</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-ic">${I('checklist')}</span><span class="ov-l">Tasks done</span></div>
+      <div class="ov-val tnum">${tD}/${tT}</div>
+      <div class="ov-bar"><span style="width:${taskPct}%;background:var(--info)"></span></div>
+      <div class="ov-sub">${openTasks()} still open</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-ic">${I('redeem')}</span><span class="ov-l">Seserahan</span></div>
+      <div class="ov-val tnum">${sf}/${sT}</div>
+      <div class="ov-bar"><span style="width:${sesPct}%;background:var(--warn)"></span></div>
+      <div class="ov-sub">${sT?`${sesPct}% prepared`:'No items yet'}</div>
+    </div>
+  </div>`;
+}
+function renderDashboard() {
+  const progress = state.tasks.filter(t=>!t.done);
+  const done = state.tasks.filter(t=>t.done);
+  const colhead = `<div class="lst-head"><span>Created</span><span>Task name</span><span>Due date</span><span>Target</span></div>`;
+  return `${overviewCards()}${colhead}
+    <div class="grp-title">On progress</div>
+    ${progress.length ? progress.map(taskRow).join('') : emptyRow('No tasks in progress — add one to get started.')}
+    <div class="grp-title" style="margin-top:22px">Goal done</div>
+    ${done.length ? done.map(taskRow).join('') : emptyRow('Nothing completed yet.')}`;
+}
+function taskRow(t) {
+  const sel = t.id===selectedTaskId, col = catColor(t.cat);
+  const due = t.due ? fmtDate(t.due,{month:'short',day:'numeric',year:'2-digit'}) : 'No date';
+  return `<button class="lst-row ${sel?'sel':''}" data-select="${t.id}" data-search="${esc((t.title+' '+(t.cat||'')).toLowerCase())}">
+    <span class="lc-time">${esc(t.created||'09:05 AM')}</span>
+    <span class="lc-main">
+      <span class="badge" style="background:${col}22;color:${col}">${I(iconFor(t.cat))}</span>
+      <span class="lc-txt"><span class="lc-name">${esc(t.title)}</span><span class="lc-sub">${esc(t.cat||'Task')}</span></span>
+    </span>
+    <span class="lc-due">${due}</span>
+    <span class="lc-target">${esc(t.cat||'General')}</span>
+  </button>`;
+}
+function renderDetail() {
+  const t = state.tasks.find(x=>x.id===selectedTaskId) || state.tasks[0];
+  if (!t) return `<div class="dt-head"><h3>Goal Detail</h3></div><p class="np-empty">No task to show yet.</p>`;
+  const status = t.done ? 'Completed' : 'On progress';
+  const dd = t.due ? daysUntil(t.due) : null;
+  const dWed = daysUntil(state.wedding.date);
+  let big, lbl, cls, urg, col, note = '';
+  if (t.done){ big='✓'; lbl='Completed'; cls='done'; urg=100; col='var(--ok)'; }
+  else if (dd===null){ big='—'; lbl='No due date set'; cls=''; urg=0; col='var(--line-2)'; }
+  else if (dd<0){ big=Math.abs(dd); lbl=`day${Math.abs(dd)!==1?'s':''} overdue`; cls='over'; urg=100; col='var(--bad)'; }
+  else if (dd===0){ big='0'; lbl='Due today'; cls='soon'; urg=100; col='var(--warn)'; }
+  else { big=dd; lbl=`day${dd!==1?'s':''} until due`; cls=dd<=14?'soon':'ok'; urg=Math.max(6,Math.min(100,Math.round((1-dd/90)*100))); col=dd<=14?'var(--warn)':'var(--lime-2)'; }
+  if (dd!==null && dWed!==null && !t.done){ const gap = dWed-dd; note = gap>0 ? `Falls ${gap} day${gap!==1?'s':''} before the wedding.` : (gap===0 ? 'Due on the wedding day.' : 'Due after the wedding date.'); }
+  return `
+    <div class="dt-head"><h3>Goal Detail</h3><button class="ic-btn sm" data-edit-task="${t.id}" title="Edit" aria-label="Edit ${esc(t.title)}">${I('edit')}</button></div>
+    <div class="dt-field"><span class="dt-l">Goal name</span><span class="dt-v">${esc(t.title)}</span></div>
+    <div class="dt-field"><span class="dt-l">Status</span><span><span class="chip ${t.done?'chip-lime':'chip-dark'}">${status}</span></span></div>
+    <div class="dt-grid2">
+      <div class="dt-field"><span class="dt-l">Created</span><span class="dt-v sm">${esc(t.created||'—')}</span></div>
+      <div class="dt-field"><span class="dt-l">Due date</span><span class="dt-v sm">${t.due?fmtDate(t.due,{month:'short',day:'numeric',year:'2-digit'}):'—'}</span></div>
+    </div>
+    <div class="dt-field"><span class="dt-l">Goal target</span><span class="dt-v sm">${esc(t.cat||'General')}</span></div>
+    <div class="dt-prog">
+      <div class="dt-l">Countdown</div>
+      <div class="dt-count ${cls}"><span class="dt-count-num tnum">${big}</span><span class="dt-count-lbl">${lbl}</span></div>
+      <div class="bar" style="margin-top:6px"><span style="width:${urg}%;background:${col}"></span></div>
+      ${note?`<p class="dt-note">${note}</p>`:''}
+    </div>`;
+}
+
+/* ---------- Vendors ---------- */
+function renderVendors() {
+  const uniqueCats = new Set(state.vendors.map(v=>v.category)).size;
+  const strip = statStrip([['Vendors', state.vendors.length], ['Committed', money(vendorsTotal())], ['Booked', vendorsBooked()], ['Categories', uniqueCats]]);
+  if (!state.vendors.length) return `${strip}${card(emptyBlock(ICON.vendors,'No vendors yet','Add the venue, caterer, photographer and more.','Add vendor'))}`;
+  const cnt = { all: state.vendors.length, inquiry:0, booked:0, paid:0 };
+  state.vendors.forEach(v => { cnt[v.status] = (cnt[v.status]||0)+1; });
+  const seg = [['all','All',cnt.all],['inquiry','Inquiry',cnt.inquiry],['booked','Booked',cnt.booked],['paid','Paid',cnt.paid]];
+  let list = state.vendors.slice();
+  if (vendorFilter!=='all') list = list.filter(v=>v.status===vendorFilter);
+  list.sort(vendorCmp(vendorSort));
+  const controls = `<div class="list-controls">
+    <div class="segmented">${seg.map(([k,l,c])=>`<button class="seg ${vendorFilter===k?'on':''}" data-vendor-filter="${k}">${l}<span class="seg-c">${c}</span></button>`).join('')}</div>
+    <div class="sort-sel"><label for="vendorSort">Sort</label><select id="vendorSort" data-vendor-sort>${sortOpts(VENDOR_SORTS, vendorSort)}</select></div>
+  </div>`;
+  return `
+  ${strip}
+  ${controls}
+  ${list.length ? `<div class="card">
+    ${list.map(v => { const col = catColor(v.category); const linked = v.contactId && state.contacts.find(c=>c.id===v.contactId);
+      const person = linked ? linked.name : (v.contact||'—');
+      const phone = linked ? linked.phone : v.phone;
+      return `
+      <div class="row" data-search="${esc((v.name+' '+v.category+' '+(v.contact||'')+' '+(linked?linked.name:'')).toLowerCase())}">
+        <div class="avatar" style="background:${col}22;color:${col}">${I(iconFor(v.category))}</div>
+        <div class="grow">
+          <div class="r-title">${esc(v.name)} <span class="chip chip-gray" style="margin-left:4px">${esc(v.category)}</span></div>
+          <div class="r-meta">${linked?`<button class="link-contact" data-goto-contact="${linked.id}" title="View contact">${I('link')}${esc(person)}</button>`:esc(person)}${phone?` · ${esc(phone)}`:''}${v.notes?` · ${esc(v.notes)}`:''}</div>
+        </div>
+        <div class="r-right"><div class="amt tnum">${money(v.cost||0)}</div><div style="margin-top:5px">${statusChip(v.status)}</div></div>
+        <div class="row-actions">
+          <button class="icon-btn" data-edit-vendor="${v.id}" aria-label="Edit ${esc(v.name)}">${I('edit')}</button>
+          <button class="icon-btn danger" data-del-vendor="${v.id}" aria-label="Delete ${esc(v.name)}">${I('delete')}</button>
+        </div>
+      </div>`; }).join('')}
+  </div>` : emptyRow('No vendors match this filter.')}`;
+}
+
+/* ---------- Budget ---------- */
+function renderBudget() {
+  const sp = spent(), tb = totalBudget(), rem = tb - sp;
+  const paid = state.budget.filter(b=>b.paid).reduce((a,b)=>a+(+b.actual||0),0);
+  const cats = {};
+  state.budget.forEach(b => { const k=b.category||'Other'; cats[k]=cats[k]||{act:0,est:0}; cats[k].act+=+b.actual||0; cats[k].est+=+b.estimated||0; });
+  const catList = Object.entries(cats).sort((a,b)=>b[1].act-a[1].act);
+  const maxCat = Math.max(1, ...catList.map(c=>Math.max(c[1].act, c[1].est)));
+  const bcnt = { all: state.budget.length, unpaid: state.budget.filter(b=>!b.paid).length, paid: state.budget.filter(b=>b.paid).length };
+  let items = state.budget.slice();
+  if (budgetFilter==='paid') items = items.filter(b=>b.paid);
+  else if (budgetFilter==='unpaid') items = items.filter(b=>!b.paid);
+  items.sort(budgetCmp(budgetSort));
+  const bseg = [['all','All',bcnt.all],['unpaid','Unpaid',bcnt.unpaid],['paid','Paid',bcnt.paid]];
+  const bcontrols = state.budget.length ? `<div class="list-controls">
+    <div class="segmented">${bseg.map(([k,l,c])=>`<button class="seg ${budgetFilter===k?'on':''}" data-budget-filter="${k}">${l}<span class="seg-c">${c}</span></button>`).join('')}</div>
+    <div class="sort-sel"><label for="budgetSort">Sort</label><select id="budgetSort" data-budget-sort>${sortOpts(BUDGET_SORTS, budgetSort)}</select></div>
+  </div>` : '';
+  return `
+  ${statStrip([['Total budget', money(tb)], ['Spent', money(sp)], [rem<0?'Over budget':'Remaining', money(Math.abs(rem))], ['Paid off', money(paid)]])}
+  ${bcontrols}
+  <div class="cols" ${bcontrols?'':'style="margin-top:18px"'}>
+    <div class="card">
+      <div class="card-head"><h3>Line Items</h3><span class="cnt">${items.length}</span></div>
+      ${state.budget.length ? (items.length ? items.map(b => `
+        <div class="row" data-search="${esc((b.item+' '+b.category).toLowerCase())}">
+          <button class="check ${b.paid?'done':''}" data-toggle-paid="${b.id}" aria-pressed="${b.paid?'true':'false'}" aria-label="${b.paid?'Mark as unpaid':'Mark as paid'}: ${esc(b.item)}">${b.paid?chk():''}</button>
+          <div class="grow"><div class="r-title">${esc(b.item)}</div><div class="r-meta">${esc(b.category)}${b.estimated?` · est. ${money(b.estimated)}`:''}</div></div>
+          <div class="amt tnum">${money(b.actual||0)}</div>
+          <div class="row-actions">
+            <button class="icon-btn" data-edit-budget="${b.id}" aria-label="Edit ${esc(b.item)}">${I('edit')}</button>
+            <button class="icon-btn danger" data-del-budget="${b.id}" aria-label="Delete ${esc(b.item)}">${I('delete')}</button>
+          </div>
+        </div>`).join('') : emptyRow('No expenses match this filter.')) : emptyRow('No expenses yet.')}
+    </div>
+    <div class="card card-pad">
+      <div style="font-weight:700;font-size:15px">By Category</div>
+      <div style="font-size:12px;color:var(--faint);margin:2px 0 16px">Actual spend vs. estimated target</div>
+      ${catList.length ? catList.map(([n,c]) => {
+        const over = c.est>0 && c.act>c.est;
+        const fill = c.est>0 ? Math.min(100, c.act/c.est*100) : (c.act/maxCat*100);
+        const barCol = over ? 'var(--bad)' : 'var(--ink)';
+        return `
+        <div class="catrow">
+          <div class="t"><span style="width:9px;height:9px;border-radius:3px;background:${catColor(n)};display:inline-block"></span><span class="nm">${esc(n)}</span><span class="vv tnum">${money(c.act)}${c.est>0?` <span style="color:var(--faint)">/ ${money(c.est)}</span>`:''}</span></div>
+          <div class="bar"><span style="width:${fill}%;background:${barCol}"></span></div>
+          ${over ? `<div class="cat-over">${money(c.act-c.est)} over target</div>` : (c.est>0 && c.act<c.est ? `<div class="cat-under">${money(c.est-c.act)} under target</div>` : '')}
+        </div>`; }).join('') : '<p style="color:var(--faint);font-size:14px">No categories yet.</p>'}
+    </div>
+  </div>`;
+}
+
+/* ---------- Tasks ---------- */
+function renderTasks() {
+  const sorted = [...state.tasks].sort((a,b)=>{ if(a.done!==b.done) return a.done?1:-1; return (a.due||'9999').localeCompare(b.due||'9999'); });
+  const overdue = state.tasks.filter(t=>!t.done && t.due && daysUntil(t.due)<0).length;
+  return `
+  ${statStrip([['Open', openTasks()], ['Completed', tasksDone()], ['Total', state.tasks.length], ['Overdue', overdue]])}
+  ${state.tasks.length ? `<div class="card" style="margin-top:18px">
+    ${sorted.map(t => {
+      const dd = t.due?daysUntil(t.due):null; let cls='ok', lbl=t.due?fmtDate(t.due,{month:'short',day:'numeric'}):'No date';
+      if (t.done){cls='done';lbl='Completed';}
+      else if(dd!==null&&dd<0){cls='over';lbl=`${Math.abs(dd)}d overdue`;}
+      else if(dd!==null&&dd<=14){cls='soon';lbl=dd===0?'Today':`in ${dd}d`;}
+      const col = catColor(t.cat);
+      return `<div class="row ${t.done?'task-done':''}" data-search="${esc((t.title+' '+(t.cat||'')).toLowerCase())}">
+        <button class="check ${t.done?'done':''}" data-toggle="${t.id}" aria-pressed="${t.done?'true':'false'}" aria-label="${t.done?'Mark task as to-do':'Mark task complete'}: ${esc(t.title)}">${t.done?chk():''}</button>
+        <div class="avatar" style="background:${col}22;color:${col}">${I(iconFor(t.cat))}</div>
+        <div class="grow"><div class="r-title">${esc(t.title)}</div><div class="r-meta">${esc(t.cat||'Task')}</div></div>
+        <div class="r-right"><div class="due ${cls}">${lbl}</div>${t.due?`<div class="r-sub">${fmtDate(t.due,{month:'short',day:'numeric'})}</div>`:''}</div>
+        <div class="row-actions">
+          <button class="icon-btn" data-edit-task="${t.id}" aria-label="Edit ${esc(t.title)}">${I('edit')}</button>
+          <button class="icon-btn danger" data-del-task="${t.id}" aria-label="Delete ${esc(t.title)}">${I('delete')}</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>` : card(emptyBlock(ICON.tasks,'No tasks yet','Add deadlines so nothing slips.','Add task'))}`;
+}
+
+/* ---------- Contacts ---------- */
+function renderContacts() {
+  return `
+  ${statStrip([['Contacts', state.contacts.length]])}
+  ${state.contacts.length ? `<div class="contacts-grid" style="margin-top:18px">
+    ${state.contacts.map(c => `
+      <div class="card contact${c.id===highlightContactId?' flash':''}" data-cid="${c.id}" data-search="${esc((c.name+' '+(c.role||'')).toLowerCase())}">
+        <div class="row-actions">
+          <button class="icon-btn" data-edit-contact="${c.id}" aria-label="Edit ${esc(c.name)}">${I('edit')}</button>
+          <button class="icon-btn danger" data-del-contact="${c.id}" aria-label="Delete ${esc(c.name)}">${I('delete')}</button>
+        </div>
+        <div class="top">
+          <div class="avatar" style="background:${catColor(c.name)}22;color:${catColor(c.name)}">${esc(c.name[0]||'?')}</div>
+          <div><div class="nm">${esc(c.name)}</div><div class="rl">${esc(c.role||'Contact')}</div></div>
+        </div>
+        ${c.phone?`<div class="ln">${I('call')}<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></div>`:''}
+        ${c.email?`<div class="ln">${I('mail')}<a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>`:''}
+        ${c.notes?`<div class="note">${esc(c.notes)}</div>`:''}
+      </div>`).join('')}
+  </div>` : card(emptyBlock(ICON.contacts,'No contacts yet','Keep vendor and family details close.','Add contact'))}`;
+}
+
+/* ---------- Seserahan ---------- */
+function sesStatusChip(s){ const [lbl,cls] = SES_STATUS[s] || SES_STATUS.pending; return `<span class="chip ${cls}"><span class="dot"></span>${lbl}</span>`; }
+function renderSeserahan() {
+  const items = state.seserahan, total = items.length;
+  if (!total) return card(emptyBlock('redeem','No seserahan items yet','Track the gift trays you’re preparing for the big day.','Add item'));
+  const cnt = { pending:0, onProgress:0, finished:0 }; let totalCost = 0;
+  items.forEach(i => { cnt[i.status] = (cnt[i.status]||0) + 1; totalCost += +i.cost||0; });
+  const pct = Math.round(cnt.finished/total*100);
+  const seg = [['all','All',total],['pending','Pending',cnt.pending],['onProgress','On Progress',cnt.onProgress],['finished','Finished',cnt.finished]];
+  const groups = SES_ORDER.filter(k => seserahanFilter==='all' || k===seserahanFilter).map(k => [k, SES_STATUS[k][0], items.filter(i=>i.status===k)]);
+  return `
+  ${statStrip([['Items', total], ['Prepared', `${cnt.finished}/${total}`], ['In progress', cnt.onProgress], ['Committed', money(totalCost)]])}
+  <div class="ses-top">
+    <div class="segmented">
+      ${seg.map(([k,l,c])=>`<button class="seg ${seserahanFilter===k?'on':''}" data-ses-filter="${k}">${l}<span class="seg-c">${c}</span></button>`).join('')}
+    </div>
+    <div class="prog-inline"><div class="bar"><span style="width:${pct}%;background:var(--lime-2)"></span></div><span class="prog-pct tnum">${pct}%</span></div>
+  </div>
+  ${groups.map(([k,label,arr]) => `
+    <div class="grp-title" style="margin-top:20px">${label} <span class="grp-count">${arr.length}</span></div>
+    ${arr.length ? `<div class="card">${arr.map(sesRow).join('')}</div>` : emptyRow('Nothing in this stage.')}
+  `).join('')}`;
+}
+function sesRow(i) {
+  const col = catColor(i.category);
+  return `<div class="row" data-search="${esc((i.name+' '+(i.category||'')+' '+(i.notes||'')).toLowerCase())}">
+    <div class="avatar" style="background:${col}22;color:${col}">${I(iconFor(i.category))}</div>
+    <div class="grow">
+      <div class="r-title">${esc(i.name)}${(+i.qty||1)>1?` <span class="chip chip-gray" style="margin-left:4px">×${+i.qty}</span>`:''}</div>
+      <div class="r-meta">${esc(i.category||'Item')}${i.notes?` · ${esc(i.notes)}`:''}</div>
+    </div>
+    ${(+i.cost||0)>0?`<div class="amt tnum" style="margin-right:8px">${money(i.cost)}</div>`:''}
+    <button class="ses-status" data-cycle-ses="${i.id}" title="Click to advance status" aria-label="${esc(i.name)} status: ${SES_LABELS[i.status]}. Activate to advance.">${sesStatusChip(i.status)}</button>
+    <div class="row-actions">
+      <button class="icon-btn" data-edit-seserahan="${i.id}" aria-label="Edit ${esc(i.name)}">${I('edit')}</button>
+      <button class="icon-btn danger" data-del-seserahan="${i.id}" aria-label="Delete ${esc(i.name)}">${I('delete')}</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- helpers ---------- */
+function chk(){ return I('check'); }
+function card(inner){ return `<div class="card" style="margin-top:18px">${inner}</div>`; }
+function emptyBlock(icon,title,text,add){ return `<div class="empty"><div class="ei">${I(icon)}</div><h3>${title}</h3><p>${text}</p>${add?`<button class="btn btn-primary" data-open-add>${I('add')}${add}</button>`:''}</div>`; }
+
+/* =====================================================================
+   Binding
+   ===================================================================== */
+function bindView() {
+  const v = $('#view');
+  v.querySelectorAll('[data-select]').forEach(b => b.onclick = () => { selectedTaskId = b.dataset.select; render(); });
+  v.querySelectorAll('[data-open-add]').forEach(b => b.onclick = () => openAdd());
+  v.querySelectorAll('[data-toggle]').forEach(b => b.onclick = () => {
+    const t = state.tasks.find(t=>t.id===b.dataset.toggle);
+    if (t){ t.done=!t.done; save(); toast(t.done?'Task complete ♥':'Marked as to-do'); renderNav(); render(); }
+  });
+  v.querySelectorAll('[data-toggle-paid]').forEach(b => b.onclick = () => {
+    const it = state.budget.find(x=>x.id===b.dataset.togglePaid);
+    if (it){ it.paid=!it.paid; save(); toast(it.paid?'Marked as paid':'Marked unpaid'); render(); }
+  });
+  v.querySelectorAll('[data-ses-filter]').forEach(b => b.onclick = () => { seserahanFilter = b.dataset.sesFilter; render(); });
+  v.querySelectorAll('[data-vendor-filter]').forEach(b => b.onclick = () => { vendorFilter = b.dataset.vendorFilter; render(); });
+  const vsortEl = v.querySelector('[data-vendor-sort]'); if (vsortEl) vsortEl.onchange = () => { vendorSort = vsortEl.value; render(); };
+  v.querySelectorAll('[data-budget-filter]').forEach(b => b.onclick = () => { budgetFilter = b.dataset.budgetFilter; render(); });
+  const bsortEl = v.querySelector('[data-budget-sort]'); if (bsortEl) bsortEl.onchange = () => { budgetSort = bsortEl.value; render(); };
+  v.querySelectorAll('[data-goto-contact]').forEach(b => b.onclick = () => { highlightContactId = b.dataset.gotoContact; go('contacts'); });
+  if (current==='contacts' && highlightContactId){ const el = v.querySelector(`[data-cid="${highlightContactId}"]`); if (el) el.scrollIntoView({behavior:'smooth',block:'center'}); highlightContactId = null; }
+  v.querySelectorAll('[data-cycle-ses]').forEach(b => b.onclick = () => {
+    const it = state.seserahan.find(x=>x.id===b.dataset.cycleSes);
+    if (it){ it.status = SES_ORDER[(SES_ORDER.indexOf(it.status)+1) % SES_ORDER.length]; save(); toast(`${it.name} → ${SES_LABELS[it.status]}`); renderNav(); render(); }
+  });
+  bindCrud(v,'vendor',state.vendors,vendorForm,'Vendor');
+  bindCrud(v,'budget',state.budget,budgetForm,'Expense');
+  bindCrud(v,'task',state.tasks,taskForm,'Task');
+  bindCrud(v,'seserahan',state.seserahan,seserahanForm,'Seserahan item');
+  bindCrud(v,'contact',state.contacts,contactForm,'Contact');
+}
+function bindDetail() {
+  $('#detail').querySelectorAll('[data-edit-task]').forEach(b => b.onclick = () => {
+    const t = state.tasks.find(x=>x.id===b.dataset.editTask); if (t) openModal(taskForm(t));
+  });
+}
+function bindCrud(v,key,arr,formFn,label){
+  v.querySelectorAll(`[data-edit-${key}]`).forEach(b => b.onclick = () => { const item=arr.find(x=>x.id===b.dataset[`edit${cap(key)}`]); openModal(formFn(item)); });
+  v.querySelectorAll(`[data-del-${key}]`).forEach(b => b.onclick = () => {
+    const id=b.dataset[`del${cap(key)}`], i=arr.findIndex(x=>x.id===id);
+    if (i<0) return;
+    const [removed] = arr.splice(i,1);
+    save(); renderNav(); render();
+    toast(`${label} removed`, { icon:'delete', action:'Undo', onAction: () => {
+      arr.splice(Math.min(i, arr.length), 0, removed); save(); renderNav(); render(); toast(`${label} restored ♥`);
+    }});
+  });
+}
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+
+$('#search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  $('#view').querySelectorAll('[data-search]').forEach(el => { el.style.display = !q || el.dataset.search.includes(q) ? '' : 'none'; });
+});
+$('#addBtn').onclick = () => openAdd();
+function openAdd(){ const fn = {dashboard:taskForm,vendors:vendorForm,budget:budgetForm,tasks:taskForm,seserahan:seserahanForm,contacts:contactForm}[current] || taskForm; openModal(fn()); }
+
+/* =====================================================================
+   Forms
+   ===================================================================== */
+function field(f){
+  const val = f.value!=null?esc(String(f.value)):'';
+  if (f.type==='select') return `<div class="field"><label>${f.label}</label><select name="${f.name}">${f.options.map(o=>`<option value="${o}" ${o===f.value?'selected':''}>${f.labels?f.labels[o]:cap(o)}</option>`).join('')}</select></div>`;
+  if (f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea name="${f.name}" placeholder="${f.ph||''}">${val}</textarea></div>`;
+  return `<div class="field"><label>${f.label}</label><input name="${f.name}" type="${f.type||'text'}" value="${val}" placeholder="${f.ph||''}" ${f.type==='number'?'step="any" inputmode="decimal"':''}></div>`;
+}
+function pair(a,b){ return `<div class="grid2">${field(a)}${field(b)}</div>`; }
+
+function vendorForm(v={}){ const e=!!v.id;
+  const contactOpts = ['', ...state.contacts.map(c=>c.id)];
+  const contactLabels = { '':'— None —' }; state.contacts.forEach(c=>contactLabels[c.id]=c.name);
+  const hasLink = !!(v.contactId && state.contacts.find(c=>c.id===v.contactId));
+  return {
+  eyebrow:e?'Edit vendor':'New vendor', title:e?'Update vendor':'Add a vendor',
+  html:`${field({label:'Business name',name:'name',value:v.name,ph:'e.g. Wildflower & Vine'})}
+    ${pair({label:'Category',name:'category',value:v.category,ph:'Florals'},{label:'Cost',name:'cost',type:'number',value:v.cost})}
+    ${field({label:'Status',name:'status',type:'select',value:v.status||'inquiry',options:['inquiry','booked','paid']})}
+    ${state.contacts.length?field({label:'Linked contact',name:'contactId',type:'select',value:v.contactId||'',options:contactOpts,labels:contactLabels}):''}
+    ${field({label:hasLink?'Contact person (used if not linked)':'Contact person',name:'contact',value:v.contact,ph:'Who you talk to'})}
+    ${pair({label:'Phone',name:'phone',value:v.phone},{label:'Email',name:'email',type:'email',value:v.email})}
+    ${field({label:'Notes',name:'notes',type:'textarea',value:v.notes,ph:'Deposit terms, what’s included…'})}`,
+  save(d){ if(!d.name.trim()) return 'Add a business name.'; d.cost=+d.cost||0; if(!('contactId' in d)) d.contactId = v.contactId||''; if(v.id) Object.assign(v,d); else state.vendors.push({id:uid(),...d}); return true; }
+};}
+function budgetForm(b={}){ const e=!!b.id; return {
+  eyebrow:e?'Edit expense':'New expense', title:e?'Update expense':'Add an expense',
+  html:`${field({label:'Description',name:'item',value:b.item,ph:'e.g. Three-tier cake'})}
+    ${field({label:'Category',name:'category',value:b.category,ph:'Cake'})}
+    ${pair({label:'Estimated',name:'estimated',type:'number',value:b.estimated},{label:'Actual',name:'actual',type:'number',value:b.actual})}
+    <label class="field" style="flex-direction:row;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--muted)"><input type="checkbox" name="paid" ${b.paid?'checked':''} style="width:18px;height:18px;accent-color:var(--ink)"> Already paid</label>`,
+  save(d,form){ if(!d.item.trim()) return 'Add a description.'; d.estimated=+d.estimated||0; d.actual=+d.actual||0; d.paid=form.querySelector('[name=paid]').checked; if(b.id) Object.assign(b,d); else state.budget.push({id:uid(),...d}); return true; }
+};}
+function taskForm(t={}){ const e=!!t.id; return {
+  eyebrow:e?'Edit task':'New task', title:e?'Update task':'Add a task',
+  html:`${field({label:'Task',name:'title',value:t.title,ph:'e.g. Book catering tasting'})}
+    ${pair({label:'Due date',name:'due',type:'date',value:t.due},{label:'Category',name:'cat',value:t.cat,ph:'Catering'})}`,
+  save(d){ if(!d.title.trim()) return 'Describe the task.'; if(t.id) Object.assign(t,d); else state.tasks.push({id:uid(),done:false,created:nowTime(),...d}); return true; }
+};}
+function seserahanForm(i={}){ const e=!!i.id; return {
+  eyebrow:e?'Edit item':'New item', title:e?'Update seserahan item':'Add seserahan item',
+  html:`${field({label:'Item name',name:'name',value:i.name,ph:'e.g. Seperangkat alat sholat'})}
+    ${pair({label:'Category',name:'category',value:i.category,ph:'Busana'},{label:'Quantity',name:'qty',type:'number',value:i.qty!=null?i.qty:1})}
+    ${pair({label:'Status',name:'status',type:'select',value:i.status||'pending',options:SES_ORDER,labels:SES_LABELS},{label:'Cost',name:'cost',type:'number',value:i.cost})}
+    ${field({label:'Notes',name:'notes',type:'textarea',value:i.notes,ph:'Store, contents, who’s handling it…'})}`,
+  save(d){ if(!d.name.trim()) return 'Add an item name.'; d.qty=Math.max(1,+d.qty||1); d.cost=+d.cost||0; if(!SES_ORDER.includes(d.status)) d.status='pending'; if(i.id) Object.assign(i,d); else state.seserahan.push({id:uid(),...d}); return true; }
+};}
+function contactForm(c={}){ const e=!!c.id; return {
+  eyebrow:e?'Edit contact':'New contact', title:e?'Update contact':'Add a contact',
+  html:`${pair({label:'Name',name:'name',value:c.name,ph:'Full name'},{label:'Role',name:'role',value:c.role,ph:'Officiant'})}
+    ${pair({label:'Phone',name:'phone',value:c.phone},{label:'Email',name:'email',type:'email',value:c.email})}
+    ${field({label:'Notes',name:'notes',type:'textarea',value:c.notes,ph:'Best times to reach, responsibilities…'})}`,
+  save(d){ if(!d.name.trim()) return 'Add a name.'; if(c.id) Object.assign(c,d); else state.contacts.push({id:uid(),...d}); return true; }
+};}
+
+/* =====================================================================
+   Modal
+   ===================================================================== */
+let activeForm = null;
+let lastFocused = null;
+/* Trap focus by making everything except the open overlay inert. */
+function bgInert(on){ ['.app','#mobileNav'].forEach(s => { const el = document.querySelector(s); if (!el) return; on ? el.setAttribute('inert','') : el.removeAttribute('inert'); }); }
+function anyOverlayOpen(){ return $('#overlay').classList.contains('open') || $('#setOverlay').classList.contains('open'); }
+function openModal(form){
+  activeForm = form;
+  if (!anyOverlayOpen()) lastFocused = document.activeElement;
+  $('#mEyebrow').textContent = form.eyebrow; $('#mTitle').textContent = form.title;
+  $('#mBody').innerHTML = form.html; $('#overlay').removeAttribute('inert'); $('#overlay').classList.add('open'); bgInert(true);
+  setTimeout(()=>$('#mBody').querySelector('input,select,textarea')?.focus(),60);
+}
+function closeModal(){
+  $('#overlay').classList.remove('open'); $('#overlay').setAttribute('inert',''); activeForm=null;
+  if (!anyOverlayOpen()){ bgInert(false); if (lastFocused && lastFocused.focus){ lastFocused.focus(); lastFocused=null; } }
+}
+$('#mCancel').onclick = closeModal;
+$('#overlay').onclick = e => { if(e.target===$('#overlay')) closeModal(); };
+$('#mSave').onclick = () => {
+  if(!activeForm) return;
+  const form = $('#mBody'), data = {};
+  form.querySelectorAll('[name]').forEach(el => { if(el.type==='checkbox') return; data[el.name]=el.value; });
+  const res = activeForm.save(data, form);
+  if(res!==true){ toast(res||'Please check the form'); return; }
+  save(); closeModal(); renderNav(); render(); toast('Saved ♥');
+};
+
+$('#mBody').addEventListener('keydown', e => {
+  if (e.key==='Enter' && e.target.tagName!=='TEXTAREA' && !e.isComposing){ e.preventDefault(); $('#mSave').click(); }
+});
+
+/* ---- toast ---- */
+let toastTimer;
+function toast(msg, opts){
+  opts = opts || {};
+  $('#toastMsg').textContent = msg;
+  $('#toastIcon').textContent = opts.icon || 'check_circle';
+  const action = $('#toastAction');
+  if (opts.action && typeof opts.onAction === 'function'){
+    action.hidden = false; action.textContent = opts.action;
+    action.onclick = () => { clearTimeout(toastTimer); $('#toast').classList.remove('show'); opts.onAction(); };
+  } else { action.hidden = true; action.onclick = null; }
+  $('#toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>$('#toast').classList.remove('show'), opts.action ? 5000 : 2400);
+}
+
+/* =====================================================================
+   Notifications
+   ===================================================================== */
+function getNotifs(){
+  const out = [];
+  state.tasks.filter(t=>!t.done&&t.due).forEach(t => {
+    const dd = daysUntil(t.due); if (dd===null) return;
+    if (dd<0) out.push({ kind:'bad', icon:'event_busy', title:t.title, msg:`${Math.abs(dd)} day${Math.abs(dd)>1?'s':''} overdue`, page:'tasks', sort:dd });
+    else if (dd<=14) out.push({ kind:'warn', icon:'schedule', title:t.title, msg:dd===0?'Due today':`Due in ${dd} day${dd>1?'s':''}`, page:'tasks', sort:dd+0.5 });
+  });
+  state.budget.filter(b=>!b.paid && (+b.actual||0)>0).forEach(b => {
+    out.push({ kind:'info', icon:'account_balance_wallet', title:b.item, msg:`${money(b.actual)} payment outstanding`, page:'budget', sort:1000 });
+  });
+  return out.sort((a,b)=>a.sort-b.sort);
+}
+function renderNotifs(){
+  const list = getNotifs();
+  const dot = $('#notifDot'); if (dot) dot.hidden = list.length===0;
+  const panel = $('#notifPanel'); if (!panel) return;
+  panel.innerHTML = `
+    <div class="np-head">Notifications <span>${list.length}</span></div>
+    ${list.length ? list.map(n => `
+      <button class="np-item" data-notif="${n.page}">
+        <span class="np-ic ${n.kind}">${I(n.icon)}</span>
+        <span class="grow"><span class="np-t">${esc(n.title)}</span><div class="np-m">${esc(n.msg)}</div></span>
+      </button>`).join('')
+      : `<div class="np-empty">You're all caught up ♥<br>No overdue tasks or payments.</div>`}`;
+  panel.querySelectorAll('[data-notif]').forEach(b => b.onclick = () => { setNotif(false); go(b.dataset.notif); });
+}
+function setNotif(open){ const p = $('#notifPanel'); if (!p) return; if (open){ renderNotifs(); p.hidden = false; } else { p.hidden = true; } }
+$('#notifBtn').onclick = e => { e.stopPropagation(); setNotif($('#notifPanel').hidden); };
+document.addEventListener('click', e => { if (!e.target.closest('.notif-wrap')) setNotif(false); });
+
+/* =====================================================================
+   Settings
+   ===================================================================== */
+function openSettings(){
+  if (!anyOverlayOpen()) lastFocused = document.activeElement;
+  const w = state.wedding, s = state.settings;
+  $('#setBody').innerHTML = `
+    <div class="set-sec">
+      <div class="set-title">Preferences</div>
+      ${field({label:'Currency',name:'currency',type:'select',value:s.currency,options:CURRENCIES.map(c=>c.code)})}
+      <p class="set-note">Applied to every amount shown across the planner.</p>
+    </div>
+    <div class="set-sec">
+      <div class="set-title">Wedding details</div>
+      ${pair({label:'Partner 1',name:'p1',value:w.p1},{label:'Partner 2',name:'p2',value:w.p2})}
+      ${pair({label:'Date',name:'date',type:'date',value:w.date},{label:'Total budget',name:'budget',type:'number',value:w.budget})}
+      ${field({label:'Venue',name:'venue',value:w.venue,ph:'Where you’ll celebrate'})}
+    </div>
+    <div class="set-sec">
+      <div class="set-title">Your data</div>
+      <p class="set-note">Everything is stored on this device only. Export a backup to move it to another browser or device.</p>
+      <div class="set-actions">
+        <button class="btn btn-sm" id="setExport">${I('download')}Export backup</button>
+        <button class="btn btn-sm" id="setImport">${I('upload')}Import backup</button>
+        <button class="btn btn-sm" id="setSample">${I('auto_awesome')}Load sample plan</button>
+      </div>
+      <div class="set-actions">
+        <button class="btn btn-sm btn-danger-ghost" id="setClear">${I('delete_forever')}Clear all data</button>
+      </div>
+      <input type="file" id="setFile" accept="application/json,.json" hidden>
+    </div>`;
+  $('#setOverlay').removeAttribute('inert'); $('#setOverlay').classList.add('open'); bgInert(true);
+  $('#setExport').onclick = exportData;
+  $('#setImport').onclick = () => $('#setFile').click();
+  $('#setFile').onchange = importData;
+  $('#setSample').onclick = () => { if(confirm('Replace your current plan with the sample data?')){ state=seed(); save(); closeSettings(); go('dashboard'); toast('Sample plan loaded'); } };
+  $('#setClear').onclick = () => { if(confirm('Delete everything and start from a blank plan? This cannot be undone.')){ state=blankState(); save(); closeSettings(); go('dashboard'); toast('All data cleared'); } };
+}
+function closeSettings(){
+  $('#setOverlay').classList.remove('open'); $('#setOverlay').setAttribute('inert','');
+  if (!anyOverlayOpen()){ bgInert(false); if (lastFocused && lastFocused.focus){ lastFocused.focus(); lastFocused=null; } }
+}
+function saveSettings(){
+  const body = $('#setBody');
+  const g = n => { const el = body.querySelector(`[name=${n}]`); return el ? el.value : ''; };
+  state.settings.currency = g('currency') || 'USD';
+  Object.assign(state.wedding, { p1:g('p1'), p2:g('p2'), date:g('date'), venue:g('venue'), budget:+g('budget')||0 });
+  save(); closeSettings(); renderNav(); render(); toast('Settings saved ♥');
+}
+function blankState(){ return { settings:{ currency: state.settings.currency||'USD' }, wedding:{ p1:'Partner 1', p2:'Partner 2', date:'', venue:'', budget:0 }, vendors:[], budget:[], tasks:[], seserahan:[], contacts:[] }; }
+function exportData(){
+  try {
+    const blob = new Blob([JSON.stringify(state,null,2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const name = `${(state.wedding.p1||'wedding')}-${(state.wedding.p2||'plan')}`.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    a.href = url; a.download = `evermore-${name}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url); toast('Backup downloaded');
+  } catch(e){ toast('Could not export'); }
+}
+function importData(e){
+  const file = e.target.files && e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || typeof data!=='object' || typeof data.wedding!=='object' || data.wedding===null) throw new Error('bad');
+      for (const k of ['vendors','budget','tasks','seserahan','contacts']) {
+        if (k in data && !Array.isArray(data[k])) throw new Error('bad');
+      }
+      state = migrate(data); save(); closeSettings(); go('dashboard'); toast('Backup restored ♥');
+    } catch(err){ toast('That file isn’t a valid Evermore backup'); }
+    finally { e.target.value = ''; }
+  };
+  reader.readAsText(file);
+}
+$('#settingsBtn').onclick = openSettings;
+$('#avatarMe').onclick = openSettings;
+$('#setClose').onclick = closeSettings;
+$('#setSave').onclick = saveSettings;
+$('#setOverlay').onclick = e => { if(e.target===$('#setOverlay')) closeSettings(); };
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeSettings(); setNotif(false); } });
+
+/* ---- boot ---- */
+renderNav(); go('dashboard');
+
+/* ---- PWA: offline + installable ---- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>

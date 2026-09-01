@@ -1,0 +1,42 @@
+import '@testing-library/jest-dom/vitest';
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
+/**
+ * Node 25 ships an experimental global `localStorage` (it warns about
+ * `--localstorage-file` and has no usable `clear()`), which shadows jsdom's.
+ * Install a simple, predictable in-memory Storage so the app under test and the
+ * tests share one implementation.
+ */
+class MemoryStorage {
+  private store = new Map<string, string>();
+  get length(): number {
+    return this.store.size;
+  }
+  clear(): void {
+    this.store.clear();
+  }
+  getItem(key: string): string | null {
+    return this.store.has(key) ? this.store.get(key)! : null;
+  }
+  key(index: number): string | null {
+    return Array.from(this.store.keys())[index] ?? null;
+  }
+  removeItem(key: string): void {
+    this.store.delete(key);
+  }
+  setItem(key: string, value: string): void {
+    this.store.set(key, String(value));
+  }
+}
+
+Object.defineProperty(globalThis, 'localStorage', {
+  value: new MemoryStorage() as unknown as Storage,
+  configurable: true,
+  writable: true,
+});
+
+afterEach(() => {
+  cleanup();
+  localStorage.clear();
+});

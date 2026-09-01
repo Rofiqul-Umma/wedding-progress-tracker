@@ -1,0 +1,44 @@
+{
+  "name": "evermore-wedding-planner",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Evermore — a wedding progress tracker (timeline, vendors, budget, tasks, seserahan, contacts).",
+  "scripts": {
+    "dev": "vite --port 4173",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "firebase": "^12.18.0",
+    "i18next": "^23.16.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@tailwindcss/vite": "^4.1.5",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.15.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.12.0",
+    "jsdom": "^25.0.1",
+    "tailwindcss": "^4.1.5",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.15.0",
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^2.1.5"
+  }
+}
