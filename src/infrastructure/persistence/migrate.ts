@@ -37,7 +37,13 @@ export function migrate(input: unknown): PlanState {
       venue: str(wedding.venue),
       budget: num(wedding.budget),
     },
-    vendors: Array.isArray(s.vendors) ? (s.vendors as Vendor[]) : [],
+    vendors: Array.isArray(s.vendors)
+      ? (s.vendors as Obj[]).map((v) => ({
+          ...(v as unknown as Vendor),
+          // Field renamed email → social; carry legacy backups forward.
+          social: str(v.social) || str(v.email),
+        }))
+      : [],
     budget: Array.isArray(s.budget) ? (s.budget as BudgetItem[]) : [],
     tasks: Array.isArray(s.tasks) ? (s.tasks as Task[]) : [],
     seserahan: Array.isArray(s.seserahan) ? (s.seserahan as SeserahanItem[]) : [],

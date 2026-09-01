@@ -15,11 +15,11 @@ export function seed(): PlanState {
       budget: 42000,
     },
     vendors: [
-      { id: uid(), name: 'The Ivy Barn', category: 'Venue', contact: 'Reneé Adler', phone: '(707) 555-0182', email: 'events@ivybarn.co', cost: 14500, status: 'paid', notes: 'Includes tables, chairs, and 11pm curfew.' },
-      { id: uid(), name: 'Wildflower & Vine', category: 'Florals', contact: 'Mina Okafor', phone: '(415) 555-2231', email: 'hello@wildflowervine.com', cost: 3800, status: 'booked', notes: 'Seasonal dahlias + ranunculus.' },
-      { id: uid(), name: 'Golden Hour Films', category: 'Photography', contact: 'Theo Marsh', phone: '(510) 555-7744', email: 'theo@goldenhourfilms.com', cost: 5200, status: 'booked', notes: '8 hrs coverage + engagement session.' },
-      { id: uid(), name: 'Copper Spoon Catering', category: 'Catering', contact: 'Dev Patel', phone: '(707) 555-9910', email: 'events@copperspoon.com', cost: 9600, status: 'inquiry', notes: 'Tasting scheduled. Family-style menu.' },
-      { id: uid(), name: 'Neon Meadow DJ', category: 'Music', contact: 'Sam Rivera', phone: '(408) 555-3320', email: 'book@neonmeadow.dj', cost: 2200, status: 'booked', notes: 'Ceremony + reception.' },
+      { id: uid(), name: 'The Ivy Barn', category: 'Venue', contact: 'Reneé Adler', phone: '(707) 555-0182', social: 'instagram.com/theivybarn', cost: 14500, status: 'paid', notes: 'Includes tables, chairs, and 11pm curfew.' },
+      { id: uid(), name: 'Wildflower & Vine', category: 'Florals', contact: 'Mina Okafor', phone: '(415) 555-2231', social: 'instagram.com/wildflowervine', cost: 3800, status: 'booked', notes: 'Seasonal dahlias + ranunculus.' },
+      { id: uid(), name: 'Golden Hour Films', category: 'Photography', contact: 'Theo Marsh', phone: '(510) 555-7744', social: 'instagram.com/goldenhourfilms', cost: 5200, status: 'booked', notes: '8 hrs coverage + engagement session.' },
+      { id: uid(), name: 'Copper Spoon Catering', category: 'Catering', contact: 'Dev Patel', phone: '(707) 555-9910', social: 'instagram.com/copperspoon', cost: 9600, status: 'inquiry', notes: 'Tasting scheduled. Family-style menu.' },
+      { id: uid(), name: 'Neon Meadow DJ', category: 'Music', contact: 'Sam Rivera', phone: '(408) 555-3320', social: 'instagram.com/neonmeadow', cost: 2200, status: 'booked', notes: 'Ceremony + reception.' },
     ],
     budget: [
       { id: uid(), category: 'Venue', item: 'Ivy Barn rental', estimated: 14500, actual: 14500, paid: true },

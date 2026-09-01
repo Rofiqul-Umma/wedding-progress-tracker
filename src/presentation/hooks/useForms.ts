@@ -78,7 +78,7 @@ export function useForms() {
         placeholder: t('forms.vendor.contactPersonPh'),
       },
       { name: 'phone', label: t('forms.vendor.phone'), value: v?.phone, half: true },
-      { name: 'email', label: t('forms.vendor.email'), type: 'email', value: v?.email, half: true },
+      { name: 'social', label: t('forms.vendor.social'), type: 'url', value: v?.social, placeholder: t('forms.vendor.socialPh'), half: true },
       { name: 'notes', label: t('forms.vendor.notes'), type: 'textarea', value: v?.notes, placeholder: t('forms.vendor.notesPh') },
     );
     return {
@@ -98,7 +98,7 @@ export function useForms() {
           contactId: hasContacts ? values.contactId : v?.contactId ?? '',
           contact: values.contact,
           phone: values.phone,
-          email: values.email,
+          social: values.social.trim(),
           notes: values.notes,
         };
         setState((s) => (v ? updateVendor(s, v.id, data) : addVendor(s, data)));

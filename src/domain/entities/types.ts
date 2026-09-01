@@ -25,7 +25,8 @@ export interface Vendor {
   /** Free-text contact person, used when no `contactId` is linked. */
   contact: string;
   phone: string;
-  email: string;
+  /** Social media handle or website URL. */
+  social: string;
   cost: number;
   status: VendorStatus;
   /** Amount paid as a down payment (only meaningful when status is 'deposit'). */

@@ -66,6 +66,37 @@ describe('migrate', () => {
     expect(migrate({ wedding: {}, shopping: 'nope' }).shopping).toEqual([]);
   });
 
+  it('carries a legacy vendor email forward as social', () => {
+    const s = migrate({
+      wedding: {},
+      vendors: [
+        { id: 'v1', name: 'Ivy', category: 'Venue', contact: '', phone: '', email: 'ivy@ex.com', cost: 0, status: 'inquiry', notes: '' },
+      ],
+    });
+    expect(s.vendors[0].social).toBe('ivy@ex.com');
+  });
+
+  it('prefers an existing social over a legacy email', () => {
+    const s = migrate({
+      wedding: {},
+      vendors: [
+        { id: 'v1', name: 'Ivy', category: 'Venue', contact: '', phone: '', social: 'instagram.com/ivy', email: 'ivy@ex.com', cost: 0, status: 'inquiry', notes: '' },
+      ],
+    });
+    expect(s.vendors[0].social).toBe('instagram.com/ivy');
+  });
+
+  it('preserves a vendor down-payment amount', () => {
+    const s = migrate({
+      wedding: {},
+      vendors: [
+        { id: 'v1', name: 'Ivy', category: 'Venue', contact: '', phone: '', social: '', cost: 1000, status: 'deposit', deposit: 250, notes: '' },
+      ],
+    });
+    expect(s.vendors[0].deposit).toBe(250);
+    expect(s.vendors[0].status).toBe('deposit');
+  });
+
   it('round-trips a task url and attachment', () => {
     const attachment = { name: 'quote.pdf', type: 'application/pdf', data: 'data:application/pdf;base64,AA==' };
     const s = migrate({

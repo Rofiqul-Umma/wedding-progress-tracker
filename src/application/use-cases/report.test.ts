@@ -78,7 +78,7 @@ describe('reportModelToCsv', () => {
   it('emits raw numbers for money/number columns', () => {
     const state = migrate({
       vendors: [
-        { id: 'v1', name: 'Ivy', category: 'Venue', contact: '', phone: '', email: '', cost: 14500, status: 'paid', notes: '' },
+        { id: 'v1', name: 'Ivy', category: 'Venue', contact: '', phone: '', social: '', cost: 14500, status: 'paid', notes: '' },
       ],
     });
     const csv = reportModelToCsv(buildReportModel(state), fmt);

@@ -13,7 +13,7 @@ function base(): PlanState {
         category: 'Venue',
         contact: '',
         phone: '',
-        email: '',
+        social: '',
         cost: 100,
         status: 'paid',
         notes: '',

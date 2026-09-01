@@ -173,6 +173,18 @@ export function VendorsPage() {
                     </div>
                   )}
                 </div>
+                {v.social && (
+                  <a
+                    href={/^https?:\/\//i.test(v.social) ? v.social : `https://${v.social}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={t('vendors.openSocial')}
+                    aria-label={t('vendors.openSocial')}
+                    className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink"
+                  >
+                    <Icon name="public" size={17} />
+                  </a>
+                )}
                 <RowActions
                   onEdit={() => openForm(vendorForm(v))}
                   onDelete={() => deleteVendor(v.id)}

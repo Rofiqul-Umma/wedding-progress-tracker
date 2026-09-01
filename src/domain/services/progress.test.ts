@@ -36,7 +36,7 @@ const vendor = (status: Vendor['status'], category: string): Vendor => ({
   category,
   contact: '',
   phone: '',
-  email: '',
+  social: '',
   cost: 0,
   status,
   notes: '',
