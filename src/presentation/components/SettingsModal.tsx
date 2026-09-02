@@ -5,18 +5,23 @@ import { Button } from '@presentation/components/ui/Button';
 import { CONTROL, LABEL } from '@presentation/components/forms/FormField';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useRoom } from '@presentation/state/RoomStore';
+import { useAccount } from '@presentation/state/AccountStore';
 import { useNav } from '@presentation/state/NavStore';
 import { useToast } from '@presentation/hooks/useToast';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { saveSettings } from '@application/use-cases/settings';
 import { CURRENCIES } from '@infrastructure/format/money';
+import { downloadBlob, planFileSlug } from '@presentation/lib/download';
+import { serializePlan } from '@application/use-cases/data';
 import type { Lang } from '@domain/entities/types';
+import type { PlanBackupMeta } from '@infrastructure/persistence/PlanBackupRepository';
 import { cn } from '@presentation/lib/cn';
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { state, setState } = usePlan();
   const room = useRoom();
+  const account = useAccount();
   const { go } = useNav();
   const toast = useToast();
   const { exportData, importData, loadSample, clearAll } = usePlanActions();
@@ -78,7 +83,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
   }
 
   function onCreateRoom() {
-    void room.createRoom(state);
+    void room.createRoom(state, account.pause);
   }
 
   function onJoinRoom() {
@@ -92,13 +97,39 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     } catch {
       /* not a URL — treat as a bare id */
     }
-    void room.join(id);
+    void room.join(id, account.pause);
     setJoinInput('');
   }
 
   async function onCopyLink() {
     if (await room.copyLink()) toast(t('room.linkCopied'));
   }
+
+  function onRestoreBackup(backup: PlanBackupMeta) {
+    if (!window.confirm(t('account.confirmRestore'))) return;
+    const restored = account.restoreBackup(backup.key);
+    if (!restored) return;
+    setState(restored);
+    toast(t('account.restored'));
+    onClose();
+    go('dashboard');
+  }
+
+  function onDownloadBackup(backup: PlanBackupMeta) {
+    const restored = account.restoreBackup(backup.key);
+    if (!restored) return;
+    downloadBlob(
+      serializePlan(restored),
+      `evermore-safety-${planFileSlug(restored)}-${backup.createdAt}.json`,
+      'application/json;charset=utf-8',
+    );
+    toast(t('account.downloaded'));
+  }
+
+  const accountBusy =
+    account.status === 'loading' ||
+    account.status === 'signingIn' ||
+    account.status === 'migrating';
 
   return (
     <ModalShell onClose={onClose} size="lg" labelledBy="settings-title">
@@ -184,12 +215,111 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           />
         </section>
 
+        {/* Account & cloud sync */}
+        {account.enabled && (
+          <section className="grid gap-3 border-t border-line pt-4">
+            <div className="text-xs font-extrabold uppercase tracking-[0.04em] text-muted">
+              {t('account.section')}
+            </div>
+            <p className="text-xs text-faint">{t('account.note')}</p>
+
+            {account.user ? (
+              <>
+                <div className="flex items-center gap-3 rounded-[12px] border border-line bg-panel/40 p-3">
+                  {account.user.photoURL ? (
+                    <img
+                      src={account.user.photoURL}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid h-10 w-10 place-items-center rounded-full bg-lime-soft text-sm font-extrabold text-lime-ink">
+                      {(account.user.displayName || account.user.email || '?')[0]?.toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13.5px] font-bold">
+                      {account.user.displayName || account.user.email}
+                    </div>
+                    {account.user.displayName && (
+                      <div className="truncate text-xs text-muted">{account.user.email}</div>
+                    )}
+                    <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-lime-ink">
+                      <span
+                        className={cn(
+                          'h-1.5 w-1.5 rounded-full',
+                          account.status === 'connected' ? 'bg-lime' : 'bg-warn',
+                        )}
+                      />
+                      {t(
+                        account.status === 'paused'
+                          ? 'account.paused'
+                          : account.status === 'migrating'
+                            ? 'account.migrating'
+                            : 'account.connected',
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {account.status === 'error' && (
+                    <Button size="sm" icon="refresh" onClick={() => void account.retry(state)}>
+                      {t('account.retry')}
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="dangerGhost"
+                    icon="logout"
+                    disabled={inRoom || accountBusy}
+                    onClick={() => void account.signOut()}
+                  >
+                    {t('account.signOut')}
+                  </Button>
+                </div>
+                {inRoom && <p className="text-xs text-faint">{t('account.leaveBeforeSignOut')}</p>}
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 text-[13px] font-semibold text-muted">
+                  <span className="h-2 w-2 rounded-full bg-faint" />
+                  {t('account.localOnly')}
+                </div>
+                <Button
+                  size="sm"
+                  variant="lime"
+                  icon="login"
+                  disabled={accountBusy}
+                  onClick={() => void account.signIn(state)}
+                  className="w-fit"
+                >
+                  {t(
+                    account.status === 'signingIn'
+                      ? 'account.signingIn'
+                      : account.status === 'migrating'
+                        ? 'account.migrating'
+                        : 'account.signIn',
+                  )}
+                </Button>
+              </>
+            )}
+            {account.error && (
+              <p className="rounded-[10px] border border-bad/25 bg-bad-soft px-3 py-2 text-xs text-bad">
+                {t(`account.error.${account.error}`)}
+              </p>
+            )}
+          </section>
+        )}
+
         {/* Your data */}
         <section className="grid gap-3 border-t border-line pt-4">
           <div className="text-xs font-extrabold uppercase tracking-[0.04em] text-muted">
             {t('settings.yourData')}
           </div>
-          <p className="text-xs text-faint">{t('settings.dataNote')}</p>
+          <p className="text-xs text-faint">
+            {t(account.user ? 'settings.dataNoteCloud' : 'settings.dataNote')}
+          </p>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" icon="download" onClick={exportData}>
               {t('settings.export')}
@@ -213,6 +343,41 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             hidden
             onChange={onImportFile}
           />
+          {account.enabled && (
+            <div className="mt-1 grid gap-2 border-t border-line-2 pt-3">
+              <div className="text-xs font-bold text-muted">{t('account.backupTitle')}</div>
+              <p className="text-xs text-faint">{t('account.backupNote')}</p>
+              {account.backups.length ? (
+                <div className="grid gap-2">
+                  {account.backups.map((backup) => (
+                    <div
+                      key={backup.key}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-line bg-panel/35 px-3 py-2"
+                    >
+                      <span className="text-xs font-semibold text-muted">
+                        {t('account.backupDate', {
+                          date: new Intl.DateTimeFormat(undefined, {
+                            dateStyle: 'medium',
+                            timeStyle: 'short',
+                          }).format(backup.createdAt),
+                        })}
+                      </span>
+                      <div className="flex gap-1.5">
+                        <Button size="sm" icon="restore" onClick={() => onRestoreBackup(backup)}>
+                          {t('account.restore')}
+                        </Button>
+                        <Button size="sm" icon="download" onClick={() => onDownloadBackup(backup)}>
+                          {t('account.download')}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-faint">{t('account.noBackups')}</p>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Collaboration */}

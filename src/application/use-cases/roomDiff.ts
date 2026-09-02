@@ -5,8 +5,8 @@ import type {
   Wedding,
 } from '@domain/entities/types';
 
-/** The array collections that sync as per-item documents. */
-export const ROOM_COLLECTIONS: PlanCollectionKey[] = [
+/** The plan arrays that sync as per-item documents in any remote plan space. */
+export const PLAN_COLLECTIONS: PlanCollectionKey[] = [
   'vendors',
   'budget',
   'tasks',
@@ -14,6 +14,9 @@ export const ROOM_COLLECTIONS: PlanCollectionKey[] = [
   'shopping',
   'contacts',
 ];
+
+/** Backward-compatible room name; rooms and personal accounts sync the same data. */
+export const ROOM_COLLECTIONS = PLAN_COLLECTIONS;
 
 /** The upserts and deletes for a single collection between two plan states. */
 export interface CollectionDelta {

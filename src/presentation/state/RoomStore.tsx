@@ -26,8 +26,8 @@ interface RoomContextValue {
   roomId: string | null;
   peers: Peer[];
   error: RoomError | null;
-  createRoom: (seed: PlanState) => Promise<void>;
-  join: (roomId: string) => Promise<void>;
+  createRoom: (seed: PlanState, beforeConnect?: () => void) => Promise<void>;
+  join: (roomId: string, beforeConnect?: () => void) => Promise<void>;
   leave: () => void;
   /** Copy the shareable room URL to the clipboard. */
   copyLink: () => Promise<boolean>;
@@ -123,9 +123,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
   );
 
   const createRoom = useCallback(
-    async (seed: PlanState) => {
+    async (seed: PlanState, beforeConnect?: () => void) => {
       if (!firebaseEnabled || busyRef.current) return;
       busyRef.current = true;
+      beforeConnect?.();
       setStatus('connecting');
       setError(null);
       try {
@@ -146,9 +147,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
   );
 
   const join = useCallback(
-    async (id: string) => {
+    async (id: string, beforeConnect?: () => void) => {
       if (!firebaseEnabled || busyRef.current) return;
       busyRef.current = true;
+      beforeConnect?.();
       setStatus('connecting');
       setError(null);
       try {
