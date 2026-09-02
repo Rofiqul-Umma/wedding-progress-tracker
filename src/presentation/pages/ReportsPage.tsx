@@ -110,34 +110,36 @@ function SectionTable({
         {section.rows.length === 0 ? (
           <div className="px-4 py-6 text-center text-[13px] text-faint">{emptyLabel}</div>
         ) : (
-          <table className="w-full border-collapse text-[13px]">
-            <thead>
-              <tr className="border-b border-line bg-panel/50 text-left">
-                {section.columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className={`px-3.5 py-2.5 font-bold text-muted ${numeric(col.type) ? 'text-right tnum' : ''}`}
-                  >
-                    {fmt.t(col.labelKey)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {section.rows.map((row, i) => (
-                <tr key={i} className="border-b border-line last:border-b-0">
+          <div className="overflow-x-auto print:overflow-visible">
+            <table className="w-full border-collapse text-[13px]">
+              <thead>
+                <tr className="border-b border-line bg-panel/50 text-left">
                   {section.columns.map((col) => (
-                    <td
+                    <th
                       key={col.key}
-                      className={`px-3.5 py-2.5 ${numeric(col.type) ? 'text-right tnum' : ''}`}
+                      className={`whitespace-nowrap px-3.5 py-2.5 font-bold text-muted print:whitespace-normal ${numeric(col.type) ? 'text-right tnum' : ''}`}
                     >
-                      {formatCell(row[col.key], col.type, fmt) || '—'}
-                    </td>
+                      {fmt.t(col.labelKey)}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {section.rows.map((row, i) => (
+                  <tr key={i} className="border-b border-line last:border-b-0">
+                    {section.columns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={`whitespace-nowrap px-3.5 py-2.5 print:whitespace-normal ${numeric(col.type) ? 'text-right tnum' : ''}`}
+                      >
+                        {formatCell(row[col.key], col.type, fmt) || '—'}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </section>

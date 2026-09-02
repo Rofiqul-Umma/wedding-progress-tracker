@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { ModalShell } from './ModalShell';
 import { Icon } from './Icon';
+import { Button } from './Button';
 import { Chip, type ChipVariant } from './Chip';
 import { Avatar } from './Avatar';
 import { TaskDetail } from '@presentation/components/dashboard/TaskDetail';
@@ -10,6 +11,7 @@ import { usePlan } from '@presentation/state/PlanStore';
 import { useNav } from '@presentation/state/NavStore';
 import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
+import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { iconForCategory, categoryColor } from '@domain/value-objects/status';
 import type {
@@ -51,14 +53,10 @@ function Header({
   eyebrow,
   category,
   title,
-  onEdit,
-  editLabel,
 }: {
   eyebrow: string;
   category: string;
   title: string;
-  onEdit: () => void;
-  editLabel: string;
 }) {
   return (
     <div className="mb-5 flex items-start gap-3">
@@ -69,15 +67,6 @@ function Header({
         </div>
         <h3 className="text-lg font-bold leading-tight">{title}</h3>
       </div>
-      <button
-        type="button"
-        onClick={onEdit}
-        aria-label={editLabel}
-        title={editLabel}
-        className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink"
-      >
-        <Icon name="edit" size={18} />
-      </button>
     </div>
   );
 }
@@ -91,31 +80,44 @@ function Notes({ label, value }: { label: string; value: string }) {
   );
 }
 
+function Footer({
+  onEdit,
+  onDelete,
+  t,
+}: {
+  onEdit: () => void;
+  onDelete: () => void;
+  t: TFunction;
+}) {
+  return (
+    <div className="mt-6 flex gap-2.5 border-t border-line pt-5">
+      <Button variant="default" icon="edit" onClick={onEdit} className="flex-1">
+        {t('common.edit')}
+      </Button>
+      <Button variant="dangerGhost" icon="delete" onClick={onDelete}>
+        {t('common.delete')}
+      </Button>
+    </div>
+  );
+}
+
 function VendorBody({
   v,
   linkedName,
   onContact,
-  onEdit,
   t,
   money,
 }: {
   v: Vendor;
   linkedName: string | null;
   onContact: () => void;
-  onEdit: () => void;
   t: TFunction;
   money: Money;
 }) {
   const person = linkedName ?? v.contact ?? '';
   return (
     <>
-      <Header
-        eyebrow={t('entity.vendor')}
-        category={v.category}
-        title={v.name}
-        onEdit={onEdit}
-        editLabel={t('vendors.editAria', { name: v.name })}
-      />
+      <Header eyebrow={t('entity.vendor')} category={v.category} title={v.name} />
       <Field label={t('forms.vendor.status')}>
         <span>
           <Chip variant={VENDOR_CHIP[v.status]} dot>
@@ -179,12 +181,10 @@ function VendorBody({
 
 function ShoppingBody({
   item,
-  onEdit,
   t,
   money,
 }: {
   item: ShoppingItem;
-  onEdit: () => void;
   t: TFunction;
   money: Money;
 }) {
@@ -192,13 +192,7 @@ function ShoppingBody({
   const lineTotal = (+item.price || 0) * qty;
   return (
     <>
-      <Header
-        eyebrow={t('entity.shopping')}
-        category={item.category}
-        title={item.name}
-        onEdit={onEdit}
-        editLabel={t('shopping.editAria', { name: item.name })}
-      />
+      <Header eyebrow={t('entity.shopping')} category={item.category} title={item.name} />
       {item.image && (
         <img
           src={item.image}
@@ -252,24 +246,16 @@ function ShoppingBody({
 
 function SeserahanBody({
   item,
-  onEdit,
   t,
   money,
 }: {
   item: SeserahanItem;
-  onEdit: () => void;
   t: TFunction;
   money: Money;
 }) {
   return (
     <>
-      <Header
-        eyebrow={t('entity.seserahan')}
-        category={item.category}
-        title={item.name}
-        onEdit={onEdit}
-        editLabel={t('seserahan.editAria', { name: item.name })}
-      />
+      <Header eyebrow={t('entity.seserahan')} category={item.category} title={item.name} />
       <Field label={t('forms.seserahan.status')}>
         <span>
           <Chip variant={SES_CHIP[item.status]} dot>
@@ -303,6 +289,7 @@ export function PreviewModal() {
   const { state } = usePlan();
   const { gotoContact } = useNav();
   const { taskForm, vendorForm, shoppingForm, seserahanForm } = useForms();
+  const { deleteTask, deleteVendor, deleteShopping, deleteSeserahan } = usePlanActions();
   const { t } = useTranslation();
   const { money } = useFormat();
 
@@ -312,18 +299,21 @@ export function PreviewModal() {
     closePreview();
     open();
   };
+  const deleteAndClose = (remove: () => void) => {
+    closePreview();
+    remove();
+  };
 
   let body: ReactNode = null;
+  let onEdit: () => void;
+  let onDelete: () => void;
 
   if (preview.kind === 'task') {
     const task = state.tasks.find((x) => x.id === preview.id);
     if (!task) return null;
-    body = (
-      <TaskDetail
-        task={task}
-        onEdit={(task) => editAndClose(() => openForm(taskForm(task)))}
-      />
-    );
+    body = <TaskDetail task={task} />;
+    onEdit = () => editAndClose(() => openForm(taskForm(task)));
+    onDelete = () => deleteAndClose(() => deleteTask(task.id));
   } else if (preview.kind === 'vendor') {
     const v = state.vendors.find((x) => x.id === preview.id);
     if (!v) return null;
@@ -339,38 +329,32 @@ export function PreviewModal() {
             gotoContact(v.contactId);
           }
         }}
-        onEdit={() => editAndClose(() => openForm(vendorForm(v)))}
         t={t}
         money={money}
       />
     );
+    onEdit = () => editAndClose(() => openForm(vendorForm(v)));
+    onDelete = () => deleteAndClose(() => deleteVendor(v.id));
   } else if (preview.kind === 'shopping') {
     const item = state.shopping.find((x) => x.id === preview.id);
     if (!item) return null;
-    body = (
-      <ShoppingBody
-        item={item}
-        onEdit={() => editAndClose(() => openForm(shoppingForm(item)))}
-        t={t}
-        money={money}
-      />
-    );
+    body = <ShoppingBody item={item} t={t} money={money} />;
+    onEdit = () => editAndClose(() => openForm(shoppingForm(item)));
+    onDelete = () => deleteAndClose(() => deleteShopping(item.id));
   } else {
     const item = state.seserahan.find((x) => x.id === preview.id);
     if (!item) return null;
-    body = (
-      <SeserahanBody
-        item={item}
-        onEdit={() => editAndClose(() => openForm(seserahanForm(item)))}
-        t={t}
-        money={money}
-      />
-    );
+    body = <SeserahanBody item={item} t={t} money={money} />;
+    onEdit = () => editAndClose(() => openForm(seserahanForm(item)));
+    onDelete = () => deleteAndClose(() => deleteSeserahan(item.id));
   }
 
   return (
     <ModalShell onClose={closePreview} ariaLabel={t('report.col.detail')}>
-      <div className="p-6 max-[520px]:p-5">{body}</div>
+      <div className="p-6 max-[520px]:p-5">
+        {body}
+        <Footer onEdit={onEdit} onDelete={onDelete} t={t} />
+      </div>
     </ModalShell>
   );
 }

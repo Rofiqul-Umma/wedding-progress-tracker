@@ -196,6 +196,7 @@ export function VendorsPage() {
                   onDelete={() => deleteVendor(v.id)}
                   editLabel={t('vendors.editAria', { name: v.name })}
                   deleteLabel={t('vendors.deleteAria', { name: v.name })}
+                  mobileHidden
                 />
               </Row>
             );

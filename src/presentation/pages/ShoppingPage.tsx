@@ -173,7 +173,7 @@ function ShoppingRow({ item, onCycle, onOpen, onEdit, onDelete }: ShoppingRowPro
           rel="noopener noreferrer"
           title={t('shopping.openLink')}
           aria-label={t('shopping.openLink')}
-          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink"
+          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
         >
           <Icon name="link" size={17} />
         </a>
@@ -203,6 +203,7 @@ function ShoppingRow({ item, onCycle, onOpen, onEdit, onDelete }: ShoppingRowPro
         onDelete={onDelete}
         editLabel={t('shopping.editAria', { name: item.name })}
         deleteLabel={t('shopping.deleteAria', { name: item.name })}
+        mobileHidden
       />
     </Row>
   );

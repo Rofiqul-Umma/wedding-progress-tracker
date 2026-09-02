@@ -9,7 +9,8 @@ import type { Task } from '@domain/entities/types';
 
 interface TaskDetailProps {
   task: Task | undefined;
-  onEdit: (task: Task) => void;
+  /** Omit to hide the header edit button (e.g. when a preview footer owns editing). */
+  onEdit?: (task: Task) => void;
 }
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = {
@@ -88,15 +89,17 @@ export function TaskDetail({ task, onEdit }: TaskDetailProps) {
     <>
       <div className="mb-5 flex items-center justify-between">
         <h3 className="text-lg font-bold">{t('detail.title')}</h3>
-        <button
-          type="button"
-          onClick={() => onEdit(task)}
-          aria-label={t('detail.editAria', { name: task.title })}
-          title={t('common.save')}
-          className="grid h-8 w-8 place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink"
-        >
-          <Icon name="edit" size={18} />
-        </button>
+        {onEdit && (
+          <button
+            type="button"
+            onClick={() => onEdit(task)}
+            aria-label={t('detail.editAria', { name: task.title })}
+            title={t('common.save')}
+            className="grid h-8 w-8 place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink"
+          >
+            <Icon name="edit" size={18} />
+          </button>
+        )}
       </div>
 
       <Field label={t('detail.goalName')}>

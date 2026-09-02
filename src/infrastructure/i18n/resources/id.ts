@@ -6,6 +6,8 @@ export const id = {
   common: {
     add: 'Tambah',
     save: 'Simpan',
+    edit: 'Ubah',
+    delete: 'Hapus',
     cancel: 'Batal',
     close: 'Tutup',
     search: 'Cari',

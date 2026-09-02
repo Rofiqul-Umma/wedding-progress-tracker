@@ -180,6 +180,7 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
         onDelete={onDelete}
         editLabel={t('seserahan.editAria', { name: item.name })}
         deleteLabel={t('seserahan.deleteAria', { name: item.name })}
+        mobileHidden
       />
     </Row>
   );
