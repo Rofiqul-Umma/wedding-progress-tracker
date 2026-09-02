@@ -490,6 +490,10 @@ export const id = {
     restoredItem: '{{label}} dipulihkan ♥',
     undo: 'Urungkan',
   },
+  preview: {
+    viewAria: 'Lihat {{name}}',
+    total: 'Total',
+  },
   entity: {
     vendor: 'Vendor',
     expense: 'Pengeluaran',

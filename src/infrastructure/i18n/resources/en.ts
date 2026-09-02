@@ -492,6 +492,10 @@ export const en = {
     restoredItem: '{{label}} restored ♥',
     undo: 'Undo',
   },
+  preview: {
+    viewAria: 'View {{name}}',
+    total: 'Total',
+  },
   entity: {
     vendor: 'Vendor',
     expense: 'Expense',

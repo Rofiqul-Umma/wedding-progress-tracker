@@ -24,7 +24,7 @@ const SHORT_DATE: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' 
 export function TasksPage() {
   const { t } = useTranslation();
   const { state } = usePlan();
-  const { openForm } = useUi();
+  const { openForm, openPreview } = useUi();
   const { taskForm } = useForms();
   const { toggleTask, deleteTask } = usePlanActions();
   const matches = useSearchMatch();
@@ -57,6 +57,7 @@ export function TasksPage() {
               key={task.id}
               task={task}
               onToggle={() => toggleTask(task.id)}
+              onOpen={() => openPreview({ kind: 'task', id: task.id })}
               onEdit={() => openForm(taskForm(task))}
               onDelete={() => deleteTask(task.id)}
             />
@@ -78,11 +79,12 @@ export function TasksPage() {
 interface TaskRowProps {
   task: Task;
   onToggle: () => void;
+  onOpen: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
+function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
   const { t } = useTranslation();
   const { date } = useFormat();
   const color = categoryColor(task.cat);
@@ -102,7 +104,7 @@ function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
   }
 
   return (
-    <Row>
+    <Row onActivate={onOpen} activateLabel={t('preview.viewAria', { name: task.title })}>
       <Check
         checked={task.done}
         onChange={onToggle}

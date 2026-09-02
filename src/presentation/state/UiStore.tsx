@@ -8,10 +8,20 @@ import {
 } from 'react';
 import type { FormDescriptor } from '@presentation/components/forms/types';
 
+/** Which entity a read-only preview dialog should show. */
+export type PreviewTarget =
+  | { kind: 'task'; id: string }
+  | { kind: 'vendor'; id: string }
+  | { kind: 'shopping'; id: string }
+  | { kind: 'seserahan'; id: string };
+
 interface UiContextValue {
   form: FormDescriptor | null;
   openForm: (f: FormDescriptor) => void;
   closeForm: () => void;
+  preview: PreviewTarget | null;
+  openPreview: (p: PreviewTarget) => void;
+  closePreview: () => void;
   settingsOpen: boolean;
   openSettings: () => void;
   closeSettings: () => void;
@@ -24,11 +34,14 @@ const UiContext = createContext<UiContextValue | null>(null);
 
 export function UiProvider({ children }: { children: ReactNode }) {
   const [form, setForm] = useState<FormDescriptor | null>(null);
+  const [preview, setPreview] = useState<PreviewTarget | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
   const openForm = useCallback((f: FormDescriptor) => setForm(f), []);
   const closeForm = useCallback(() => setForm(null), []);
+  const openPreview = useCallback((p: PreviewTarget) => setPreview(p), []);
+  const closePreview = useCallback(() => setPreview(null), []);
   const openSettings = useCallback(() => setSettingsOpen(true), []);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
   const openNav = useCallback(() => setNavOpen(true), []);
@@ -39,6 +52,9 @@ export function UiProvider({ children }: { children: ReactNode }) {
       form,
       openForm,
       closeForm,
+      preview,
+      openPreview,
+      closePreview,
       settingsOpen,
       openSettings,
       closeSettings,
@@ -50,6 +66,9 @@ export function UiProvider({ children }: { children: ReactNode }) {
       form,
       openForm,
       closeForm,
+      preview,
+      openPreview,
+      closePreview,
       settingsOpen,
       openSettings,
       closeSettings,

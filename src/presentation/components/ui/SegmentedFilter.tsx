@@ -19,7 +19,7 @@ export function SegmentedFilter<T extends string>({
   onChange,
 }: SegmentedFilterProps<T>) {
   return (
-    <div className="inline-flex gap-1 rounded-xl bg-panel p-1">
+    <div className="inline-flex max-w-full gap-1 overflow-x-auto rounded-xl bg-panel p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -28,7 +28,7 @@ export function SegmentedFilter<T extends string>({
             type="button"
             onClick={() => onChange(o.value)}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-[9px] px-[13px] py-[7px] text-[13px] font-semibold transition-all duration-150 ease-planner',
+              'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[9px] px-[13px] py-[7px] text-[13px] font-semibold transition-all duration-150 ease-planner',
               on ? 'bg-app text-ink shadow-sm' : 'text-muted hover:text-ink',
             )}
           >

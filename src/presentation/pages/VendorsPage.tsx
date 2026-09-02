@@ -44,7 +44,7 @@ export function VendorsPage() {
   const { t } = useTranslation();
   const { state } = usePlan();
   const { gotoContact } = useNav();
-  const { openForm } = useUi();
+  const { openForm, openPreview } = useUi();
   const { vendorForm } = useForms();
   const { deleteVendor } = usePlanActions();
   const { money } = useFormat();
@@ -134,12 +134,18 @@ export function VendorsPage() {
             const phone = linked ? linked.phone : v.phone;
             const meta = [phone, v.notes].filter(Boolean).join(' · ');
             return (
-              <Row key={v.id}>
+              <Row
+                key={v.id}
+                onActivate={() => openPreview({ kind: 'vendor', id: v.id })}
+                activateLabel={t('preview.viewAria', { name: v.name })}
+              >
                 <Avatar color={color} icon={iconForCategory(v.category)} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
                     <span className="truncate">{v.name}</span>
-                    <Chip variant="gray">{v.category}</Chip>
+                    <Chip variant="gray" className="max-[520px]:hidden">
+                      {v.category}
+                    </Chip>
                   </div>
                   <div className="mt-0.5 truncate text-[12.5px] text-muted">
                     {linked ? (
@@ -180,7 +186,7 @@ export function VendorsPage() {
                     rel="noopener noreferrer"
                     title={t('vendors.openSocial')}
                     aria-label={t('vendors.openSocial')}
-                    className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink"
+                    className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
                   >
                     <Icon name="public" size={17} />
                   </a>

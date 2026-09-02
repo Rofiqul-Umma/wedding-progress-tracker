@@ -31,7 +31,7 @@ const STATUS_CHIP: Record<SeserahanStatus, ChipVariant> = {
 export function SeserahanPage() {
   const { t } = useTranslation();
   const { state } = usePlan();
-  const { openForm } = useUi();
+  const { openForm, openPreview } = useUi();
   const { seserahanForm } = useForms();
   const { cycleSeserahan, deleteSeserahan } = usePlanActions();
   const { money } = useFormat();
@@ -116,6 +116,7 @@ export function SeserahanPage() {
                   key={item.id}
                   item={item}
                   onCycle={() => cycleSeserahan(item.id)}
+                  onOpen={() => openPreview({ kind: 'seserahan', id: item.id })}
                   onEdit={() => openForm(seserahanForm(item))}
                   onDelete={() => deleteSeserahan(item.id)}
                 />
@@ -133,18 +134,19 @@ export function SeserahanPage() {
 interface SeserahanRowProps {
   item: SeserahanItem;
   onCycle: () => void;
+  onOpen: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function SeserahanRow({ item, onCycle, onEdit, onDelete }: SeserahanRowProps) {
+function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowProps) {
   const { t } = useTranslation();
   const { money } = useFormat();
   const color = categoryColor(item.category);
   const meta = [item.category || t('seserahan.item'), item.notes].filter(Boolean).join(' · ');
 
   return (
-    <Row>
+    <Row onActivate={onOpen} activateLabel={t('preview.viewAria', { name: item.name })}>
       <Avatar color={color} icon={iconForCategory(item.category)} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">

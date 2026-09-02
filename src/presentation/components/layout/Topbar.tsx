@@ -100,7 +100,7 @@ export function Topbar() {
   }
 
   return (
-    <header className="flex flex-none items-center gap-4 border-b border-line px-[26px] py-[22px] max-[860px]:gap-2.5 max-[860px]:p-4 print:hidden">
+    <header className="flex flex-none items-center gap-4 border-b border-line px-[26px] py-[22px] pl-[calc(1.625rem+env(safe-area-inset-left))] pr-[calc(1.625rem+env(safe-area-inset-right))] max-[860px]:gap-2.5 max-[860px]:p-4 max-[860px]:pl-[calc(1rem+env(safe-area-inset-left))] max-[860px]:pr-[calc(1rem+env(safe-area-inset-right))] print:hidden">
       <IconButton
         icon="menu"
         label={t('nav.menu')}
@@ -108,7 +108,7 @@ export function Topbar() {
         className="hidden h-10 w-10 max-[860px]:grid"
       />
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight max-[520px]:text-xl">{title}</h1>
         <p className="mt-[3px] truncate text-[13px] text-muted max-[460px]:hidden">
           {sub}
         </p>
@@ -138,8 +138,8 @@ export function Topbar() {
         )}
         <NotificationsPanel />
         {page !== 'reports' && (
-          <Button variant="primary" icon="add" onClick={openAdd}>
-            {addLabel}
+          <Button variant="primary" icon="add" onClick={openAdd} aria-label={addLabel}>
+            <span className="max-[520px]:hidden">{addLabel}</span>
           </Button>
         )}
       </div>

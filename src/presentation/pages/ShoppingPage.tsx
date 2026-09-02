@@ -32,7 +32,7 @@ const STATUS_CHIP: Record<ShoppingStatus, ChipVariant> = {
 export function ShoppingPage() {
   const { t } = useTranslation();
   const { state } = usePlan();
-  const { openForm } = useUi();
+  const { openForm, openPreview } = useUi();
   const { shoppingForm } = useForms();
   const { cycleShopping, deleteShopping } = usePlanActions();
   const { money } = useFormat();
@@ -116,6 +116,7 @@ export function ShoppingPage() {
                   key={item.id}
                   item={item}
                   onCycle={() => cycleShopping(item.id)}
+                  onOpen={() => openPreview({ kind: 'shopping', id: item.id })}
                   onEdit={() => openForm(shoppingForm(item))}
                   onDelete={() => deleteShopping(item.id)}
                 />
@@ -133,11 +134,12 @@ export function ShoppingPage() {
 interface ShoppingRowProps {
   item: ShoppingItem;
   onCycle: () => void;
+  onOpen: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function ShoppingRow({ item, onCycle, onEdit, onDelete }: ShoppingRowProps) {
+function ShoppingRow({ item, onCycle, onOpen, onEdit, onDelete }: ShoppingRowProps) {
   const { t } = useTranslation();
   const { money } = useFormat();
   const color = categoryColor(item.category);
@@ -147,7 +149,7 @@ function ShoppingRow({ item, onCycle, onEdit, onDelete }: ShoppingRowProps) {
   const lineTotal = (+item.price || 0) * (+item.qty || 1);
 
   return (
-    <Row>
+    <Row onActivate={onOpen} activateLabel={t('preview.viewAria', { name: item.name })}>
       {item.image ? (
         <img
           src={item.image}

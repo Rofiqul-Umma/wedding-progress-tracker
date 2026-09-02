@@ -10,7 +10,10 @@ interface RowActionsProps {
   className?: string;
 }
 
-/** Edit + delete pair, hidden until the parent `.group` is hovered. */
+/**
+ * Edit + delete pair. Hidden until the parent `.group` is hovered on pointer
+ * devices; always visible on touch devices, which have no hover state.
+ */
 export function RowActions({
   onEdit,
   onDelete,
@@ -21,7 +24,7 @@ export function RowActions({
   return (
     <div
       className={cn(
-        'flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100',
+        'flex flex-none gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100',
         className,
       )}
     >
