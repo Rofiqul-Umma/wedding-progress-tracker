@@ -290,7 +290,7 @@ describe('contact use cases', () => {
       name: 'Renee',
       role: 'Coordinator',
       phone: '',
-      email: '',
+      social: '',
       notes: '',
     });
     expect(s.contacts[0].name).toBe('Renee');

@@ -195,13 +195,13 @@ export function buildReportModel(
       { key: 'name', labelKey: 'report.col.name', type: 'text' },
       { key: 'role', labelKey: 'report.col.role', type: 'text' },
       { key: 'phone', labelKey: 'report.col.phone', type: 'text' },
-      { key: 'email', labelKey: 'report.col.email', type: 'text' },
+      { key: 'social', labelKey: 'report.col.social', type: 'text' },
     ],
     rows: state.contacts.map((c) => ({
       name: c.name,
       role: c.role,
       phone: c.phone,
-      email: c.email,
+      social: c.social,
     })),
   });
 

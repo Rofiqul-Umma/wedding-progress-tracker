@@ -48,6 +48,12 @@ export function migrate(input: unknown): PlanState {
     tasks: Array.isArray(s.tasks) ? (s.tasks as Task[]) : [],
     seserahan: Array.isArray(s.seserahan) ? (s.seserahan as SeserahanItem[]) : [],
     shopping: Array.isArray(s.shopping) ? (s.shopping as ShoppingItem[]) : [],
-    contacts: Array.isArray(s.contacts) ? (s.contacts as Contact[]) : [],
+    contacts: Array.isArray(s.contacts)
+      ? (s.contacts as Obj[]).map((c) => ({
+          ...(c as unknown as Contact),
+          // Field renamed email → social; carry legacy backups forward.
+          social: str(c.social) || str(c.email),
+        }))
+      : [],
   };
 }

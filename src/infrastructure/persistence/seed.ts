@@ -59,9 +59,9 @@ export function seed(): PlanState {
       { id: uid(), name: 'Table numbers (1–15)', category: 'Stationery', store: 'Local print shop', price: 3, qty: 15, status: 'ordered', url: '', image: '', notes: 'Acrylic, matching signage.' },
     ],
     contacts: [
-      { id: uid(), name: 'Reneé Adler', role: 'Venue Coordinator', phone: '(707) 555-0182', email: 'renee@ivybarn.co', notes: 'Best reached mornings. Handles day-of logistics.' },
-      { id: uid(), name: 'Pastor Elena Cruz', role: 'Officiant', phone: '(707) 555-6621', email: 'elena.cruz@gracechapel.org', notes: 'Rehearsal the evening before at 5pm.' },
-      { id: uid(), name: 'Mom (Diane)', role: 'Family / Helper', phone: '(707) 555-0043', email: 'diane.h@email.com', notes: 'Coordinating the rehearsal dinner.' },
+      { id: uid(), name: 'Reneé Adler', role: 'Venue Coordinator', phone: '(707) 555-0182', social: 'instagram.com/ivybarnvenue', notes: 'Best reached mornings. Handles day-of logistics.' },
+      { id: uid(), name: 'Pastor Elena Cruz', role: 'Officiant', phone: '(707) 555-6621', social: 'instagram.com/pastorelena', notes: 'Rehearsal the evening before at 5pm.' },
+      { id: uid(), name: 'Mom (Diane)', role: 'Family / Helper', phone: '(707) 555-0043', social: 'tiktok.com/@dianehelps', notes: 'Coordinating the rehearsal dinner.' },
     ],
   };
 }

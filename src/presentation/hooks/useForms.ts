@@ -257,7 +257,7 @@ export function useForms() {
         { name: 'name', label: t('forms.contact.name'), value: c?.name, placeholder: t('forms.contact.namePh'), half: true },
         { name: 'role', label: t('forms.contact.role'), value: c?.role, placeholder: t('forms.contact.rolePh'), half: true },
         { name: 'phone', label: t('forms.contact.phone'), value: c?.phone, half: true },
-        { name: 'email', label: t('forms.contact.email'), type: 'email', value: c?.email, half: true },
+        { name: 'social', label: t('forms.contact.social'), type: 'url', value: c?.social, placeholder: t('forms.contact.socialPh'), half: true },
         { name: 'notes', label: t('forms.contact.notes'), type: 'textarea', value: c?.notes, placeholder: t('forms.contact.notesPh') },
       ],
       submit: (values) => {
@@ -266,7 +266,7 @@ export function useForms() {
           name: values.name,
           role: values.role,
           phone: values.phone,
-          email: values.email,
+          social: values.social.trim(),
           notes: values.notes,
         };
         setState((s) => (c ? updateContact(s, c.id, data) : addContact(s, data)));

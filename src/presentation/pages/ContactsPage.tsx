@@ -99,11 +99,16 @@ export function ContactsPage() {
                   </a>
                 </div>
               )}
-              {c.email && (
+              {c.social && (
                 <div className="mt-[9px] flex items-center gap-[9px] text-[13px] text-muted">
-                  <Icon name="mail" size={17} className="text-faint" />
-                  <a href={`mailto:${c.email}`} className="truncate hover:text-ink">
-                    {c.email}
+                  <Icon name="public" size={17} className="text-faint" />
+                  <a
+                    href={/^https?:\/\//i.test(c.social) ? c.social : `https://${c.social}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="truncate hover:text-ink"
+                  >
+                    {c.social}
                   </a>
                 </div>
               )}

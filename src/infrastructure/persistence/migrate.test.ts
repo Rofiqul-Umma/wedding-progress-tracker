@@ -86,6 +86,16 @@ describe('migrate', () => {
     expect(s.vendors[0].social).toBe('instagram.com/ivy');
   });
 
+  it('carries a legacy contact email forward as social', () => {
+    const s = migrate({
+      wedding: {},
+      contacts: [
+        { id: 'c1', name: 'Renee', role: '', phone: '', email: 'renee@ex.com', notes: '' },
+      ],
+    });
+    expect(s.contacts[0].social).toBe('renee@ex.com');
+  });
+
   it('preserves a vendor down-payment amount', () => {
     const s = migrate({
       wedding: {},

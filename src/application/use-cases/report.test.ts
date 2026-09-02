@@ -90,7 +90,7 @@ describe('reportModelToCsv', () => {
   it('escapes fields containing commas and quotes', () => {
     const state = migrate({
       contacts: [
-        { id: 'c1', name: 'Adler, Reneé', role: 'Says "hi"', phone: '', email: '', notes: '' },
+        { id: 'c1', name: 'Adler, Reneé', role: 'Says "hi"', phone: '', social: '', notes: '' },
       ],
     });
     const csv = reportModelToCsv(buildReportModel(state), fmt);
@@ -101,6 +101,6 @@ describe('reportModelToCsv', () => {
   it('still emits headers for an empty plan', () => {
     const csv = reportModelToCsv(buildReportModel(migrate({})), fmt);
     expect(csv).toContain('report.sec.contacts');
-    expect(csv).toContain('report.col.email');
+    expect(csv).toContain('report.col.social');
   });
 });

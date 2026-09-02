@@ -120,7 +120,7 @@ describe('diffPlan', () => {
       name: `Person ${i}`,
       role: '',
       phone: '',
-      email: '',
+      social: '',
       notes: '',
     }));
     const d = diffPlan(prev, next);
