@@ -27,6 +27,8 @@ const ses = (status: SeserahanItem['status']): SeserahanItem => ({
   qty: 1,
   cost: 0,
   status,
+  url: '',
+  image: '',
   notes: '',
 });
 

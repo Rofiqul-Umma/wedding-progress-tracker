@@ -46,7 +46,7 @@ export function MobileDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label={t('nav.menu')}
-        className="drawer-in flex h-full w-[264px] max-w-[82vw] flex-col overflow-y-auto bg-app shadow-lg pl-[env(safe-area-inset-left)] pb-[env(safe-area-inset-bottom)]"
+        className="drawer-in flex h-full w-[264px] max-w-[82vw] flex-col overflow-y-auto bg-app shadow-lg pl-[var(--sa-left)] pt-[var(--sa-top)] pb-[var(--sa-bottom)]"
       >
         <SidebarContent onNavigate={closeNav} />
       </div>

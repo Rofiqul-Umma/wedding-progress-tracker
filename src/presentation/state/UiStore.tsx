@@ -15,6 +15,12 @@ export type PreviewTarget =
   | { kind: 'shopping'; id: string }
   | { kind: 'seserahan'; id: string };
 
+/** A full-size image shown over the app (attachment / reference photo). */
+export interface ImageView {
+  src: string;
+  alt: string;
+}
+
 interface UiContextValue {
   form: FormDescriptor | null;
   openForm: (f: FormDescriptor) => void;
@@ -22,6 +28,9 @@ interface UiContextValue {
   preview: PreviewTarget | null;
   openPreview: (p: PreviewTarget) => void;
   closePreview: () => void;
+  image: ImageView | null;
+  openImage: (src: string, alt: string) => void;
+  closeImage: () => void;
   settingsOpen: boolean;
   openSettings: () => void;
   closeSettings: () => void;
@@ -35,6 +44,7 @@ const UiContext = createContext<UiContextValue | null>(null);
 export function UiProvider({ children }: { children: ReactNode }) {
   const [form, setForm] = useState<FormDescriptor | null>(null);
   const [preview, setPreview] = useState<PreviewTarget | null>(null);
+  const [image, setImage] = useState<ImageView | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
@@ -42,6 +52,8 @@ export function UiProvider({ children }: { children: ReactNode }) {
   const closeForm = useCallback(() => setForm(null), []);
   const openPreview = useCallback((p: PreviewTarget) => setPreview(p), []);
   const closePreview = useCallback(() => setPreview(null), []);
+  const openImage = useCallback((src: string, alt: string) => setImage({ src, alt }), []);
+  const closeImage = useCallback(() => setImage(null), []);
   const openSettings = useCallback(() => setSettingsOpen(true), []);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
   const openNav = useCallback(() => setNavOpen(true), []);
@@ -55,6 +67,9 @@ export function UiProvider({ children }: { children: ReactNode }) {
       preview,
       openPreview,
       closePreview,
+      image,
+      openImage,
+      closeImage,
       settingsOpen,
       openSettings,
       closeSettings,
@@ -69,6 +84,9 @@ export function UiProvider({ children }: { children: ReactNode }) {
       preview,
       openPreview,
       closePreview,
+      image,
+      openImage,
+      closeImage,
       settingsOpen,
       openSettings,
       closeSettings,

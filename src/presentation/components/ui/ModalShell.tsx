@@ -68,7 +68,7 @@ export function ModalShell({
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-ink/40 p-5 backdrop-blur-[3px]"
+      className="fixed inset-0 z-[100] grid place-items-center bg-ink/40 backdrop-blur-[3px] pt-[calc(1.25rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -81,7 +81,10 @@ export function ModalShell({
         aria-label={ariaLabel}
         onKeyDown={onKeyDown}
         className={cn(
-          'max-h-[90vh] w-full overflow-auto rounded-[20px] bg-app shadow-lg',
+          // `max-h-full` resolves against the inset-padded backdrop, so the
+          // dialog never slides under a notch or home indicator the way a
+          // fixed `90vh` would.
+          'max-h-full w-full overflow-auto rounded-[20px] bg-app shadow-lg',
           size === 'lg' ? 'max-w-[560px]' : 'max-w-[520px]',
         )}
       >

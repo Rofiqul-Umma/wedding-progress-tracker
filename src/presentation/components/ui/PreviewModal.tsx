@@ -181,10 +181,12 @@ function VendorBody({
 
 function ShoppingBody({
   item,
+  onViewImage,
   t,
   money,
 }: {
   item: ShoppingItem;
+  onViewImage: (src: string, alt: string) => void;
   t: TFunction;
   money: Money;
 }) {
@@ -194,11 +196,17 @@ function ShoppingBody({
     <>
       <Header eyebrow={t('entity.shopping')} category={item.category} title={item.name} />
       {item.image && (
-        <img
-          src={item.image}
-          alt={item.name}
-          className="mb-4 max-h-48 w-full rounded-xl border border-line-2 object-cover"
-        />
+        <button
+          type="button"
+          onClick={() => onViewImage(item.image, item.name)}
+          className="mb-4 block w-full"
+        >
+          <img
+            src={item.image}
+            alt={item.name}
+            className="max-h-48 w-full rounded-xl border border-line-2 object-cover"
+          />
+        </button>
       )}
       <Field label={t('forms.shopping.status')}>
         <span>
@@ -246,16 +254,31 @@ function ShoppingBody({
 
 function SeserahanBody({
   item,
+  onViewImage,
   t,
   money,
 }: {
   item: SeserahanItem;
+  onViewImage: (src: string, alt: string) => void;
   t: TFunction;
   money: Money;
 }) {
   return (
     <>
       <Header eyebrow={t('entity.seserahan')} category={item.category} title={item.name} />
+      {item.image && (
+        <button
+          type="button"
+          onClick={() => onViewImage(item.image, item.name)}
+          className="mb-4 block w-full"
+        >
+          <img
+            src={item.image}
+            alt={item.name}
+            className="max-h-48 w-full rounded-xl border border-line-2 object-cover"
+          />
+        </button>
+      )}
       <Field label={t('forms.seserahan.status')}>
         <span>
           <Chip variant={SES_CHIP[item.status]} dot>
@@ -278,6 +301,19 @@ function SeserahanBody({
           <span className="text-[13.5px] font-semibold tnum">{money(item.cost)}</span>
         </Field>
       )}
+      {item.url && (
+        <Field label={t('forms.seserahan.url')}>
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 truncate text-[13.5px] font-semibold text-info hover:underline"
+          >
+            <Icon name="link" size={16} />
+            <span className="truncate">{item.url}</span>
+          </a>
+        </Field>
+      )}
       <Notes label={t('forms.seserahan.notes')} value={item.notes} />
     </>
   );
@@ -285,7 +321,7 @@ function SeserahanBody({
 
 /** Read-only detail dialog opened by clicking a list row. */
 export function PreviewModal() {
-  const { preview, closePreview, openForm } = useUi();
+  const { preview, closePreview, openForm, openImage } = useUi();
   const { state } = usePlan();
   const { gotoContact } = useNav();
   const { taskForm, vendorForm, shoppingForm, seserahanForm } = useForms();
@@ -338,13 +374,13 @@ export function PreviewModal() {
   } else if (preview.kind === 'shopping') {
     const item = state.shopping.find((x) => x.id === preview.id);
     if (!item) return null;
-    body = <ShoppingBody item={item} t={t} money={money} />;
+    body = <ShoppingBody item={item} onViewImage={openImage} t={t} money={money} />;
     onEdit = () => editAndClose(() => openForm(shoppingForm(item)));
     onDelete = () => deleteAndClose(() => deleteShopping(item.id));
   } else {
     const item = state.seserahan.find((x) => x.id === preview.id);
     if (!item) return null;
-    body = <SeserahanBody item={item} t={t} money={money} />;
+    body = <SeserahanBody item={item} onViewImage={openImage} t={t} money={money} />;
     onEdit = () => editAndClose(() => openForm(seserahanForm(item)));
     onDelete = () => deleteAndClose(() => deleteSeserahan(item.id));
   }

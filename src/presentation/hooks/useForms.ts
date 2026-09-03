@@ -227,6 +227,8 @@ export function useForms() {
           half: true,
         },
         { name: 'cost', label: t('forms.seserahan.cost'), type: 'number', value: i?.cost, half: true },
+        { name: 'url', label: t('forms.seserahan.url'), type: 'url', value: i?.url, placeholder: t('forms.seserahan.urlPh') },
+        { name: 'image', label: t('forms.seserahan.image'), type: 'image', value: i?.image },
         { name: 'notes', label: t('forms.seserahan.notes'), type: 'textarea', value: i?.notes, placeholder: t('forms.seserahan.notesPh') },
       ],
       submit: (values) => {
@@ -240,6 +242,8 @@ export function useForms() {
           qty: Math.max(1, Math.round(numOr(values.qty, 1))),
           cost: numOr(values.cost),
           status,
+          url: values.url.trim(),
+          image: values.image,
           notes: values.notes,
         };
         setState((s) => (i ? updateSeserahan(s, i.id, data) : addSeserahan(s, data)));

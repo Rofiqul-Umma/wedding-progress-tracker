@@ -212,6 +212,8 @@ describe('seserahan use cases', () => {
       qty: 1,
       cost: 0,
       status: 'pending',
+      url: '',
+      image: '',
       notes: '',
     });
     const id = s.seserahan[0].id;
@@ -230,6 +232,8 @@ describe('seserahan use cases', () => {
       qty: 1,
       cost: 0,
       status: 'pending',
+      url: '',
+      image: '',
       notes: '',
     });
     const r = deleteSeserahan(s, s.seserahan[0].id);

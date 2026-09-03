@@ -25,6 +25,7 @@ const HARD_DOC_BYTES = 1_040_000;
 const ATTACHMENT_FIELD: Partial<Record<PlanCollectionKey, string>> = {
   tasks: 'attachment',
   shopping: 'image',
+  seserahan: 'image',
 };
 
 type Batch = ReturnType<typeof writeBatch>;

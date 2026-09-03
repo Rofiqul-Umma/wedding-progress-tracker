@@ -46,7 +46,15 @@ export function migrate(input: unknown): PlanState {
       : [],
     budget: Array.isArray(s.budget) ? (s.budget as BudgetItem[]) : [],
     tasks: Array.isArray(s.tasks) ? (s.tasks as Task[]) : [],
-    seserahan: Array.isArray(s.seserahan) ? (s.seserahan as SeserahanItem[]) : [],
+    seserahan: Array.isArray(s.seserahan)
+      ? (s.seserahan as Obj[]).map((i) => ({
+          ...(i as unknown as SeserahanItem),
+          // `url` / `image` were added after launch; legacy items lack them and
+          // the form/preview code reads them as plain strings.
+          url: str(i.url),
+          image: str(i.image),
+        }))
+      : [],
     shopping: Array.isArray(s.shopping) ? (s.shopping as ShoppingItem[]) : [],
     contacts: Array.isArray(s.contacts)
       ? (s.contacts as Obj[]).map((c) => ({

@@ -5,6 +5,7 @@ import { MobileDrawer } from '@presentation/components/layout/MobileDrawer';
 import { TaskDetail } from '@presentation/components/dashboard/TaskDetail';
 import { Modal } from '@presentation/components/ui/Modal';
 import { PreviewModal } from '@presentation/components/ui/PreviewModal';
+import { ImageViewer } from '@presentation/components/ui/ImageViewer';
 import { SettingsModal } from '@presentation/components/SettingsModal';
 import { DashboardPage } from '@presentation/pages/DashboardPage';
 import { VendorsPage } from '@presentation/pages/VendorsPage';
@@ -49,12 +50,12 @@ function Shell() {
           <div className="flex min-h-0 flex-1">
             <section
               key={page}
-              className="fade-in min-w-0 flex-1 overflow-auto px-[26px] pt-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] max-[860px]:px-4 max-[860px]:pt-[18px]"
+              className="fade-in min-w-0 flex-1 overflow-auto pt-6 pl-[calc(1.625rem+var(--sa-left))] pr-[calc(1.625rem+var(--sa-right))] pb-[calc(2.5rem+var(--sa-bottom))] max-[860px]:pt-[18px] max-[860px]:pl-[calc(1rem+var(--sa-left))] max-[860px]:pr-[calc(1rem+var(--sa-right))]"
             >
               <Page />
             </section>
             {page === 'dashboard' && (
-              <aside className="w-[306px] flex-none overflow-auto border-l border-line px-[22px] pb-8 pt-6 max-[1040px]:hidden">
+              <aside className="w-[306px] flex-none overflow-auto border-l border-line px-[22px] pt-6 pr-[calc(1.375rem+var(--sa-right))] pb-[calc(2rem+var(--sa-bottom))] max-[1040px]:hidden">
                 <TaskDetail task={selectedTask} onEdit={(task) => openForm(taskForm(task))} />
               </aside>
             )}
@@ -67,6 +68,7 @@ function Shell() {
       {form && <Modal form={form} onClose={closeForm} />}
       <PreviewModal />
       {settingsOpen && <SettingsModal onClose={closeSettings} />}
+      <ImageViewer />
     </>
   );
 }

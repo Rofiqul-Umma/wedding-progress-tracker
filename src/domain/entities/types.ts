@@ -71,6 +71,10 @@ export interface SeserahanItem {
   qty: number;
   cost: number;
   status: SeserahanStatus;
+  /** Optional reference link (product page, inspiration). */
+  url: string;
+  /** Optional inline reference photo, stored as a data URL. */
+  image: string;
   notes: string;
 }
 

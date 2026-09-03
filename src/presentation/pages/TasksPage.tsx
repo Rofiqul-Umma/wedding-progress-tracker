@@ -17,7 +17,9 @@ import { tasksDone, openTasks } from '@domain/services/progress';
 import { daysUntil } from '@domain/services/schedule';
 import { iconForCategory, categoryColor } from '@domain/value-objects/status';
 import { cn } from '@presentation/lib/cn';
-import type { Task } from '@domain/entities/types';
+import { isImageAttachment } from '@presentation/lib/attachments';
+import { downloadAttachment } from '@presentation/lib/dataUrl';
+import type { Attachment, Task } from '@domain/entities/types';
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
 
@@ -86,9 +88,18 @@ interface TaskRowProps {
 
 function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
   const { t } = useTranslation();
+  const { openImage } = useUi();
   const { date } = useFormat();
   const color = categoryColor(task.cat);
   const dd = task.due ? daysUntil(task.due) : null;
+  const attachment = task.attachment;
+
+  // Attachments live in `data:` URLs, which browsers will not open as a
+  // top-level navigation — images go to the in-app viewer, files download.
+  const openAttachment = (a: Attachment) => {
+    if (isImageAttachment(a)) openImage(a.data, a.name);
+    else downloadAttachment(a);
+  };
 
   let dueColor = 'text-faint';
   let label = task.due ? date(task.due, SHORT_DATE) : t('tasks.noDate');
@@ -136,18 +147,16 @@ function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
           <Icon name="link" size={17} />
         </a>
       )}
-      {task.attachment && (
-        <a
-          href={task.attachment.data}
-          target="_blank"
-          rel="noopener noreferrer"
-          download={task.attachment.name}
+      {attachment && (
+        <button
+          type="button"
+          onClick={() => openAttachment(attachment)}
           title={t('tasks.viewFile')}
           aria-label={t('tasks.viewFile')}
           className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
         >
           <Icon name="attach_file" size={17} />
-        </a>
+        </button>
       )}
       <div className="flex-none text-right">
         <div className={cn('text-xs font-bold', dueColor)}>{label}</div>

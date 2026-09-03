@@ -42,6 +42,20 @@
   --ease-planner: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+/* ------------------------------------------------------------
+   Safe-area insets (notch, rounded corners, home indicator).
+   `viewport-fit=cover` lets the app paint edge to edge, so every
+   fixed/edge-hugging surface has to pad itself back in. Mirroring
+   `env()` into variables keeps that readable at the call site and
+   lets tests override the insets to emulate a curved-edge phone.
+   ------------------------------------------------------------ */
+:root {
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-right: env(safe-area-inset-right, 0px);
+  --sa-bottom: env(safe-area-inset-bottom, 0px);
+  --sa-left: env(safe-area-inset-left, 0px);
+}
+
 @layer base {
   html,
   body,

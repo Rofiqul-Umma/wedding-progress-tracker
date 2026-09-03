@@ -3,7 +3,10 @@ import { Icon } from '@presentation/components/ui/Icon';
 import { Chip } from '@presentation/components/ui/Chip';
 import { ProgressBar } from '@presentation/components/ui/ProgressBar';
 import { usePlan } from '@presentation/state/PlanStore';
+import { useUi } from '@presentation/state/UiStore';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { isImageAttachment } from '@presentation/lib/attachments';
+import { downloadAttachment } from '@presentation/lib/dataUrl';
 import { taskCountdown } from '@domain/services/schedule';
 import type { Task } from '@domain/entities/types';
 
@@ -22,6 +25,7 @@ const SHORT_DATE: Intl.DateTimeFormatOptions = {
 export function TaskDetail({ task, onEdit }: TaskDetailProps) {
   const { t } = useTranslation();
   const { state } = usePlan();
+  const { openImage } = useUi();
   const { date } = useFormat();
 
   if (!task) {
@@ -38,6 +42,7 @@ export function TaskDetail({ task, onEdit }: TaskDetailProps) {
   }
 
   const info = taskCountdown(task, state.wedding);
+  const attachment = task.attachment;
 
   let big: string;
   let label: string;
@@ -145,27 +150,29 @@ export function TaskDetail({ task, onEdit }: TaskDetailProps) {
         </Field>
       )}
 
-      {task.attachment && (
+      {attachment && (
         <Field label={t('detail.attachment')}>
-          {task.attachment.type.startsWith('image/') ? (
-            <a href={task.attachment.data} target="_blank" rel="noopener noreferrer">
+          {isImageAttachment(attachment) ? (
+            <button
+              type="button"
+              onClick={() => openImage(attachment.data, attachment.name)}
+              className="block w-full"
+            >
               <img
-                src={task.attachment.data}
-                alt={task.attachment.name}
+                src={attachment.data}
+                alt={attachment.name}
                 className="max-h-40 w-full rounded-xl border border-line-2 object-cover"
               />
-            </a>
+            </button>
           ) : (
-            <a
-              href={task.attachment.data}
-              target="_blank"
-              rel="noopener noreferrer"
-              download={task.attachment.name}
-              className="flex items-center gap-1.5 truncate text-[13.5px] font-semibold text-info hover:underline"
+            <button
+              type="button"
+              onClick={() => downloadAttachment(attachment)}
+              className="flex items-center gap-1.5 self-start truncate text-[13.5px] font-semibold text-info hover:underline"
             >
               <Icon name="description" size={16} />
-              <span className="truncate">{task.attachment.name}</span>
-            </a>
+              <span className="truncate">{attachment.name}</span>
+            </button>
           )}
         </Field>
       )}

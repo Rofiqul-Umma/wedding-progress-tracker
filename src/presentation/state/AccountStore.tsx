@@ -37,6 +37,7 @@ export type AccountError =
   | 'backupFailed'
   | 'cloudIncomplete'
   | 'permission'
+  | 'configuration'
   | 'generic';
 
 interface AccountContextValue {
@@ -75,7 +76,18 @@ function errorType(error: unknown): AccountError {
   if (code.includes('popup-blocked')) return 'popupBlocked';
   if (code.includes('network')) return 'network';
   if (code.includes('permission-denied')) return 'permission';
-  return 'generic';
+  // Without this branch a project misconfiguration (unauthorized domain,
+  // disabled provider, bad key) is indistinguishable from a transient failure,
+  // so the user retries forever on an error only they can fix.
+  const configuration =
+    code.includes('unauthorized-domain') ||
+    code.includes('operation-not-allowed') ||
+    code.includes('argument-error') ||
+    code.includes('invalid-api-key') ||
+    code.includes('configuration-not-found');
+  // The provider code never reaches the UI, so log it once for diagnosis.
+  console.error('[account]', code || error);
+  return configuration ? 'configuration' : 'generic';
 }
 
 export function AccountProvider({ children }: { children: ReactNode }) {
@@ -237,6 +249,15 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     void loadAccount()
       .then(({ firebase }) => {
         if (!alive) return;
+        // A redirect sign-in reports its failure (unauthorized domain, cancelled
+        // consent) only here — the auth subscription just stays signed out.
+        if (firebase.hasPendingRedirect()) {
+          void firebase.getGoogleRedirectResult().catch((reason) => {
+            if (!alive || userRef.current) return;
+            setError(errorType(reason));
+            setStatus('signedOut');
+          });
+        }
         unsubscribe = firebase.subscribeAuth((account) => {
           if (!alive) return;
           if (!account) {
@@ -275,6 +296,10 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       try {
         const { firebase } = await loadAccount();
         const account = await firebase.signInWithGoogle();
+        // `null` means the browser refused a popup and a full-page redirect is
+        // underway. Stay in `signingIn`; this document is about to be unloaded
+        // and the redirect result is resolved on the way back.
+        if (!account) return;
         // The auth subscription usually owns initialization. This call is a safe
         // fallback for environments that delay the callback after popup resolve.
         if (!connectionRef.current && initializingRef.current !== account.uid) {

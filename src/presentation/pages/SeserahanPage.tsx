@@ -7,6 +7,7 @@ import { Card } from '@presentation/components/ui/Card';
 import { Row } from '@presentation/components/ui/Row';
 import { Avatar } from '@presentation/components/ui/Avatar';
 import { Chip, type ChipVariant } from '@presentation/components/ui/Chip';
+import { Icon } from '@presentation/components/ui/Icon';
 import { ProgressBar } from '@presentation/components/ui/ProgressBar';
 import { RowActions } from '@presentation/components/ui/RowActions';
 import { usePlan } from '@presentation/state/PlanStore';
@@ -147,7 +148,15 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
 
   return (
     <Row onActivate={onOpen} activateLabel={t('preview.viewAria', { name: item.name })}>
-      <Avatar color={color} icon={iconForCategory(item.category)} />
+      {item.image ? (
+        <img
+          src={item.image}
+          alt=""
+          className="h-10 w-10 flex-none rounded-[11px] border border-line-2 object-cover"
+        />
+      ) : (
+        <Avatar color={color} icon={iconForCategory(item.category)} />
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
           <span className="truncate">{item.name}</span>
@@ -155,6 +164,18 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
         </div>
         <div className="mt-0.5 truncate text-[12.5px] text-muted">{meta}</div>
       </div>
+      {item.url && (
+        <a
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={t('seserahan.openLink')}
+          aria-label={t('seserahan.openLink')}
+          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
+        >
+          <Icon name="link" size={17} />
+        </a>
+      )}
       {(+item.cost || 0) > 0 && (
         <div className="mr-2 text-[15px] font-extrabold tnum">{money(item.cost)}</div>
       )}

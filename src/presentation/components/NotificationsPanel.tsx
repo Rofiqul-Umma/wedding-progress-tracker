@@ -59,7 +59,7 @@ export function NotificationsPanel() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-[50px] z-[60] w-[328px] overflow-hidden rounded-card border border-line bg-app shadow-lg">
+        <div className="absolute right-0 top-[50px] z-[60] w-[328px] max-w-[calc(100vw-2rem-var(--sa-left)-var(--sa-right))] overflow-hidden rounded-card border border-line bg-app shadow-lg">
           <div className="flex items-center justify-between border-b border-line px-4 py-3.5 text-sm font-bold">
             {t('notif.title')}
             <span className="rounded-full bg-panel px-[9px] py-0.5 text-xs font-semibold text-muted">
