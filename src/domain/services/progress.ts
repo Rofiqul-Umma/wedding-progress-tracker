@@ -4,6 +4,7 @@ import type {
   Task,
   Vendor,
 } from '@domain/entities/types';
+import type { SeserahanStatus } from '@domain/value-objects/status';
 
 /* ---- Tasks ---- */
 export function tasksDone(tasks: Task[]): number {
@@ -17,11 +18,33 @@ export function taskPct(tasks: Task[]): number {
 }
 
 /* ---- Seserahan ---- */
+
+/** How many of a tray's contents are ready, or null when it is not a bundle. */
+export function contentsProgress(
+  item: SeserahanItem,
+): { done: number; total: number } | null {
+  const contents = item.contents ?? [];
+  if (!contents.length) return null;
+  return { done: contents.filter((c) => c.done).length, total: contents.length };
+}
+
+/**
+ * The status to display and count. A bundle derives it from its checklist, so
+ * the chip can never contradict the items inside; a plain tray keeps the
+ * hand-set value it cycles through on click.
+ */
+export function effectiveSeserahanStatus(item: SeserahanItem): SeserahanStatus {
+  const progress = contentsProgress(item);
+  if (!progress) return item.status;
+  if (progress.done === progress.total) return 'finished';
+  return progress.done === 0 ? 'pending' : 'onProgress';
+}
+
 export function sesDone(items: SeserahanItem[]): number {
-  return items.filter((i) => i.status === 'finished').length;
+  return items.filter((i) => effectiveSeserahanStatus(i) === 'finished').length;
 }
 export function sesOpen(items: SeserahanItem[]): number {
-  return items.filter((i) => i.status !== 'finished').length;
+  return items.filter((i) => effectiveSeserahanStatus(i) !== 'finished').length;
 }
 export function sesPct(items: SeserahanItem[]): number {
   return items.length ? Math.round((sesDone(items) / items.length) * 100) : 0;

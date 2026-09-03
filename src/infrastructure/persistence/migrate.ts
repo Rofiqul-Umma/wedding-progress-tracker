@@ -3,16 +3,47 @@ import type {
   Contact,
   Lang,
   PlanState,
+  SeserahanContent,
   SeserahanItem,
   ShoppingItem,
   Task,
   Vendor,
+  VendorItem,
 } from '@domain/entities/types';
+import { uid } from '@application/use-cases/id';
 
 type Obj = Record<string, unknown>;
 const asObj = (v: unknown): Obj => (v && typeof v === 'object' ? (v as Obj) : {});
 const str = (v: unknown): string => (typeof v === 'string' ? v : '');
 const num = (v: unknown): number => +(v as number) || 0;
+
+/** Coerce arbitrary parsed data into well-formed vendor quote line items. */
+function vendorItems(v: unknown): VendorItem[] {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map(asObj)
+    .filter((i) => str(i.name).trim() !== '')
+    .map((i) => ({
+      id: str(i.id) || uid(),
+      name: str(i.name),
+      qty: Math.max(1, Math.round(num(i.qty)) || 1),
+      price: Math.max(0, num(i.price)),
+    }));
+}
+
+/** Coerce arbitrary parsed data into well-formed seserahan bundle contents. */
+function seserahanContents(v: unknown): SeserahanContent[] {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map(asObj)
+    .filter((c) => str(c.name).trim() !== '')
+    .map((c) => ({
+      id: str(c.id) || uid(),
+      name: str(c.name),
+      qty: Math.max(1, Math.round(num(c.qty)) || 1),
+      done: c.done === true,
+    }));
+}
 
 /**
  * Normalize an arbitrary parsed object (from localStorage or an imported
@@ -42,6 +73,9 @@ export function migrate(input: unknown): PlanState {
           ...(v as unknown as Vendor),
           // Field renamed email → social; carry legacy backups forward.
           social: str(v.social) || str(v.email),
+          // Quote line items, added later. Legacy vendors get an empty list,
+          // which keeps them behaving as flat-cost vendors.
+          items: vendorItems(v.items),
         }))
       : [],
     budget: Array.isArray(s.budget) ? (s.budget as BudgetItem[]) : [],
@@ -53,6 +87,9 @@ export function migrate(input: unknown): PlanState {
           // the form/preview code reads them as plain strings.
           url: str(i.url),
           image: str(i.image),
+          // Bundle contents, added later still. Legacy items get an empty list,
+          // which keeps them behaving as plain single-status trays.
+          contents: seserahanContents(i.contents),
         }))
       : [],
     shopping: Array.isArray(s.shopping) ? (s.shopping as ShoppingItem[]) : [],

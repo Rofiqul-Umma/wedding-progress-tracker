@@ -41,6 +41,81 @@ describe('migrate', () => {
     expect(s.settings).toEqual({ currency: 'USD', lang: 'en' });
   });
 
+  it('backfills seserahan bundle contents on legacy items', () => {
+    const s = migrate({
+      seserahan: [{ id: 'a', name: 'Kebaya', status: 'pending' }],
+    });
+    expect(s.seserahan[0].contents).toEqual([]);
+  });
+
+  it('sanitizes seserahan bundle contents', () => {
+    const s = migrate({
+      seserahan: [
+        {
+          id: 'a',
+          name: 'Alat sholat',
+          status: 'pending',
+          contents: [
+            { id: 'c1', name: 'Mukena', qty: 0, done: true },
+            { name: 'Sajadah', qty: 3 },
+            { name: '   ' },
+            'nonsense',
+          ],
+        },
+      ],
+    });
+    const contents = s.seserahan[0].contents;
+    expect(contents).toHaveLength(2);
+    expect(contents[0]).toEqual({ id: 'c1', name: 'Mukena', qty: 1, done: true });
+    expect(contents[1].id).toBeTruthy();
+    expect(contents[1]).toMatchObject({ name: 'Sajadah', qty: 3, done: false });
+  });
+
+  it('replaces non-array seserahan contents with an empty list', () => {
+    const s = migrate({
+      seserahan: [{ id: 'a', name: 'X', status: 'pending', contents: 'Mukena, sajadah' }],
+    });
+    expect(s.seserahan[0].contents).toEqual([]);
+  });
+
+  it('backfills vendor line items on legacy vendors', () => {
+    const s = migrate({
+      vendors: [{ id: 'a', name: 'Ivy Barn', cost: 14500, status: 'paid' }],
+    });
+    expect(s.vendors[0].items).toEqual([]);
+  });
+
+  it('sanitizes vendor line items', () => {
+    const s = migrate({
+      vendors: [
+        {
+          id: 'a',
+          name: 'Copper Spoon',
+          cost: 9600,
+          status: 'inquiry',
+          items: [
+            { id: 'i1', name: 'Dinner', qty: 0, price: 105 },
+            { name: 'Staff', qty: 4, price: -300 },
+            { name: '   ', qty: 1, price: 10 },
+            'nonsense',
+          ],
+        },
+      ],
+    });
+    const items = s.vendors[0].items;
+    expect(items).toHaveLength(2);
+    expect(items[0]).toEqual({ id: 'i1', name: 'Dinner', qty: 1, price: 105 });
+    expect(items[1].id).toBeTruthy();
+    expect(items[1]).toMatchObject({ name: 'Staff', qty: 4, price: 0 });
+  });
+
+  it('replaces non-array vendor line items with an empty list', () => {
+    const s = migrate({
+      vendors: [{ id: 'a', name: 'X', cost: 0, status: 'inquiry', items: 'dinner, staff' }],
+    });
+    expect(s.vendors[0].items).toEqual([]);
+  });
+
   it('coerces wedding fields to their expected types', () => {
     const s = migrate({
       wedding: { p1: 'A', p2: 5, date: null, venue: undefined, budget: '42000' },

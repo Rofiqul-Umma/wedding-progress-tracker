@@ -17,6 +17,15 @@ export interface Attachment {
   data: string;
 }
 
+/** One priced line on a vendor's quote. */
+export interface VendorItem {
+  id: string;
+  name: string;
+  qty: number;
+  /** Unit price; the line total is `price * qty`. */
+  price: number;
+}
+
 /** A wedding vendor (venue, caterer, photographer…). */
 export interface Vendor {
   id: string;
@@ -28,6 +37,11 @@ export interface Vendor {
   /** Social media handle or website URL. */
   social: string;
   cost: number;
+  /**
+   * Quote line items. Empty for a flat-cost vendor; when non-empty the vendor's
+   * cost is the sum of these rather than the `cost` field.
+   */
+  items: VendorItem[];
   status: VendorStatus;
   /** Amount paid as a down payment (only meaningful when status is 'deposit'). */
   deposit?: number;
@@ -63,6 +77,14 @@ export interface Task {
   attachment?: Attachment | null;
 }
 
+/** One thing inside a seserahan tray (a bundle line). */
+export interface SeserahanContent {
+  id: string;
+  name: string;
+  qty: number;
+  done: boolean;
+}
+
 /** A seserahan (gift tray) item. */
 export interface SeserahanItem {
   id: string;
@@ -71,6 +93,11 @@ export interface SeserahanItem {
   qty: number;
   cost: number;
   status: SeserahanStatus;
+  /**
+   * Bundle contents. Empty for a plain single item; when non-empty the tray's
+   * status is derived from these rather than set by hand.
+   */
+  contents: SeserahanContent[];
   /** Optional reference link (product page, inspiration). */
   url: string;
   /** Optional inline reference photo, stored as a data URL. */

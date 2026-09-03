@@ -15,6 +15,7 @@ function sample(): PlanState {
         phone: '',
         social: '',
         cost: 100,
+        items: [],
         status: 'paid',
         notes: '',
       },

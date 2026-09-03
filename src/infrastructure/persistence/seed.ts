@@ -15,11 +15,19 @@ export function seed(): PlanState {
       budget: 42000,
     },
     vendors: [
-      { id: uid(), name: 'The Ivy Barn', category: 'Venue', contact: 'Reneé Adler', phone: '(707) 555-0182', social: 'instagram.com/theivybarn', cost: 14500, status: 'paid', notes: 'Includes tables, chairs, and 11pm curfew.' },
-      { id: uid(), name: 'Wildflower & Vine', category: 'Florals', contact: 'Mina Okafor', phone: '(415) 555-2231', social: 'instagram.com/wildflowervine', cost: 3800, status: 'booked', notes: 'Seasonal dahlias + ranunculus.' },
-      { id: uid(), name: 'Golden Hour Films', category: 'Photography', contact: 'Theo Marsh', phone: '(510) 555-7744', social: 'instagram.com/goldenhourfilms', cost: 5200, status: 'booked', notes: '8 hrs coverage + engagement session.' },
-      { id: uid(), name: 'Copper Spoon Catering', category: 'Catering', contact: 'Dev Patel', phone: '(707) 555-9910', social: 'instagram.com/copperspoon', cost: 9600, status: 'inquiry', notes: 'Tasting scheduled. Family-style menu.' },
-      { id: uid(), name: 'Neon Meadow DJ', category: 'Music', contact: 'Sam Rivera', phone: '(408) 555-3320', social: 'instagram.com/neonmeadow', cost: 2200, status: 'booked', notes: 'Ceremony + reception.' },
+      { id: uid(), name: 'The Ivy Barn', category: 'Venue', contact: 'Reneé Adler', phone: '(707) 555-0182', social: 'instagram.com/theivybarn', cost: 14500, items: [], status: 'paid', notes: 'Includes tables, chairs, and 11pm curfew.' },
+      { id: uid(), name: 'Wildflower & Vine', category: 'Florals', contact: 'Mina Okafor', phone: '(415) 555-2231', social: 'instagram.com/wildflowervine', cost: 3800, items: [], status: 'booked', notes: 'Seasonal dahlias + ranunculus.' },
+      // Two itemized quotes, each summing to the flat cost it replaced, so the
+      // sample budget is unchanged while the feature is discoverable.
+      { id: uid(), name: 'Golden Hour Films', category: 'Photography', contact: 'Theo Marsh', phone: '(510) 555-7744', social: 'instagram.com/goldenhourfilms', cost: 5200, items: [
+        { id: uid(), name: '8 hrs coverage', qty: 1, price: 4200 },
+        { id: uid(), name: 'Engagement session', qty: 1, price: 1000 },
+      ], status: 'booked', notes: '8 hrs coverage + engagement session.' },
+      { id: uid(), name: 'Copper Spoon Catering', category: 'Catering', contact: 'Dev Patel', phone: '(707) 555-9910', social: 'instagram.com/copperspoon', cost: 9600, items: [
+        { id: uid(), name: 'Family-style dinner', qty: 80, price: 105 },
+        { id: uid(), name: 'Service staff', qty: 4, price: 300 },
+      ], status: 'inquiry', notes: 'Tasting scheduled. Family-style menu.' },
+      { id: uid(), name: 'Neon Meadow DJ', category: 'Music', contact: 'Sam Rivera', phone: '(408) 555-3320', social: 'instagram.com/neonmeadow', cost: 2200, items: [], status: 'booked', notes: 'Ceremony + reception.' },
     ],
     budget: [
       { id: uid(), category: 'Venue', item: 'Ivy Barn rental', estimated: 14500, actual: 14500, paid: true },
@@ -41,15 +49,22 @@ export function seed(): PlanState {
       { id: uid(), title: 'Confirm final headcount', due: `${d(8)}-14`, done: false, cat: 'Venue', created: '04:15 PM' },
     ],
     seserahan: [
-      { id: uid(), name: 'Seperangkat alat sholat', category: 'Ibadah', qty: 1, cost: 0, status: 'finished', url: '', image: '', notes: 'Mukena, sajadah & Al-Qur’an' },
-      { id: uid(), name: 'Kosmetik & skincare', category: 'Kecantikan', qty: 1, cost: 320, status: 'onProgress', url: '', image: '', notes: 'Full make-up + skincare set' },
-      { id: uid(), name: 'Sepatu & sandal', category: 'Busana', qty: 2, cost: 180, status: 'pending', url: '', image: '', notes: '1 heels, 1 flat' },
-      { id: uid(), name: 'Tas tangan', category: 'Aksesoris', qty: 1, cost: 140, status: 'finished', url: '', image: '', notes: 'Hand bag for daily use' },
-      { id: uid(), name: 'Kebaya & batik', category: 'Busana', qty: 2, cost: 260, status: 'onProgress', url: '', image: '', notes: 'For the akad & reception' },
-      { id: uid(), name: 'Parfum', category: 'Kecantikan', qty: 1, cost: 90, status: 'pending', url: '', image: '', notes: '' },
-      { id: uid(), name: 'Buah-buahan segar', category: 'Makanan', qty: 1, cost: 40, status: 'pending', url: '', image: '', notes: 'Seasonal fruit arrangement' },
-      { id: uid(), name: 'Perhiasan (cincin & kalung)', category: 'Aksesoris', qty: 1, cost: 0, status: 'pending', url: '', image: '', notes: 'Handled by the family' },
-      { id: uid(), name: 'Kue tradisional', category: 'Makanan', qty: 1, cost: 55, status: 'finished', url: '', image: '', notes: 'Assorted traditional sweets' },
+      { id: uid(), name: 'Seperangkat alat sholat', category: 'Ibadah', qty: 1, cost: 0, status: 'finished', contents: [
+        { id: uid(), name: 'Mukena', qty: 1, done: true },
+        { id: uid(), name: 'Sajadah', qty: 1, done: true },
+        { id: uid(), name: 'Al-Qur’an', qty: 1, done: true },
+      ], url: '', image: '', notes: 'A prayer set — every piece checked off.' },
+      { id: uid(), name: 'Kosmetik & skincare', category: 'Kecantikan', qty: 1, cost: 320, status: 'onProgress', contents: [], url: '', image: '', notes: 'Full make-up + skincare set' },
+      { id: uid(), name: 'Sepatu & sandal', category: 'Busana', qty: 2, cost: 180, status: 'pending', contents: [
+        { id: uid(), name: 'Heels', qty: 1, done: true },
+        { id: uid(), name: 'Flat shoes', qty: 1, done: false },
+      ], url: '', image: '', notes: 'One pair for the akad, one for the reception.' },
+      { id: uid(), name: 'Tas tangan', category: 'Aksesoris', qty: 1, cost: 140, status: 'finished', contents: [], url: '', image: '', notes: 'Hand bag for daily use' },
+      { id: uid(), name: 'Kebaya & batik', category: 'Busana', qty: 2, cost: 260, status: 'onProgress', contents: [], url: '', image: '', notes: 'For the akad & reception' },
+      { id: uid(), name: 'Parfum', category: 'Kecantikan', qty: 1, cost: 90, status: 'pending', contents: [], url: '', image: '', notes: '' },
+      { id: uid(), name: 'Buah-buahan segar', category: 'Makanan', qty: 1, cost: 40, status: 'pending', contents: [], url: '', image: '', notes: 'Seasonal fruit arrangement' },
+      { id: uid(), name: 'Perhiasan (cincin & kalung)', category: 'Aksesoris', qty: 1, cost: 0, status: 'pending', contents: [], url: '', image: '', notes: 'Handled by the family' },
+      { id: uid(), name: 'Kue tradisional', category: 'Makanan', qty: 1, cost: 55, status: 'finished', contents: [], url: '', image: '', notes: 'Assorted traditional sweets' },
     ],
     shopping: [
       { id: uid(), name: 'String lights (10m)', category: 'Decor', store: 'Etsy — GlowCraft', price: 45, qty: 6, status: 'purchased', url: 'https://www.etsy.com/listing/string-lights', image: '', notes: 'Warm white, for the barn ceiling.' },

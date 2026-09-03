@@ -5,13 +5,29 @@ export function spent(budget: BudgetItem[]): number {
   return budget.reduce((a, b) => a + (+b.actual || 0), 0);
 }
 
+/** Sum of a vendor's quote line items, or null when it has none. */
+export function vendorItemsTotal(v: Vendor): number | null {
+  const items = v.items ?? [];
+  if (!items.length) return null;
+  return items.reduce((a, i) => a + (+i.price || 0) * Math.max(1, +i.qty || 1), 0);
+}
+
+/**
+ * The cost to display and sum. An itemized vendor derives it from its lines, so
+ * the headline figure can never contradict the breakdown; a flat-cost vendor
+ * keeps the hand-entered value.
+ */
+export function effectiveVendorCost(v: Vendor): number {
+  return vendorItemsTotal(v) ?? (+v.cost || 0);
+}
+
 /**
  * Money actually paid to vendors: the full cost once a vendor is paid, the
  * recorded down payment while a deposit is outstanding, nothing before that.
  */
 export function vendorsPaid(vendors: Vendor[]): number {
   return vendors.reduce((a, v) => {
-    if (v.status === 'paid') return a + (+v.cost || 0);
+    if (v.status === 'paid') return a + effectiveVendorCost(v);
     if (v.status === 'deposit') return a + (+(v.deposit ?? 0) || 0);
     return a;
   }, 0);
@@ -55,7 +71,7 @@ export function budgetUsedPct(
 
 /** Sum of all vendor costs (money committed). */
 export function vendorsTotal(vendors: Vendor[]): number {
-  return vendors.reduce((a, v) => a + (+v.cost || 0), 0);
+  return vendors.reduce((a, v) => a + effectiveVendorCost(v), 0);
 }
 
 /** A per-category actual-vs-estimate rollup, sorted by actual descending. */

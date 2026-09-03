@@ -16,7 +16,12 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { sesDone, sesPct } from '@domain/services/progress';
+import {
+  contentsProgress,
+  effectiveSeserahanStatus,
+  sesDone,
+  sesPct,
+} from '@domain/services/progress';
 import { SES_ORDER, iconForCategory, categoryColor } from '@domain/value-objects/status';
 import type { SeserahanStatus } from '@domain/value-objects/status';
 import type { SeserahanItem } from '@domain/entities/types';
@@ -56,9 +61,9 @@ export function SeserahanPage() {
   }
 
   const counts: Record<SeserahanStatus, number> = {
-    pending: items.filter((i) => i.status === 'pending').length,
-    onProgress: items.filter((i) => i.status === 'onProgress').length,
-    finished: items.filter((i) => i.status === 'finished').length,
+    pending: items.filter((i) => effectiveSeserahanStatus(i) === 'pending').length,
+    onProgress: items.filter((i) => effectiveSeserahanStatus(i) === 'onProgress').length,
+    finished: items.filter((i) => effectiveSeserahanStatus(i) === 'finished').length,
   };
   const totalCost = items.reduce((a, i) => a + (+i.cost || 0), 0);
   const pct = sesPct(items);
@@ -74,7 +79,15 @@ export function SeserahanPage() {
     key: k,
     label: t(`status.ses.${k}`),
     rows: items.filter(
-      (i) => i.status === k && matches(`${i.name} ${i.category || ''} ${i.notes || ''}`),
+      (i) =>
+        effectiveSeserahanStatus(i) === k &&
+        // Contents are searchable too, so looking for "mukena" finds the tray
+        // holding it rather than nothing at all.
+        matches(
+          `${i.name} ${i.category || ''} ${i.notes || ''} ${i.contents
+            .map((c) => c.name)
+            .join(' ')}`,
+        ),
     ),
   }));
 
@@ -145,6 +158,14 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
   const { money } = useFormat();
   const color = categoryColor(item.category);
   const meta = [item.category || t('seserahan.item'), item.notes].filter(Boolean).join(' · ');
+  const progress = contentsProgress(item);
+  const status = effectiveSeserahanStatus(item);
+
+  const statusChip = (
+    <Chip variant={STATUS_CHIP[status]} dot>
+      {t(`status.ses.${status}`)}
+    </Chip>
+  );
 
   return (
     <Row onActivate={onOpen} activateLabel={t('preview.viewAria', { name: item.name })}>
@@ -161,6 +182,11 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
         <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
           <span className="truncate">{item.name}</span>
           {(+item.qty || 1) > 1 && <Chip variant="gray">×{+item.qty}</Chip>}
+          {progress && (
+            <Chip variant="gray">
+              {progress.done}/{progress.total}
+            </Chip>
+          )}
         </div>
         <div className="mt-0.5 truncate text-[12.5px] text-muted">{meta}</div>
       </div>
@@ -179,23 +205,27 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
       {(+item.cost || 0) > 0 && (
         <div className="mr-2 text-[15px] font-extrabold tnum">{money(item.cost)}</div>
       )}
-      <button
-        type="button"
-        onClick={onCycle}
-        title={t('seserahan.cycleAria', {
-          name: item.name,
-          status: t(`status.ses.${item.status}`),
-        })}
-        aria-label={t('seserahan.cycleAria', {
-          name: item.name,
-          status: t(`status.ses.${item.status}`),
-        })}
-        className="rounded-full transition-transform hover:-translate-y-px"
-      >
-        <Chip variant={STATUS_CHIP[item.status]} dot>
-          {t(`status.ses.${item.status}`)}
-        </Chip>
-      </button>
+      {/* A bundle's status follows its checklist, so it is shown but not
+          clickable — a button that silently does nothing is worse than none. */}
+      {progress ? (
+        <span title={t('seserahan.derivedAria', { name: item.name })}>{statusChip}</span>
+      ) : (
+        <button
+          type="button"
+          onClick={onCycle}
+          title={t('seserahan.cycleAria', {
+            name: item.name,
+            status: t(`status.ses.${status}`),
+          })}
+          aria-label={t('seserahan.cycleAria', {
+            name: item.name,
+            status: t(`status.ses.${status}`),
+          })}
+          className="rounded-full transition-transform hover:-translate-y-px"
+        >
+          {statusChip}
+        </button>
+      )}
       <RowActions
         onEdit={onEdit}
         onDelete={onDelete}

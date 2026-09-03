@@ -6,6 +6,7 @@ import {
   paidTotal,
   vendorsTotal,
   categoryRollup,
+  effectiveVendorCost,
 } from '@domain/services/budget';
 import {
   tasksDone,
@@ -13,6 +14,8 @@ import {
   sesDone,
   shopBought,
   vendorsBooked,
+  contentsProgress,
+  effectiveSeserahanStatus,
 } from '@domain/services/progress';
 import { getNotifications } from '@domain/services/schedule';
 
@@ -110,6 +113,7 @@ export function buildReportModel(
     columns: [
       { key: 'name', labelKey: 'report.col.vendor', type: 'text' },
       { key: 'category', labelKey: 'report.col.category', type: 'text' },
+      { key: 'items', labelKey: 'report.col.items', type: 'text' },
       { key: 'cost', labelKey: 'report.col.cost', type: 'money' },
       { key: 'deposit', labelKey: 'report.col.deposit', type: 'money' },
       { key: 'status', labelKey: 'report.col.status', type: 'text' },
@@ -119,7 +123,13 @@ export function buildReportModel(
     rows: state.vendors.map((v) => ({
       name: v.name,
       category: v.category,
-      cost: v.cost,
+      // A count only — the full breakdown lives in the vendor preview. Emitted
+      // as the JSON descriptor `resolveText` decodes, so it localizes in both
+      // the on-screen table and the CSV.
+      items: v.items?.length
+        ? JSON.stringify({ key: 'vendors.itemCount', count: v.items.length })
+        : '',
+      cost: effectiveVendorCost(v),
       deposit: v.status === 'deposit' ? v.deposit ?? 0 : null,
       status: `status.vendor.${v.status}`,
       contact: v.contact,
@@ -153,16 +163,21 @@ export function buildReportModel(
       { key: 'name', labelKey: 'report.col.item', type: 'text' },
       { key: 'category', labelKey: 'report.col.category', type: 'text' },
       { key: 'qty', labelKey: 'report.col.qty', type: 'number' },
+      { key: 'contents', labelKey: 'report.col.contents', type: 'text' },
       { key: 'cost', labelKey: 'report.col.cost', type: 'money' },
       { key: 'status', labelKey: 'report.col.status', type: 'text' },
     ],
-    rows: state.seserahan.map((s) => ({
-      name: s.name,
-      category: s.category,
-      qty: s.qty,
-      cost: s.cost,
-      status: `status.ses.${s.status}`,
-    })),
+    rows: state.seserahan.map((s) => {
+      const progress = contentsProgress(s);
+      return {
+        name: s.name,
+        category: s.category,
+        qty: s.qty,
+        contents: progress ? `${progress.done}/${progress.total}` : '',
+        cost: s.cost,
+        status: `status.ses.${effectiveSeserahanStatus(s)}`,
+      };
+    }),
   });
 
   // Shopping

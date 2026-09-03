@@ -8,6 +8,8 @@ import {
   budgetUsedPct,
   vendorsTotal,
   vendorsPaid,
+  vendorItemsTotal,
+  effectiveVendorCost,
   totalSpent,
   categoryRollup,
   maxCategoryValue,
@@ -61,17 +63,21 @@ describe('budget service', () => {
   });
 
   it('sums vendor costs', () => {
-    const vendors = [{ cost: 1000 }, { cost: 500 }, { cost: 0 }] as Vendor[];
+    const vendors = [
+      { cost: 1000, items: [] },
+      { cost: 500, items: [] },
+      { cost: 0, items: [] },
+    ] as unknown as Vendor[];
     expect(vendorsTotal(vendors)).toBe(1500);
   });
 
   it('counts money paid to vendors: full cost when paid, deposit when down payment', () => {
     const vendors = [
-      { cost: 1000, status: 'paid', deposit: 0 },
-      { cost: 2000, status: 'deposit', deposit: 500 },
-      { cost: 800, status: 'booked', deposit: 0 },
-      { cost: 400, status: 'inquiry', deposit: 0 },
-    ] as Vendor[];
+      { cost: 1000, status: 'paid', deposit: 0, items: [] },
+      { cost: 2000, status: 'deposit', deposit: 500, items: [] },
+      { cost: 800, status: 'booked', deposit: 0, items: [] },
+      { cost: 400, status: 'inquiry', deposit: 0, items: [] },
+    ] as unknown as Vendor[];
     // 1000 (paid) + 500 (deposit) + 0 + 0
     expect(vendorsPaid(vendors)).toBe(1500);
   });
@@ -79,13 +85,43 @@ describe('budget service', () => {
   it('folds vendor payments into total spent, remaining, and used %', () => {
     const budget = [item({ actual: 200 })];
     const vendors = [
-      { cost: 1000, status: 'paid', deposit: 0 },
-      { cost: 2000, status: 'deposit', deposit: 300 },
-    ] as Vendor[];
+      { cost: 1000, status: 'paid', deposit: 0, items: [] },
+      { cost: 2000, status: 'deposit', deposit: 300, items: [] },
+    ] as unknown as Vendor[];
     // budget 200 + vendors (1000 + 300) = 1500
     expect(totalSpent(budget, vendors)).toBe(1500);
     expect(remaining(wedding, budget, vendors)).toBe(-500); // target 1000
     expect(budgetUsedPct(wedding, budget, vendors)).toBe(100); // capped
+  });
+
+  it('derives a vendor cost from its line items, falling back to the flat cost', () => {
+    const flat = { cost: 700, items: [] } as unknown as Vendor;
+    expect(vendorItemsTotal(flat)).toBeNull();
+    expect(effectiveVendorCost(flat)).toBe(700);
+
+    const itemized = {
+      cost: 0,
+      items: [
+        { id: 'i1', name: 'Dinner', qty: 80, price: 105 },
+        { id: 'i2', name: 'Staff', qty: 4, price: 300 },
+      ],
+    } as unknown as Vendor;
+    expect(vendorItemsTotal(itemized)).toBe(9600);
+    expect(effectiveVendorCost(itemized)).toBe(9600);
+  });
+
+  it('sums and pays itemized vendors by their lines, not a stale stored cost', () => {
+    const vendors = [
+      {
+        cost: 1, // stale: an imported backup where the two disagree
+        status: 'paid',
+        deposit: 0,
+        items: [{ id: 'i1', name: 'Coverage', qty: 2, price: 400 }],
+      },
+      { cost: 500, status: 'booked', deposit: 0, items: [] },
+    ] as unknown as Vendor[];
+    expect(vendorsTotal(vendors)).toBe(1300);
+    expect(vendorsPaid(vendors)).toBe(800);
   });
 
   it('treats total spent without vendors as budget-only', () => {

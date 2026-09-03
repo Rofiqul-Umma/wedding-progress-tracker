@@ -7,6 +7,8 @@ import {
   sesDone,
   sesOpen,
   sesPct,
+  contentsProgress,
+  effectiveSeserahanStatus,
   vendorsBooked,
   vendorCategories,
 } from './progress';
@@ -20,16 +22,28 @@ const task = (done: boolean): Task => ({
   created: '',
 });
 
-const ses = (status: SeserahanItem['status']): SeserahanItem => ({
+const ses = (
+  status: SeserahanItem['status'],
+  contents: SeserahanItem['contents'] = [],
+): SeserahanItem => ({
   id: 's' + Math.random(),
   name: '',
   category: '',
   qty: 1,
   cost: 0,
   status,
+  contents,
   url: '',
   image: '',
   notes: '',
+});
+
+/** Shorthand for a bundle line; only `done` matters to these assertions. */
+const content = (done: boolean) => ({
+  id: 'c' + Math.random(),
+  name: 'x',
+  qty: 1,
+  done,
 });
 
 const vendor = (status: Vendor['status'], category: string): Vendor => ({
@@ -40,6 +54,7 @@ const vendor = (status: Vendor['status'], category: string): Vendor => ({
   phone: '',
   social: '',
   cost: 0,
+  items: [],
   status,
   notes: '',
 });
@@ -65,6 +80,40 @@ describe('seserahan progress', () => {
   });
   it('returns 0% for an empty list', () => {
     expect(sesPct([])).toBe(0);
+  });
+});
+
+describe('seserahan bundles', () => {
+  it('reports no progress for a tray without contents', () => {
+    expect(contentsProgress(ses('pending'))).toBeNull();
+  });
+
+  it('counts ticked contents', () => {
+    const item = ses('pending', [content(true), content(false), content(false)]);
+    expect(contentsProgress(item)).toEqual({ done: 1, total: 3 });
+  });
+
+  it('keeps the hand-set status when there are no contents', () => {
+    expect(effectiveSeserahanStatus(ses('onProgress'))).toBe('onProgress');
+  });
+
+  it('derives the status from the checklist', () => {
+    expect(effectiveSeserahanStatus(ses('finished', [content(false), content(false)]))).toBe(
+      'pending',
+    );
+    expect(effectiveSeserahanStatus(ses('pending', [content(true), content(false)]))).toBe(
+      'onProgress',
+    );
+    expect(effectiveSeserahanStatus(ses('pending', [content(true), content(true)]))).toBe(
+      'finished',
+    );
+  });
+
+  it('counts a fully ticked bundle as done despite a stale stored status', () => {
+    const items = [ses('pending', [content(true), content(true)]), ses('pending')];
+    expect(sesDone(items)).toBe(1);
+    expect(sesOpen(items)).toBe(1);
+    expect(sesPct(items)).toBe(50);
   });
 });
 

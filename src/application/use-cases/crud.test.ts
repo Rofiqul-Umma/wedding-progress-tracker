@@ -20,6 +20,8 @@ import {
   addSeserahan,
   deleteSeserahan,
   cycleSeserahanStatus,
+  toggleSeserahanContent,
+  setSeserahanContents,
 } from './seserahan';
 import {
   addShopping,
@@ -85,6 +87,7 @@ describe('vendor use cases', () => {
       phone: '',
       social: '',
       cost: 100,
+      items: [],
       status: 'inquiry',
       notes: '',
     });
@@ -101,6 +104,7 @@ describe('vendor use cases', () => {
       phone: '',
       social: '',
       cost: 0,
+      items: [],
       status: 'inquiry',
       notes: '',
     });
@@ -121,6 +125,7 @@ describe('vendor use cases', () => {
         phone: '',
         social: '',
         cost: 0,
+        items: [],
         status: 'inquiry',
         notes: '',
       });
@@ -212,6 +217,7 @@ describe('seserahan use cases', () => {
       qty: 1,
       cost: 0,
       status: 'pending',
+      contents: [],
       url: '',
       image: '',
       notes: '',
@@ -232,6 +238,7 @@ describe('seserahan use cases', () => {
       qty: 1,
       cost: 0,
       status: 'pending',
+      contents: [],
       url: '',
       image: '',
       notes: '',
@@ -239,6 +246,66 @@ describe('seserahan use cases', () => {
     const r = deleteSeserahan(s, s.seserahan[0].id);
     expect(r.removed?.name).toBe('X');
     expect(r.state.seserahan).toHaveLength(0);
+  });
+
+  it('ticks one bundle item and leaves its siblings alone', () => {
+    let s = addSeserahan(base(), {
+      name: 'Alat sholat',
+      category: 'Ibadah',
+      qty: 1,
+      cost: 0,
+      status: 'pending',
+      contents: [
+        { id: 'c1', name: 'Mukena', qty: 1, done: false },
+        { id: 'c2', name: 'Sajadah', qty: 1, done: false },
+      ],
+      url: '',
+      image: '',
+      notes: '',
+    });
+    const id = s.seserahan[0].id;
+
+    s = toggleSeserahanContent(s, id, 'c1');
+    expect(s.seserahan[0].contents.map((c) => c.done)).toEqual([true, false]);
+
+    s = toggleSeserahanContent(s, id, 'c1');
+    expect(s.seserahan[0].contents.map((c) => c.done)).toEqual([false, false]);
+  });
+
+  it('does not cycle the status of a bundle', () => {
+    let s = addSeserahan(base(), {
+      name: 'Alat sholat',
+      category: 'Ibadah',
+      qty: 1,
+      cost: 0,
+      status: 'pending',
+      contents: [{ id: 'c1', name: 'Mukena', qty: 1, done: false }],
+      url: '',
+      image: '',
+      notes: '',
+    });
+    s = cycleSeserahanStatus(s, s.seserahan[0].id);
+    expect(s.seserahan[0].status).toBe('pending');
+  });
+
+  it('replaces bundle contents wholesale', () => {
+    let s = addSeserahan(base(), {
+      name: 'Alat sholat',
+      category: '',
+      qty: 1,
+      cost: 0,
+      status: 'pending',
+      contents: [{ id: 'c1', name: 'Mukena', qty: 1, done: true }],
+      url: '',
+      image: '',
+      notes: '',
+    });
+    s = setSeserahanContents(s, s.seserahan[0].id, [
+      { id: 'c2', name: 'Sajadah', qty: 2, done: false },
+    ]);
+    expect(s.seserahan[0].contents).toEqual([
+      { id: 'c2', name: 'Sajadah', qty: 2, done: false },
+    ]);
   });
 });
 

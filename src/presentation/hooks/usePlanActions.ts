@@ -11,6 +11,7 @@ import {
   cycleSeserahanStatus,
   deleteSeserahan,
   insertSeserahan,
+  toggleSeserahanContent,
 } from '@application/use-cases/seserahan';
 import {
   cycleShoppingStatus,
@@ -48,11 +49,18 @@ export function usePlanActions() {
 
   function cycleSeserahan(id: string) {
     const item = state.seserahan.find((x) => x.id === id);
+    // A bundle takes its status from its checklist; there is nothing to cycle.
+    if (item?.contents.length) return;
     setState((s) => cycleSeserahanStatus(s, id));
     if (item) {
       const next = nextSeserahanStatus(item.status);
       toast(t('seserahan.advanced', { name: item.name, status: t(`status.ses.${next}`) }));
     }
+  }
+
+  // No toast: ticking is high-frequency and the checkbox is its own feedback.
+  function toggleSeserahanContentAction(itemId: string, contentId: string) {
+    setState((s) => toggleSeserahanContent(s, itemId, contentId));
   }
 
   function cycleShopping(id: string) {
@@ -206,6 +214,7 @@ export function usePlanActions() {
     toggleTask,
     togglePaid,
     cycleSeserahan,
+    toggleSeserahanContent: toggleSeserahanContentAction,
     cycleShopping,
     deleteVendor: deleteVendorAction,
     deleteBudget: deleteBudgetAction,

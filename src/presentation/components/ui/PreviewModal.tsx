@@ -6,6 +6,7 @@ import { Icon } from './Icon';
 import { Button } from './Button';
 import { Chip, type ChipVariant } from './Chip';
 import { Avatar } from './Avatar';
+import { Check } from './Check';
 import { TaskDetail } from '@presentation/components/dashboard/TaskDetail';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav } from '@presentation/state/NavStore';
@@ -14,6 +15,9 @@ import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { contentsProgress, effectiveSeserahanStatus } from '@domain/services/progress';
+import { effectiveVendorCost } from '@domain/services/budget';
+import { cn } from '@presentation/lib/cn';
 import type {
   VendorStatus,
   SeserahanStatus,
@@ -115,6 +119,7 @@ function VendorBody({
   money: Money;
 }) {
   const person = linkedName ?? v.contact ?? '';
+  const items = v.items ?? [];
   return (
     <>
       <Header eyebrow={t('entity.vendor')} category={v.category} title={v.name} />
@@ -125,12 +130,46 @@ function VendorBody({
           </Chip>
         </span>
       </Field>
+      {items.length > 0 && (
+        <Field label={t('vendors.itemsTitle', { count: items.length })}>
+          {/* `min-w-0` throughout: a grid/flex child defaults to a min-content
+              floor, which the fixed-width figures would push past the dialog. */}
+          <div className="grid min-w-0 gap-2">
+            {items.map((item) => (
+              <div key={item.id} className="flex min-w-0 items-center gap-2">
+                <span className="min-w-0 flex-1 truncate text-[13.5px] font-semibold">
+                  {item.name}
+                </span>
+                {item.qty > 1 && <Chip variant="gray">×{item.qty}</Chip>}
+                {/* The unit price is the least useful of the three when space
+                    runs out — it is recoverable from the line total and qty. */}
+                <span className="flex-none text-[12px] text-faint tnum max-[420px]:hidden">
+                  {money(item.price)}
+                </span>
+                <span className="flex-none text-right text-[13.5px] font-semibold tnum">
+                  {money(item.price * item.qty)}
+                </span>
+              </div>
+            ))}
+            <div className="flex min-w-0 items-center justify-between border-t border-line pt-2">
+              <span className="text-[12.5px] font-bold text-muted">
+                {t('preview.total')}
+              </span>
+              <span className="text-[14px] font-extrabold tnum">
+                {money(effectiveVendorCost(v))}
+              </span>
+            </div>
+          </div>
+        </Field>
+      )}
       <div className="grid grid-cols-2 gap-3.5">
         <Field label={t('forms.vendor.category')}>
           <span className="text-[13.5px] font-semibold">{v.category || '—'}</span>
         </Field>
         <Field label={t('forms.vendor.cost')}>
-          <span className="text-[13.5px] font-semibold tnum">{money(v.cost || 0)}</span>
+          <span className="text-[13.5px] font-semibold tnum">
+            {money(effectiveVendorCost(v))}
+          </span>
         </Field>
       </div>
       {v.status === 'deposit' && (v.deposit ?? 0) > 0 && (
@@ -255,14 +294,18 @@ function ShoppingBody({
 function SeserahanBody({
   item,
   onViewImage,
+  onToggleContent,
   t,
   money,
 }: {
   item: SeserahanItem;
   onViewImage: (src: string, alt: string) => void;
+  onToggleContent: (contentId: string) => void;
   t: TFunction;
   money: Money;
 }) {
+  const progress = contentsProgress(item);
+  const status = effectiveSeserahanStatus(item);
   return (
     <>
       <Header eyebrow={t('entity.seserahan')} category={item.category} title={item.name} />
@@ -281,11 +324,41 @@ function SeserahanBody({
       )}
       <Field label={t('forms.seserahan.status')}>
         <span>
-          <Chip variant={SES_CHIP[item.status]} dot>
-            {t(`status.ses.${item.status}`)}
+          <Chip variant={SES_CHIP[status]} dot>
+            {t(`status.ses.${status}`)}
           </Chip>
         </span>
       </Field>
+      {progress && (
+        <Field
+          label={t('seserahan.contentsTitle', {
+            done: progress.done,
+            total: progress.total,
+          })}
+        >
+          <div className="grid gap-2">
+            {item.contents.map((content) => (
+              <div key={content.id} className="flex items-center gap-2.5">
+                <Check
+                  checked={content.done}
+                  onChange={() => onToggleContent(content.id)}
+                  label={t('seserahan.contentsToggleAria', { name: content.name })}
+                />
+                <span
+                  className={cn(
+                    'min-w-0 flex-1 truncate text-[13.5px] font-semibold',
+                    content.done && 'text-muted line-through',
+                  )}
+                >
+                  {content.name}
+                </span>
+                {content.qty > 1 && <Chip variant="gray">×{content.qty}</Chip>}
+              </div>
+            ))}
+            <p className="text-[12px] text-faint">{t('seserahan.derivedNote')}</p>
+          </div>
+        </Field>
+      )}
       <div className="grid grid-cols-2 gap-3.5">
         <Field label={t('forms.seserahan.category')}>
           <span className="text-[13.5px] font-semibold">{item.category || '—'}</span>
@@ -325,7 +398,13 @@ export function PreviewModal() {
   const { state } = usePlan();
   const { gotoContact } = useNav();
   const { taskForm, vendorForm, shoppingForm, seserahanForm } = useForms();
-  const { deleteTask, deleteVendor, deleteShopping, deleteSeserahan } = usePlanActions();
+  const {
+    deleteTask,
+    deleteVendor,
+    deleteShopping,
+    deleteSeserahan,
+    toggleSeserahanContent,
+  } = usePlanActions();
   const { t } = useTranslation();
   const { money } = useFormat();
 
@@ -380,7 +459,15 @@ export function PreviewModal() {
   } else {
     const item = state.seserahan.find((x) => x.id === preview.id);
     if (!item) return null;
-    body = <SeserahanBody item={item} onViewImage={openImage} t={t} money={money} />;
+    body = (
+      <SeserahanBody
+        item={item}
+        onViewImage={openImage}
+        onToggleContent={(contentId) => toggleSeserahanContent(item.id, contentId)}
+        t={t}
+        money={money}
+      />
+    );
     onEdit = () => editAndClose(() => openForm(seserahanForm(item)));
     onDelete = () => deleteAndClose(() => deleteSeserahan(item.id));
   }

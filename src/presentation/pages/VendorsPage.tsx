@@ -16,7 +16,7 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { vendorsTotal } from '@domain/services/budget';
+import { effectiveVendorCost, vendorsTotal } from '@domain/services/budget';
 import { vendorsBooked, vendorCategories } from '@domain/services/progress';
 import { iconForCategory, categoryColor } from '@domain/value-objects/status';
 import type { Vendor } from '@domain/entities/types';
@@ -34,8 +34,8 @@ const STATUS_CHIP: Record<VendorStatus, ChipVariant> = {
 };
 
 const COMPARATORS: Record<VendorSort, (a: Vendor, b: Vendor) => number> = {
-  'cost-desc': (a, b) => (+b.cost || 0) - (+a.cost || 0),
-  'cost-asc': (a, b) => (+a.cost || 0) - (+b.cost || 0),
+  'cost-desc': (a, b) => effectiveVendorCost(b) - effectiveVendorCost(a),
+  'cost-asc': (a, b) => effectiveVendorCost(a) - effectiveVendorCost(b),
   name: (a, b) => (a.name || '').localeCompare(b.name || ''),
   cat: (a, b) => (a.category || '').localeCompare(b.category || ''),
 };
@@ -100,8 +100,11 @@ export function VendorsPage() {
 
   const visible = list.filter((v) => {
     const linked = v.contactId && state.contacts.find((c) => c.id === v.contactId);
+    // Item names are searchable too, so "engagement" finds the photographer
+    // whose quote breaks out an engagement session.
+    const items = (v.items ?? []).map((i) => i.name).join(' ');
     return matches(
-      `${v.name} ${v.category} ${v.contact || ''} ${linked ? linked.name : ''}`,
+      `${v.name} ${v.category} ${v.contact || ''} ${linked ? linked.name : ''} ${items}`,
     );
   });
 
@@ -146,6 +149,11 @@ export function VendorsPage() {
                     <Chip variant="gray" className="max-[520px]:hidden">
                       {v.category}
                     </Chip>
+                    {(v.items?.length ?? 0) > 0 && (
+                      <Chip variant="gray" className="max-[520px]:hidden">
+                        {t('vendors.itemCount', { count: v.items.length })}
+                      </Chip>
+                    )}
                   </div>
                   <div className="mt-0.5 truncate text-[12.5px] text-muted">
                     {linked ? (
@@ -166,7 +174,7 @@ export function VendorsPage() {
                 </div>
                 <div className="flex-none text-right">
                   <div className="text-[15px] font-extrabold tnum">
-                    {money(v.cost || 0)}
+                    {money(effectiveVendorCost(v))}
                   </div>
                   <div className="mt-[5px]">
                     <Chip variant={STATUS_CHIP[v.status]}>

@@ -8,7 +8,9 @@ export type FieldType =
   | 'checkbox'
   | 'url'
   | 'image'
-  | 'file';
+  | 'file'
+  | 'checklist'
+  | 'lineitems';
 
 export interface FieldOption {
   value: string;

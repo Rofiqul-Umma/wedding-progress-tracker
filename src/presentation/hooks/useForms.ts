@@ -18,6 +18,8 @@ import { addShopping, updateShopping } from '@application/use-cases/shopping';
 import { addContact, updateContact } from '@application/use-cases/contacts';
 import { nowTime } from '@infrastructure/format/date';
 import { parseAttachment, serializeAttachment } from '@presentation/lib/attachments';
+import { parseContents, serializeContents } from '@presentation/lib/checklist';
+import { lineItemsSum, parseLineItems, serializeLineItems } from '@presentation/lib/lineItems';
 
 const numOr = (v: string, fallback = 0): number => {
   const n = parseFloat(v);
@@ -40,7 +42,22 @@ export function useForms() {
     const fields: Field[] = [
       { name: 'name', label: t('forms.vendor.name'), value: v?.name, placeholder: t('forms.vendor.namePh') },
       { name: 'category', label: t('forms.vendor.category'), value: v?.category, placeholder: t('forms.vendor.categoryPh'), half: true },
-      { name: 'cost', label: t('forms.vendor.cost'), type: 'number', value: v?.cost, half: true },
+      {
+        name: 'cost',
+        label: t('forms.vendor.cost'),
+        type: 'number',
+        value: v?.cost,
+        half: true,
+        // An itemized vendor derives its cost from the lines below, so a manual
+        // figure here could only contradict them.
+        showWhen: (values) => parseLineItems(values.items).length === 0,
+      },
+      {
+        name: 'items',
+        label: t('forms.vendor.items'),
+        type: 'lineitems',
+        value: serializeLineItems(v?.items),
+      },
       {
         name: 'status',
         label: t('forms.vendor.status'),
@@ -88,10 +105,14 @@ export function useForms() {
       submit: (values) => {
         if (!values.name.trim()) return t('forms.vendor.errName');
         const status = values.status as Vendor['status'];
+        const items = parseLineItems(values.items);
         const data: Omit<Vendor, 'id'> = {
           name: values.name,
           category: values.category,
-          cost: numOr(values.cost),
+          // Keep the stored cost truthful for raw readers: an itemized vendor
+          // saves the sum of its lines, a flat one the hand-entered figure.
+          cost: items.length ? lineItemsSum(items) : numOr(values.cost),
+          items,
           status,
           // Only a down-payment vendor carries a deposit amount.
           deposit: status === 'deposit' ? numOr(values.deposit) : 0,
@@ -225,6 +246,15 @@ export function useForms() {
           value: i?.status ?? 'pending',
           options: SES_ORDER.map((s) => ({ value: s, label: t(`status.ses.${s}`) })),
           half: true,
+          // A bundle's status is derived from its checklist, so offering the
+          // select would invite setting a value the contents contradict.
+          showWhen: (values) => parseContents(values.contents).length === 0,
+        },
+        {
+          name: 'contents',
+          label: t('forms.seserahan.contents'),
+          type: 'checklist',
+          value: serializeContents(i?.contents),
         },
         { name: 'cost', label: t('forms.seserahan.cost'), type: 'number', value: i?.cost, half: true },
         { name: 'url', label: t('forms.seserahan.url'), type: 'url', value: i?.url, placeholder: t('forms.seserahan.urlPh') },
@@ -242,6 +272,7 @@ export function useForms() {
           qty: Math.max(1, Math.round(numOr(values.qty, 1))),
           cost: numOr(values.cost),
           status,
+          contents: parseContents(values.contents),
           url: values.url.trim(),
           image: values.image,
           notes: values.notes,
