@@ -17,6 +17,7 @@ import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { shopBought, shopPct } from '@domain/services/progress';
+import { shoppingPaid } from '@domain/services/budget';
 import { SHOP_ORDER, iconForCategory, categoryColor } from '@domain/value-objects/status';
 import type { ShoppingStatus } from '@domain/value-objects/status';
 import type { ShoppingItem } from '@domain/entities/types';
@@ -60,9 +61,8 @@ export function ShoppingPage() {
     ordered: items.filter((i) => i.status === 'ordered').length,
     purchased: items.filter((i) => i.status === 'purchased').length,
   };
-  const totalSpent = items
-    .filter((i) => i.status === 'purchased')
-    .reduce((a, i) => a + (+i.price || 0) * (+i.qty || 1), 0);
+  // The same service the budget rollups use, so the two can never disagree.
+  const totalSpent = shoppingPaid(items);
   const pct = shopPct(items);
 
   const segments: Segment<ShopFilter>[] = [

@@ -47,7 +47,7 @@ export function BudgetPage() {
   const [filter, setFilter] = useState<BudgetFilter>('all');
   const [sort, setSort] = useState<BudgetSort>('amount-desc');
 
-  const sp = totalSpent(state.budget, state.vendors);
+  const sp = totalSpent(state.budget, state.vendors, state.shopping);
   const tb = totalBudget(state.wedding);
   const rem = tb - sp;
   const rollup = categoryRollup(state.budget);
@@ -79,7 +79,10 @@ export function BudgetPage() {
             label: rem < 0 ? t('budget.stripOver') : t('budget.stripRemaining'),
             value: money(Math.abs(rem)),
           },
-          { label: t('budget.stripPaid'), value: money(paidTotal(state.budget)) },
+          {
+            label: t('budget.stripPaid'),
+            value: money(paidTotal(state.budget, state.shopping)),
+          },
         ]}
       />
 

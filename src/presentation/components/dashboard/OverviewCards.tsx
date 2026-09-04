@@ -79,10 +79,10 @@ export function OverviewCards() {
   const { wedding, budget, vendors, tasks, seserahan, shopping } = state;
 
   const dleft = daysUntil(wedding.date);
-  const sp = totalSpent(budget, vendors);
+  const sp = totalSpent(budget, vendors, shopping);
   const tb = totalBudget(wedding);
   const rem = tb - sp;
-  const budPct = budgetUsedPct(wedding, budget, vendors);
+  const budPct = budgetUsedPct(wedding, budget, vendors, shopping);
 
   const countdown =
     dleft === null

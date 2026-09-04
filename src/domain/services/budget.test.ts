@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { BudgetItem, Vendor, Wedding } from '@domain/entities/types';
+import type { BudgetItem, ShoppingItem, Vendor, Wedding } from '@domain/entities/types';
 import {
   spent,
   totalBudget,
@@ -10,6 +10,7 @@ import {
   vendorsPaid,
   vendorItemsTotal,
   effectiveVendorCost,
+  shoppingPaid,
   totalSpent,
   categoryRollup,
   maxCategoryValue,
@@ -126,6 +127,51 @@ describe('budget service', () => {
 
   it('treats total spent without vendors as budget-only', () => {
     expect(totalSpent([item({ actual: 250 })])).toBe(250);
+  });
+
+  it('counts only purchased shopping items as money spent', () => {
+    const shopping = [
+      { price: 45, qty: 6, status: 'purchased' },
+      { price: 4, qty: 80, status: 'ordered' },
+      { price: 28, qty: 1, status: 'toBuy' },
+    ] as unknown as ShoppingItem[];
+    expect(shoppingPaid(shopping)).toBe(270);
+    expect(shoppingPaid([])).toBe(0);
+  });
+
+  it('clamps a zero or missing shopping quantity to one line', () => {
+    const shopping = [
+      { price: 50, qty: 0, status: 'purchased' },
+      { price: 20, status: 'purchased' },
+    ] as unknown as ShoppingItem[];
+    expect(shoppingPaid(shopping)).toBe(70);
+  });
+
+  it('adds purchased shopping to the paid-off total', () => {
+    const budget = [item({ actual: 100, paid: true }), item({ actual: 250, paid: false })];
+    const shopping = [
+      { price: 45, qty: 6, status: 'purchased' },
+      { price: 4, qty: 80, status: 'ordered' },
+    ] as unknown as ShoppingItem[];
+    expect(paidTotal(budget, shopping)).toBe(370);
+    // Omitting shopping keeps the old behaviour the untouched call sites rely on.
+    expect(paidTotal(budget)).toBe(100);
+  });
+
+  it('folds purchased shopping into spent, remaining, and used %', () => {
+    const budget = [item({ actual: 200 })];
+    const vendors = [
+      { cost: 300, status: 'paid', deposit: 0, items: [] },
+    ] as unknown as Vendor[];
+    const shopping = [
+      { price: 100, qty: 2, status: 'purchased' },
+    ] as unknown as ShoppingItem[];
+    // budget 200 + vendor 300 + shopping 200
+    expect(totalSpent(budget, vendors, shopping)).toBe(700);
+    expect(remaining(wedding, budget, vendors, shopping)).toBe(300); // target 1000
+    expect(budgetUsedPct(wedding, budget, vendors, shopping)).toBe(70);
+    // Without shopping the same inputs stop at 500.
+    expect(totalSpent(budget, vendors)).toBe(500);
   });
 
   it('rolls categories up, sorts by actual desc, and flags over-estimate', () => {

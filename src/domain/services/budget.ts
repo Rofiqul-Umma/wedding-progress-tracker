@@ -1,4 +1,4 @@
-import type { BudgetItem, Vendor, Wedding } from '@domain/entities/types';
+import type { BudgetItem, ShoppingItem, Vendor, Wedding } from '@domain/entities/types';
 
 /** Total actually spent across all budget items. */
 export function spent(budget: BudgetItem[]): number {
@@ -33,9 +33,23 @@ export function vendorsPaid(vendors: Vendor[]): number {
   }, 0);
 }
 
-/** Total actually spent = budget line items + money paid to vendors. */
-export function totalSpent(budget: BudgetItem[], vendors: Vendor[] = []): number {
-  return spent(budget) + vendorsPaid(vendors);
+/**
+ * Money spent on shopping: the line total of every purchased item. Ordered and
+ * to-buy items are money not yet out the door, so they do not count.
+ */
+export function shoppingPaid(shopping: ShoppingItem[]): number {
+  return shopping
+    .filter((i) => i.status === 'purchased')
+    .reduce((a, i) => a + (+i.price || 0) * Math.max(1, +i.qty || 1), 0);
+}
+
+/** Total actually spent = budget line items + vendor payments + shopping bought. */
+export function totalSpent(
+  budget: BudgetItem[],
+  vendors: Vendor[] = [],
+  shopping: ShoppingItem[] = [],
+): number {
+  return spent(budget) + vendorsPaid(vendors) + shoppingPaid(shopping);
 }
 
 /** The overall wedding budget target. */
@@ -43,30 +57,38 @@ export function totalBudget(wedding: Wedding): number {
   return +wedding.budget || 0;
 }
 
-/** Budget remaining (negative means over budget), vendor payments included. */
+/** Budget remaining (negative means over budget), every payment included. */
 export function remaining(
   wedding: Wedding,
   budget: BudgetItem[],
   vendors: Vendor[] = [],
+  shopping: ShoppingItem[] = [],
 ): number {
-  return totalBudget(wedding) - totalSpent(budget, vendors);
+  return totalBudget(wedding) - totalSpent(budget, vendors, shopping);
 }
 
-/** Total already paid off. */
-export function paidTotal(budget: BudgetItem[]): number {
-  return budget
-    .filter((b) => b.paid)
-    .reduce((a, b) => a + (+b.actual || 0), 0);
+/** Total already paid off: paid budget rows plus purchased shopping. */
+export function paidTotal(
+  budget: BudgetItem[],
+  shopping: ShoppingItem[] = [],
+): number {
+  return (
+    budget.filter((b) => b.paid).reduce((a, b) => a + (+b.actual || 0), 0) +
+    shoppingPaid(shopping)
+  );
 }
 
-/** Percentage of budget used (0–100, capped), vendor payments included. */
+/** Percentage of budget used (0–100, capped), every payment included. */
 export function budgetUsedPct(
   wedding: Wedding,
   budget: BudgetItem[],
   vendors: Vendor[] = [],
+  shopping: ShoppingItem[] = [],
 ): number {
   const tb = totalBudget(wedding);
-  return tb > 0 ? Math.min(100, Math.round((totalSpent(budget, vendors) / tb) * 100)) : 0;
+  return tb > 0
+    ? Math.min(100, Math.round((totalSpent(budget, vendors, shopping) / tb) * 100))
+    : 0;
 }
 
 /** Sum of all vendor costs (money committed). */

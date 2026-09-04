@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ModalShell } from '@presentation/components/ui/ModalShell';
 import { Button } from '@presentation/components/ui/Button';
+import { Chip } from '@presentation/components/ui/Chip';
+import { Icon } from '@presentation/components/ui/Icon';
 import { CONTROL, LABEL } from '@presentation/components/forms/FormField';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useRoom } from '@presentation/state/RoomStore';
@@ -28,6 +30,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [joinInput, setJoinInput] = useState('');
+  const [backupsOpen, setBackupsOpen] = useState(false);
   const inRoom = room.enabled && room.status === 'connected';
 
   const [currency, setCurrency] = useState(state.settings.currency);
@@ -345,36 +348,66 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           />
           {account.enabled && (
             <div className="mt-1 grid gap-2 border-t border-line-2 pt-3">
-              <div className="text-xs font-bold text-muted">{t('account.backupTitle')}</div>
-              <p className="text-xs text-faint">{t('account.backupNote')}</p>
-              {account.backups.length ? (
-                <div className="grid gap-2">
-                  {account.backups.map((backup) => (
-                    <div
-                      key={backup.key}
-                      className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-line bg-panel/35 px-3 py-2"
-                    >
-                      <span className="text-xs font-semibold text-muted">
-                        {t('account.backupDate', {
-                          date: new Intl.DateTimeFormat(undefined, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          }).format(backup.createdAt),
-                        })}
-                      </span>
-                      <div className="flex gap-1.5">
-                        <Button size="sm" icon="restore" onClick={() => onRestoreBackup(backup)}>
-                          {t('account.restore')}
-                        </Button>
-                        <Button size="sm" icon="download" onClick={() => onDownloadBackup(backup)}>
-                          {t('account.download')}
-                        </Button>
-                      </div>
+              {/* Collapsed by default: safety backups are a break-glass tool, so
+                  the list would otherwise crowd the everyday data buttons above. */}
+              <button
+                type="button"
+                aria-expanded={backupsOpen}
+                aria-controls="settings-backups"
+                onClick={() => setBackupsOpen((open) => !open)}
+                className="flex items-center gap-2 text-left text-xs font-bold text-muted transition-colors hover:text-ink"
+              >
+                <Icon
+                  name="expand_more"
+                  size={18}
+                  className={cn('transition-transform', backupsOpen && 'rotate-180')}
+                />
+                <span className="flex-1">{t('account.backupTitle')}</span>
+                {account.backups.length > 0 && (
+                  <Chip variant="gray">{account.backups.length}</Chip>
+                )}
+              </button>
+              {backupsOpen && (
+                <div id="settings-backups" className="grid gap-2">
+                  <p className="text-xs text-faint">{t('account.backupNote')}</p>
+                  {account.backups.length ? (
+                    <div className="grid gap-2">
+                      {account.backups.map((backup) => (
+                        <div
+                          key={backup.key}
+                          className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-line bg-panel/35 px-3 py-2"
+                        >
+                          <span className="text-xs font-semibold text-muted">
+                            {t('account.backupDate', {
+                              date: new Intl.DateTimeFormat(undefined, {
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
+                              }).format(backup.createdAt),
+                            })}
+                          </span>
+                          <div className="flex gap-1.5">
+                            <Button
+                              size="sm"
+                              icon="restore"
+                              onClick={() => onRestoreBackup(backup)}
+                            >
+                              {t('account.restore')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              icon="download"
+                              onClick={() => onDownloadBackup(backup)}
+                            >
+                              {t('account.download')}
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <p className="text-xs text-faint">{t('account.noBackups')}</p>
+                  )}
                 </div>
-              ) : (
-                <p className="text-xs text-faint">{t('account.noBackups')}</p>
               )}
             </div>
           )}

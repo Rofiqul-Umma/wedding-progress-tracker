@@ -248,15 +248,17 @@ export function buildReportStats(
   return [
     {
       labelKey: 'report.stat.budgetUsed',
-      value: `${fmt.money(totalSpent(state.budget, state.vendors))} / ${fmt.money(totalBudget(state.wedding))}`,
+      value: `${fmt.money(totalSpent(state.budget, state.vendors, state.shopping))} / ${fmt.money(totalBudget(state.wedding))}`,
     },
     {
       labelKey: 'report.stat.remaining',
-      value: fmt.money(remaining(state.wedding, state.budget, state.vendors)),
+      value: fmt.money(
+        remaining(state.wedding, state.budget, state.vendors, state.shopping),
+      ),
     },
     {
       labelKey: 'report.stat.paid',
-      value: fmt.money(paidTotal(state.budget)),
+      value: fmt.money(paidTotal(state.budget, state.shopping)),
     },
     {
       labelKey: 'report.stat.vendorsCommitted',
