@@ -18,7 +18,8 @@ import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { effectiveVendorCost, vendorsTotal } from '@domain/services/budget';
 import { vendorsBooked, vendorCategories } from '@domain/services/progress';
-import { iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { categoryColor } from '@domain/value-objects/status';
+import { itemIcon } from '@domain/value-objects/icons';
 import type { Vendor } from '@domain/entities/types';
 import type { VendorStatus } from '@domain/value-objects/status';
 import type { ChipVariant } from '@presentation/components/ui/Chip';
@@ -142,7 +143,7 @@ export function VendorsPage() {
                 onActivate={() => openPreview({ kind: 'vendor', id: v.id })}
                 activateLabel={t('preview.viewAria', { name: v.name })}
               >
-                <Avatar color={color} icon={iconForCategory(v.category)} />
+                <Avatar color={color} icon={itemIcon(v.icon, v.category)} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
                     <span className="truncate">{v.name}</span>

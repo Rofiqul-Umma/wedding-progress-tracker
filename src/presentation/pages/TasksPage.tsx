@@ -15,7 +15,8 @@ import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { tasksDone, openTasks } from '@domain/services/progress';
 import { daysUntil } from '@domain/services/schedule';
-import { iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { categoryColor } from '@domain/value-objects/status';
+import { itemIcon } from '@domain/value-objects/icons';
 import { cn } from '@presentation/lib/cn';
 import { isImageAttachment } from '@presentation/lib/attachments';
 import { downloadAttachment } from '@presentation/lib/dataUrl';
@@ -121,7 +122,7 @@ function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
         onChange={onToggle}
         label={`${task.done ? t('tasks.markTodo') : t('tasks.markComplete')}: ${task.title}`}
       />
-      <Avatar color={color} icon={iconForCategory(task.cat)} />
+      <Avatar color={color} icon={itemIcon(task.icon, task.cat)} />
       <div className="min-w-0 flex-1">
         <div
           className={cn(

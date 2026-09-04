@@ -193,4 +193,30 @@ describe('migrate', () => {
     expect(s.tasks[0].url).toBe('https://ex.com');
     expect(s.tasks[0].attachment).toEqual(attachment);
   });
+
+  it('keeps a chosen icon on every entity that can carry one', () => {
+    const s = migrate({
+      vendors: [{ id: 'v1', name: 'Ivy', icon: 'church' }],
+      tasks: [{ id: 't1', title: 'Bands', icon: 'music_note' }],
+      seserahan: [{ id: 'e1', name: 'Tray', icon: 'card_giftcard' }],
+      shopping: [{ id: 's1', name: 'Lights', icon: 'lightbulb' }],
+    });
+    expect(s.vendors[0].icon).toBe('church');
+    expect(s.tasks[0].icon).toBe('music_note');
+    expect(s.seserahan[0].icon).toBe('card_giftcard');
+    expect(s.shopping[0].icon).toBe('lightbulb');
+  });
+
+  it('coerces a non-string icon to empty, so it falls back to the category', () => {
+    const s = migrate({
+      vendors: [{ id: 'v1', name: 'Ivy', icon: 42 }],
+      tasks: [{ id: 't1', title: 'Bands', icon: { name: 'x' } }],
+      seserahan: [{ id: 'e1', name: 'Tray' }],
+      shopping: [{ id: 's1', name: 'Lights', icon: null }],
+    });
+    expect(s.vendors[0].icon).toBe('');
+    expect(s.tasks[0].icon).toBe('');
+    expect(s.seserahan[0].icon).toBe('');
+    expect(s.shopping[0].icon).toBe('');
+  });
 });

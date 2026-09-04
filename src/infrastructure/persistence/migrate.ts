@@ -76,10 +76,17 @@ export function migrate(input: unknown): PlanState {
           // Quote line items, added later. Legacy vendors get an empty list,
           // which keeps them behaving as flat-cost vendors.
           items: vendorItems(v.items),
+          // Per-item icon, added later. '' means "use the category default".
+          icon: str(v.icon),
         }))
       : [],
     budget: Array.isArray(s.budget) ? (s.budget as BudgetItem[]) : [],
-    tasks: Array.isArray(s.tasks) ? (s.tasks as Task[]) : [],
+    tasks: Array.isArray(s.tasks)
+      ? (s.tasks as Obj[]).map((t) => ({
+          ...(t as unknown as Task),
+          icon: str(t.icon),
+        }))
+      : [],
     seserahan: Array.isArray(s.seserahan)
       ? (s.seserahan as Obj[]).map((i) => ({
           ...(i as unknown as SeserahanItem),
@@ -90,9 +97,15 @@ export function migrate(input: unknown): PlanState {
           // Bundle contents, added later still. Legacy items get an empty list,
           // which keeps them behaving as plain single-status trays.
           contents: seserahanContents(i.contents),
+          icon: str(i.icon),
         }))
       : [],
-    shopping: Array.isArray(s.shopping) ? (s.shopping as ShoppingItem[]) : [],
+    shopping: Array.isArray(s.shopping)
+      ? (s.shopping as Obj[]).map((i) => ({
+          ...(i as unknown as ShoppingItem),
+          icon: str(i.icon),
+        }))
+      : [],
     contacts: Array.isArray(s.contacts)
       ? (s.contacts as Obj[]).map((c) => ({
           ...(c as unknown as Contact),

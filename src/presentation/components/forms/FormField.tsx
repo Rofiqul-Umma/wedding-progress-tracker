@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Field } from './types';
+import type { Field, FormValues } from './types';
 import { Icon } from '@presentation/components/ui/Icon';
 import {
   FileTooLargeError,
@@ -17,6 +17,7 @@ import {
   serializeLineItems,
 } from '@presentation/lib/lineItems';
 import { uid } from '@application/use-cases/id';
+import { ICON_GROUPS, itemIcon } from '@domain/value-objects/icons';
 import type { SeserahanContent, VendorItem } from '@domain/entities/types';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { cn } from '@presentation/lib/cn';
@@ -24,6 +25,8 @@ import { cn } from '@presentation/lib/cn';
 interface FormFieldProps {
   field: Field;
   value: string;
+  /** All live form values, for fields that read a sibling (see `autoFrom`). */
+  values: FormValues;
   checked: boolean;
   onValue: (name: string, value: string) => void;
   onCheck: (name: string, checked: boolean) => void;
@@ -36,7 +39,14 @@ export const LABEL = 'text-[12.5px] font-bold text-muted';
 const ATTACH_BTN =
   'inline-flex items-center gap-1.5 rounded-xl border border-line-2 bg-panel px-3 py-2 text-[13px] font-bold text-ink transition-colors hover:bg-white';
 
-export function FormField({ field, value, checked, onValue, onCheck }: FormFieldProps) {
+export function FormField({
+  field,
+  value,
+  values,
+  checked,
+  onValue,
+  onCheck,
+}: FormFieldProps) {
   const type = field.type ?? 'text';
 
   if (type === 'checkbox') {
@@ -90,6 +100,13 @@ export function FormField({ field, value, checked, onValue, onCheck }: FormField
         <ChecklistField field={field} value={value} onValue={onValue} />
       ) : type === 'lineitems' ? (
         <LineItemsField field={field} value={value} onValue={onValue} />
+      ) : type === 'icon' ? (
+        <IconField
+          field={field}
+          value={value}
+          category={field.autoFrom ? values[field.autoFrom] ?? '' : ''}
+          onValue={onValue}
+        />
       ) : (
         <input
           id={`f-${field.name}`}
@@ -315,6 +332,129 @@ function LineItemsField({ field, value, onValue }: SubFieldProps) {
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * The current icon plus a button that reveals the picker. The grid stays
+ * collapsed until asked for: it is ~60 tiles tall and would otherwise push the
+ * rest of every form off the screen. The stored value is a plain Material
+ * Symbols name, or '' for Auto — no serialization needed, so like the pickers
+ * above it stays stateless apart from its own open/query state.
+ */
+function IconField({
+  field,
+  value,
+  category,
+  onValue,
+}: SubFieldProps & { category: string }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const q = query.trim().toLowerCase();
+  const groups = ICON_GROUPS.map((group) => ({
+    labelKey: group.labelKey,
+    label: t(group.labelKey),
+    // Underscores read as spaces so "local florist" finds `local_florist`, and
+    // the translated group label is searchable too — the raw names are all
+    // English, which is no help in Indonesian.
+    names: group.names.filter(
+      (name) =>
+        !q ||
+        name.replace(/_/g, ' ').includes(q) ||
+        t(group.labelKey).toLowerCase().includes(q),
+    ),
+  })).filter((group) => group.names.length > 0);
+
+  const tile = (
+    name: string,
+    selected: boolean,
+    label: string,
+    onClick: () => void,
+  ) => (
+    <button
+      key={name}
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      aria-label={label}
+      title={label}
+      className={cn(
+        'grid h-[42px] w-[42px] place-items-center rounded-xl border-2 transition-colors',
+        selected
+          ? 'border-lime bg-lime text-ink'
+          : 'border-line-2 bg-panel text-muted hover:border-ink hover:text-ink',
+      )}
+    >
+      <Icon name={name} size={20} />
+    </button>
+  );
+
+  return (
+    <div className="grid gap-2.5">
+      {/* Collapsed: the icon as it stands today, and a way in. */}
+      <div className="flex items-center gap-2.5">
+        <span className="grid h-[42px] w-[42px] flex-none place-items-center rounded-xl border border-line-2 bg-panel text-ink">
+          <Icon name={itemIcon(value, category)} size={20} />
+        </span>
+        <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-muted">
+          {value || t('forms.common.iconAuto')}
+        </span>
+        <button
+          type="button"
+          className={ATTACH_BTN}
+          aria-expanded={open}
+          onClick={() => {
+            setOpen((o) => !o);
+            setQuery('');
+          }}
+        >
+          <Icon name={open ? 'close' : 'edit'} size={17} />
+          {open ? t('forms.common.iconDone') : t('forms.common.iconChange')}
+        </button>
+      </div>
+
+      {open && (
+        <>
+          <input
+            id={`f-${field.name}`}
+            type="search"
+            value={query}
+            placeholder={t('forms.common.iconSearch')}
+            onChange={(e) => setQuery(e.target.value)}
+            className={CONTROL}
+          />
+          {!q && (
+            <div className="flex items-center gap-2.5">
+              {tile(itemIcon('', category), !value, t('forms.common.iconAuto'), () =>
+                onValue(field.name, ''),
+              )}
+              <span className="text-[12.5px] font-semibold text-muted">
+                {t('forms.common.iconAuto')}
+              </span>
+            </div>
+          )}
+          {groups.map((group) => (
+            <div key={group.labelKey} className="grid gap-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wide text-faint">
+                {group.label}
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {group.names.map((name) =>
+                  tile(name, value === name, t('forms.common.iconPick', { name }), () =>
+                    onValue(field.name, name),
+                  ),
+                )}
+              </div>
+            </div>
+          ))}
+          {!groups.length && (
+            <p className="text-[12.5px] text-faint">{t('forms.common.iconNoMatch')}</p>
+          )}
+        </>
+      )}
     </div>
   );
 }

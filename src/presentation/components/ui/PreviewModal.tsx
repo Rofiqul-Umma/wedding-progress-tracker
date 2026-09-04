@@ -14,7 +14,8 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { categoryColor } from '@domain/value-objects/status';
+import { itemIcon } from '@domain/value-objects/icons';
 import { contentsProgress, effectiveSeserahanStatus } from '@domain/services/progress';
 import { effectiveVendorCost } from '@domain/services/budget';
 import { cn } from '@presentation/lib/cn';
@@ -57,14 +58,17 @@ function Header({
   eyebrow,
   category,
   title,
+  icon,
 }: {
   eyebrow: string;
   category: string;
   title: string;
+  /** The item's own icon choice, if any; falls back to the category default. */
+  icon?: string;
 }) {
   return (
     <div className="mb-5 flex items-start gap-3">
-      <Avatar color={categoryColor(category)} icon={iconForCategory(category)} />
+      <Avatar color={categoryColor(category)} icon={itemIcon(icon, category)} />
       <div className="min-w-0 flex-1">
         <div className="text-[11px] font-bold uppercase tracking-wide text-muted">
           {eyebrow}
@@ -122,7 +126,12 @@ function VendorBody({
   const items = v.items ?? [];
   return (
     <>
-      <Header eyebrow={t('entity.vendor')} category={v.category} title={v.name} />
+      <Header
+        eyebrow={t('entity.vendor')}
+        category={v.category}
+        title={v.name}
+        icon={v.icon}
+      />
       <Field label={t('forms.vendor.status')}>
         <span>
           <Chip variant={VENDOR_CHIP[v.status]} dot>
@@ -233,7 +242,12 @@ function ShoppingBody({
   const lineTotal = (+item.price || 0) * qty;
   return (
     <>
-      <Header eyebrow={t('entity.shopping')} category={item.category} title={item.name} />
+      <Header
+        eyebrow={t('entity.shopping')}
+        category={item.category}
+        title={item.name}
+        icon={item.icon}
+      />
       {item.image && (
         <button
           type="button"
@@ -308,7 +322,12 @@ function SeserahanBody({
   const status = effectiveSeserahanStatus(item);
   return (
     <>
-      <Header eyebrow={t('entity.seserahan')} category={item.category} title={item.name} />
+      <Header
+        eyebrow={t('entity.seserahan')}
+        category={item.category}
+        title={item.name}
+        icon={item.icon}
+      />
       {item.image && (
         <button
           type="button"

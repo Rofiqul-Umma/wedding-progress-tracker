@@ -80,6 +80,7 @@ export function Modal({ form, onClose }: ModalProps) {
               key={f.name}
               field={f}
               value={values[f.name] ?? ''}
+              values={values}
               checked={checks[f.name] ?? false}
               onValue={(name, val) => setValues((s) => ({ ...s, [name]: val }))}
               onCheck={(name, val) => setChecks((s) => ({ ...s, [name]: val }))}

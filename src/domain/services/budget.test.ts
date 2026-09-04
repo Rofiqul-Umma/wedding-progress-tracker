@@ -14,6 +14,8 @@ import {
   totalSpent,
   categoryRollup,
   maxCategoryValue,
+  paidVendorEntries,
+  paidShoppingItems,
 } from './budget';
 
 const item = (over: Partial<BudgetItem> = {}): BudgetItem => ({
@@ -193,6 +195,59 @@ describe('budget service', () => {
   it('falls back to "Other" for blank categories', () => {
     const roll = categoryRollup([item({ category: '', actual: 10, estimated: 0 })]);
     expect(roll[0].name).toBe('Other');
+  });
+
+  it('lists the vendors money has actually gone to, with the amount', () => {
+    const vendors = [
+      { id: 'v1', name: 'Paid', cost: 300, status: 'paid', deposit: 0, items: [] },
+      { id: 'v2', name: 'Deposit', cost: 800, status: 'deposit', deposit: 200, items: [] },
+      { id: 'v3', name: 'Booked', cost: 500, status: 'booked', deposit: 0, items: [] },
+      { id: 'v4', name: 'Inquiry', cost: 400, status: 'inquiry', deposit: 0, items: [] },
+      // A deposit vendor who has not paid anything yet is not a spend.
+      { id: 'v5', name: 'Zero DP', cost: 900, status: 'deposit', deposit: 0, items: [] },
+    ] as unknown as Vendor[];
+    const entries = paidVendorEntries(vendors);
+    expect(entries.map((e) => [e.vendor.id, e.amount])).toEqual([
+      ['v1', 300],
+      ['v2', 200],
+    ]);
+    // The headline total is exactly the sum of what the page would list.
+    expect(vendorsPaid(vendors)).toBe(entries.reduce((a, e) => a + e.amount, 0));
+  });
+
+  it('lists only purchased shopping items, and totals the same set', () => {
+    const shopping = [
+      { id: 's1', price: 100, qty: 2, status: 'purchased' },
+      { id: 's2', price: 50, qty: 1, status: 'ordered' },
+      { id: 's3', price: 25, qty: 4, status: 'toBuy' },
+    ] as unknown as ShoppingItem[];
+    expect(paidShoppingItems(shopping).map((i) => i.id)).toEqual(['s1']);
+    expect(shoppingPaid(shopping)).toBe(200);
+  });
+
+  it('folds paid vendors and purchased shopping into the category rollup', () => {
+    const budget = [item({ category: 'Venue', estimated: 100, actual: 100 })];
+    const vendors = [
+      { category: 'Venue', cost: 300, status: 'paid', deposit: 0, items: [] },
+      // Not yet paid, so it must not reach the rollup.
+      { category: 'Cake', cost: 900, status: 'booked', deposit: 0, items: [] },
+    ] as unknown as Vendor[];
+    const shopping = [
+      { category: 'Decor', price: 45, qty: 6, status: 'purchased' },
+      { category: 'Decor', price: 80, qty: 1, status: 'toBuy' },
+    ] as unknown as ShoppingItem[];
+    const roll = categoryRollup(budget, vendors, shopping);
+    expect(roll.map((c) => c.name)).toEqual(['Venue', 'Decor']);
+    // Venue: budget 100 + vendor 300, still against the budget row's estimate.
+    expect(roll[0]).toMatchObject({ actual: 400, estimated: 100, over: true });
+    // A category made purely of shopping carries no estimate, so it is never
+    // flagged over target.
+    expect(roll[1]).toMatchObject({ actual: 270, estimated: 0, over: false });
+  });
+
+  it('reproduces the budget-only rollup when the extra sources are omitted', () => {
+    const budget = [item({ category: 'Venue', estimated: 100, actual: 100 })];
+    expect(categoryRollup(budget)).toEqual(categoryRollup(budget, [], []));
   });
 
   it('derives the max bar-scaling value with a floor of 1', () => {

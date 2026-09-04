@@ -10,7 +10,8 @@ export type FieldType =
   | 'image'
   | 'file'
   | 'checklist'
-  | 'lineitems';
+  | 'lineitems'
+  | 'icon';
 
 export interface FieldOption {
   value: string;
@@ -29,6 +30,12 @@ export interface Field {
   options?: FieldOption[];
   /** Render at half width so two fields share a row. */
   half?: boolean;
+  /**
+   * For `icon` fields: the name of the sibling field holding the category, so
+   * the "Auto" tile can preview what that category currently resolves to as the
+   * user types it.
+   */
+  autoFrom?: string;
   /**
    * Optional predicate over the live form values: when it returns false the
    * field is hidden (e.g. a down-payment amount that only applies to a certain

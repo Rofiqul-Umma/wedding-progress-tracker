@@ -6,7 +6,8 @@ import { EmptyRow } from '@presentation/components/ui/EmptyState';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav, useSearchMatch } from '@presentation/state/NavStore';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { categoryColor } from '@domain/value-objects/status';
+import { itemIcon } from '@domain/value-objects/icons';
 import { cn } from '@presentation/lib/cn';
 import type { Task } from '@domain/entities/types';
 
@@ -110,7 +111,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
         {task.created || '09:05 AM'}
       </span>
       <span className="flex min-w-0 items-center gap-3">
-        <Avatar color={color} icon={iconForCategory(task.cat)} size={36} />
+        <Avatar color={color} icon={itemIcon(task.icon, task.cat)} size={36} />
         <span className="block min-w-0">
           <span
             className={cn(

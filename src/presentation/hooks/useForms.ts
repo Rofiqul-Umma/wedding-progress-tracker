@@ -42,6 +42,7 @@ export function useForms() {
     const fields: Field[] = [
       { name: 'name', label: t('forms.vendor.name'), value: v?.name, placeholder: t('forms.vendor.namePh') },
       { name: 'category', label: t('forms.vendor.category'), value: v?.category, placeholder: t('forms.vendor.categoryPh'), half: true },
+      { name: 'icon', label: t('forms.vendor.icon'), type: 'icon', value: v?.icon ?? '', autoFrom: 'category' },
       {
         name: 'cost',
         label: t('forms.vendor.cost'),
@@ -114,6 +115,7 @@ export function useForms() {
           cost: items.length ? lineItemsSum(items) : numOr(values.cost),
           items,
           status,
+          icon: values.icon,
           // Only a down-payment vendor carries a deposit amount.
           deposit: status === 'deposit' ? numOr(values.deposit) : 0,
           contactId: hasContacts ? values.contactId : v?.contactId ?? '',
@@ -164,6 +166,7 @@ export function useForms() {
         { name: 'title', label: t('forms.task.title'), value: task?.title, placeholder: t('forms.task.titlePh') },
         { name: 'due', label: t('forms.task.due'), type: 'date', value: task?.due, half: true },
         { name: 'cat', label: t('forms.task.cat'), value: task?.cat, placeholder: t('forms.task.catPh'), half: true },
+        { name: 'icon', label: t('forms.task.icon'), type: 'icon', value: task?.icon ?? '', autoFrom: 'cat' },
         { name: 'url', label: t('forms.task.url'), type: 'url', value: task?.url, placeholder: t('forms.task.urlPh') },
         { name: 'attachment', label: t('forms.task.attachment'), type: 'file', value: serializeAttachment(task?.attachment) },
       ],
@@ -173,6 +176,7 @@ export function useForms() {
           title: values.title,
           due: values.due,
           cat: values.cat,
+          icon: values.icon,
           url: values.url.trim(),
           attachment: parseAttachment(values.attachment),
         };
@@ -195,6 +199,7 @@ export function useForms() {
         { name: 'name', label: t('forms.shopping.name'), value: i?.name, placeholder: t('forms.shopping.namePh') },
         { name: 'category', label: t('forms.shopping.category'), value: i?.category, placeholder: t('forms.shopping.categoryPh'), half: true },
         { name: 'store', label: t('forms.shopping.store'), value: i?.store, placeholder: t('forms.shopping.storePh'), half: true },
+        { name: 'icon', label: t('forms.shopping.icon'), type: 'icon', value: i?.icon ?? '', autoFrom: 'category' },
         { name: 'price', label: t('forms.shopping.price'), type: 'number', value: i?.price, half: true },
         { name: 'qty', label: t('forms.shopping.qty'), type: 'number', value: i?.qty ?? 1, half: true },
         {
@@ -220,6 +225,7 @@ export function useForms() {
           price: numOr(values.price),
           qty: Math.max(1, Math.round(numOr(values.qty, 1))),
           status,
+          icon: values.icon,
           url: values.url.trim(),
           image: values.image,
           notes: values.notes,
@@ -239,6 +245,7 @@ export function useForms() {
         { name: 'name', label: t('forms.seserahan.name'), value: i?.name, placeholder: t('forms.seserahan.namePh') },
         { name: 'category', label: t('forms.seserahan.category'), value: i?.category, placeholder: t('forms.seserahan.categoryPh'), half: true },
         { name: 'qty', label: t('forms.seserahan.qty'), type: 'number', value: i?.qty ?? 1, half: true },
+        { name: 'icon', label: t('forms.seserahan.icon'), type: 'icon', value: i?.icon ?? '', autoFrom: 'category' },
         {
           name: 'status',
           label: t('forms.seserahan.status'),
@@ -272,6 +279,7 @@ export function useForms() {
           qty: Math.max(1, Math.round(numOr(values.qty, 1))),
           cost: numOr(values.cost),
           status,
+          icon: values.icon,
           contents: parseContents(values.contents),
           url: values.url.trim(),
           image: values.image,

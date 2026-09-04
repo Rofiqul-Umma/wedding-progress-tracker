@@ -22,7 +22,8 @@ import {
   sesDone,
   sesPct,
 } from '@domain/services/progress';
-import { SES_ORDER, iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { SES_ORDER, categoryColor } from '@domain/value-objects/status';
+import { itemIcon } from '@domain/value-objects/icons';
 import type { SeserahanStatus } from '@domain/value-objects/status';
 import type { SeserahanItem } from '@domain/entities/types';
 
@@ -176,7 +177,7 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
           className="h-10 w-10 flex-none rounded-[11px] border border-line-2 object-cover"
         />
       ) : (
-        <Avatar color={color} icon={iconForCategory(item.category)} />
+        <Avatar color={color} icon={itemIcon(item.icon, item.category)} />
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">

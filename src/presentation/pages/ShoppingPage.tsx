@@ -18,7 +18,8 @@ import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { shopBought, shopPct } from '@domain/services/progress';
 import { shoppingPaid } from '@domain/services/budget';
-import { SHOP_ORDER, iconForCategory, categoryColor } from '@domain/value-objects/status';
+import { SHOP_ORDER, categoryColor } from '@domain/value-objects/status';
+import { itemIcon } from '@domain/value-objects/icons';
 import type { ShoppingStatus } from '@domain/value-objects/status';
 import type { ShoppingItem } from '@domain/entities/types';
 
@@ -157,7 +158,7 @@ function ShoppingRow({ item, onCycle, onOpen, onEdit, onDelete }: ShoppingRowPro
           className="h-10 w-10 flex-none rounded-[11px] border border-line-2 object-cover"
         />
       ) : (
-        <Avatar color={color} icon={iconForCategory(item.category)} />
+        <Avatar color={color} icon={itemIcon(item.icon, item.category)} />
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
