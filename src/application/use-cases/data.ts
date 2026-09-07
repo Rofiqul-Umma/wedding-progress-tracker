@@ -9,7 +9,15 @@ export function serializePlan(state: PlanState): string {
 export function blankState(prev: Settings): PlanState {
   return {
     settings: { currency: prev.currency || 'USD', lang: prev.lang || 'en' },
-    wedding: { p1: 'Partner 1', p2: 'Partner 2', date: '', venue: '', budget: 0 },
+    wedding: {
+      p1: 'Partner 1',
+      p2: 'Partner 2',
+      date: '',
+      venue: '',
+      budget: 0,
+      avatar1: '',
+      avatar2: '',
+    },
     vendors: [],
     budget: [],
     tasks: [],

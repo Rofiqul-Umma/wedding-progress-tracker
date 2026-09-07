@@ -151,6 +151,10 @@ export interface Wedding {
   date: string;
   venue: string;
   budget: number;
+  /** Partner 1's cartoon avatar as `"face:color"`, or '' for their initial. */
+  avatar1: string;
+  /** Partner 2's cartoon avatar as `"face:color"`, or '' for their initial. */
+  avatar2: string;
 }
 
 /** App-wide preferences. */

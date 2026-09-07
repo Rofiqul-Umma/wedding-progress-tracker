@@ -9,6 +9,8 @@ const wedding: Wedding = {
   date: '2026-09-14',
   venue: '',
   budget: 0,
+  avatar1: '',
+  avatar2: '',
 };
 
 const task = (over: Partial<Task> = {}): Task => ({

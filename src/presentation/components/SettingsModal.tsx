@@ -4,6 +4,7 @@ import { ModalShell } from '@presentation/components/ui/ModalShell';
 import { Button } from '@presentation/components/ui/Button';
 import { Chip } from '@presentation/components/ui/Chip';
 import { Icon } from '@presentation/components/ui/Icon';
+import { AvatarPicker } from '@presentation/components/AvatarPicker';
 import { CONTROL, LABEL } from '@presentation/components/forms/FormField';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useRoom } from '@presentation/state/RoomStore';
@@ -40,6 +41,11 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
   const [date, setDate] = useState(state.wedding.date);
   const [budget, setBudget] = useState(String(state.wedding.budget || ''));
   const [venue, setVenue] = useState(state.wedding.venue);
+  const [avatar1, setAvatar1] = useState(state.wedding.avatar1);
+  const [avatar2, setAvatar2] = useState(state.wedding.avatar2);
+  // Only one partner's avatar grid is expanded at a time, so the modal never
+  // grows two full grids tall.
+  const [avatarSlot, setAvatarSlot] = useState<1 | 2 | null>(null);
 
   function save() {
     setState((s) =>
@@ -51,6 +57,8 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           date,
           venue,
           budget: parseFloat(budget) || 0,
+          avatar1,
+          avatar2,
         },
       }),
     );
@@ -209,6 +217,27 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               onChange={setBudget}
             />
           </div>
+
+          <div className="grid gap-2">
+            <span className={LABEL}>{t('settings.avatars')}</span>
+            <AvatarPicker
+              label={p1 || t('settings.p1')}
+              letter={(p1 || 'A')[0]}
+              value={avatar1}
+              onChange={setAvatar1}
+              open={avatarSlot === 1}
+              onToggle={() => setAvatarSlot((s) => (s === 1 ? null : 1))}
+            />
+            <AvatarPicker
+              label={p2 || t('settings.p2')}
+              letter={(p2 || 'B')[0]}
+              value={avatar2}
+              onChange={setAvatar2}
+              open={avatarSlot === 2}
+              onToggle={() => setAvatarSlot((s) => (s === 2 ? null : 2))}
+            />
+          </div>
+
           <TextInput
             id="set-venue"
             label={t('settings.venue')}

@@ -67,6 +67,10 @@ export function migrate(input: unknown): PlanState {
       date: str(wedding.date),
       venue: str(wedding.venue),
       budget: num(wedding.budget),
+      // Cartoon avatars, added later. `parseAvatar` rejects anything it can't
+      // draw, so a legacy or hostile value falls back to the partner's initial.
+      avatar1: str(wedding.avatar1),
+      avatar2: str(wedding.avatar2),
     },
     vendors: Array.isArray(s.vendors)
       ? (s.vendors as Obj[]).map((v) => ({

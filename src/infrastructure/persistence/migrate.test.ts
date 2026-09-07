@@ -5,7 +5,15 @@ describe('migrate', () => {
   it('fills defaults for a completely empty input', () => {
     const s = migrate(undefined);
     expect(s.settings).toEqual({ currency: 'USD', lang: 'en' });
-    expect(s.wedding).toEqual({ p1: '', p2: '', date: '', venue: '', budget: 0 });
+    expect(s.wedding).toEqual({
+      p1: '',
+      p2: '',
+      date: '',
+      venue: '',
+      budget: 0,
+      avatar1: '',
+      avatar2: '',
+    });
     expect(s.vendors).toEqual([]);
     expect(s.budget).toEqual([]);
     expect(s.tasks).toEqual([]);
@@ -125,6 +133,18 @@ describe('migrate', () => {
     expect(s.wedding.date).toBe('');
     expect(s.wedding.venue).toBe('');
     expect(s.wedding.budget).toBe(42000);
+  });
+
+  it('carries cartoon avatars and coerces bad ones to empty', () => {
+    const s = migrate({
+      wedding: { p1: 'A', avatar1: 'bun:lime', avatar2: { nope: true } },
+    });
+    expect(s.wedding.avatar1).toBe('bun:lime');
+    expect(s.wedding.avatar2).toBe('');
+    // A legacy plan predating avatars has neither key.
+    const legacy = migrate({ wedding: { p1: 'A', p2: 'B', budget: 10 } });
+    expect(legacy.wedding.avatar1).toBe('');
+    expect(legacy.wedding.avatar2).toBe('');
   });
 
   it('replaces a non-array collection with an empty array', () => {

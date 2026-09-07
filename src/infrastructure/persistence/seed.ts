@@ -13,6 +13,8 @@ export function seed(): PlanState {
       date: `${yr}-09-14`,
       venue: 'The Ivy Barn, Sonoma',
       budget: 42000,
+      avatar1: 'bun:lime',
+      avatar2: 'beard:info',
     },
     vendors: [
       { id: uid(), name: 'The Ivy Barn', category: 'Venue', contact: 'Reneé Adler', phone: '(707) 555-0182', social: 'instagram.com/theivybarn', cost: 14500, items: [], status: 'paid', notes: 'Includes tables, chairs, and 11pm curfew.' },

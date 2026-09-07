@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { PAGES } from './pages';
 import { Icon } from '@presentation/components/ui/Icon';
+import { CartoonAvatar } from '@presentation/components/ui/CartoonAvatar';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav, type PageId } from '@presentation/state/NavStore';
 import { useUi } from '@presentation/state/UiStore';
@@ -31,7 +32,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { page, go } = useNav();
   const { openSettings } = useUi();
   const counts = useNavCounts();
-  const { p1, p2 } = state.wedding;
+  const { p1, p2, avatar1, avatar2 } = state.wedding;
   const userName = `${p1 || t('user.partnerFallback')} & ${p2 || ''}`.replace(
     / & $/,
     '',
@@ -90,9 +91,19 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             type="button"
             onClick={toSettings}
             title={t('user.settingsTitle')}
-            className="grid h-[34px] w-[34px] flex-none place-items-center rounded-full bg-ink text-sm font-bold text-white"
+            aria-label={t('user.settingsTitle')}
+            className="flex flex-none items-center"
           >
-            {(p1 || 'A')[0]}
+            <CartoonAvatar value={avatar1} letter={(p1 || 'A')[0]} size={34} />
+            {/* A single-name plan keeps exactly today's single circle. */}
+            {(p2 || avatar2) && (
+              <CartoonAvatar
+                value={avatar2}
+                letter={(p2 || 'B')[0]}
+                size={34}
+                className="-ml-2.5 ring-2 ring-app"
+              />
+            )}
           </button>
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13.5px] font-bold">{userName}</div>

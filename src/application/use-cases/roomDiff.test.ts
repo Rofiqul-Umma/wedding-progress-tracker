@@ -5,7 +5,15 @@ import { diffPlan, ROOM_COLLECTIONS } from './roomDiff';
 function base(): PlanState {
   return {
     settings: { currency: 'IDR', lang: 'id' },
-    wedding: { p1: 'Amara', p2: 'Julian', date: '2026-09-14', venue: 'Barn', budget: 42000 },
+    wedding: {
+      p1: 'Amara',
+      p2: 'Julian',
+      date: '2026-09-14',
+      venue: 'Barn',
+      budget: 42000,
+      avatar1: '',
+      avatar2: '',
+    },
     vendors: [
       {
         id: 'v1',

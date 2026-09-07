@@ -35,7 +35,7 @@ import { addContact, deleteContact } from './contacts';
 function base(): PlanState {
   return {
     settings: { currency: 'USD', lang: 'en' },
-    wedding: { p1: 'A', p2: 'B', date: '', venue: '', budget: 0 },
+    wedding: { p1: 'A', p2: 'B', date: '', venue: '', budget: 0, avatar1: '', avatar2: '' },
     vendors: [],
     budget: [],
     tasks: [],

@@ -28,7 +28,15 @@ const item = (over: Partial<BudgetItem> = {}): BudgetItem => ({
   ...over,
 });
 
-const wedding: Wedding = { p1: '', p2: '', date: '', venue: '', budget: 1000 };
+const wedding: Wedding = {
+  p1: '',
+  p2: '',
+  date: '',
+  venue: '',
+  budget: 1000,
+  avatar1: '',
+  avatar2: '',
+};
 
 describe('budget service', () => {
   it('sums actual spend, ignoring non-numeric values', () => {

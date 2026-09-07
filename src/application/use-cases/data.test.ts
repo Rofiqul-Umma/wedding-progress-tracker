@@ -5,7 +5,15 @@ import { serializePlan, blankState, clearData } from './data';
 function sample(): PlanState {
   return {
     settings: { currency: 'IDR', lang: 'id' },
-    wedding: { p1: 'Amara', p2: 'Julian', date: '2026-09-14', venue: 'Barn', budget: 42000 },
+    wedding: {
+      p1: 'Amara',
+      p2: 'Julian',
+      date: '2026-09-14',
+      venue: 'Barn',
+      budget: 42000,
+      avatar1: 'bun:lime',
+      avatar2: '',
+    },
     vendors: [
       {
         id: 'v1',
@@ -57,5 +65,7 @@ describe('clearData', () => {
     expect(cleared.vendors).toEqual([]);
     expect(cleared.settings).toEqual({ currency: 'IDR', lang: 'id' });
     expect(cleared.wedding.p1).toBe('Partner 1');
+    expect(cleared.wedding.avatar1).toBe('');
+    expect(cleared.wedding.avatar2).toBe('');
   });
 });
