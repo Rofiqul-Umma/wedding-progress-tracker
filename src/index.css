@@ -184,6 +184,32 @@
   body {
     background: #fff;
   }
+  /* ---- report tables ----
+     The widest section (Vendors, 8 columns) needs ~657px at screen padding but
+     a 14mm-margin page only offers ~634px, so it used to run under the card's
+     `overflow-hidden` and lose its right-hand columns with nothing to show it
+     had. Wrapping alone doesn't close that gap — the horizontal cell padding
+     is most of it — so tighten the padding and shrink the type, let long
+     unbroken values break instead of forcing a column wider than the page, and
+     cap the table at the printable width. `table-layout` stays auto so columns
+     keep their content-proportional widths; `max-width` is only honoured
+     because every cell can now wrap. */
+  #report-root table {
+    width: 100%;
+    max-width: 100%;
+    font-size: 11.5px;
+  }
+  #report-root th,
+  #report-root td {
+    padding-left: 8px;
+    padding-right: 8px;
+    overflow-wrap: anywhere;
+  }
+  /* Belt and braces: if a future section still outgrows the page, let it spill
+     visibly rather than be clipped without a trace. */
+  #report-root .rounded-card {
+    overflow: visible !important;
+  }
   @page {
     margin: 14mm;
   }
