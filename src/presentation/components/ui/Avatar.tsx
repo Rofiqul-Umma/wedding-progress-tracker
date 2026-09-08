@@ -4,7 +4,7 @@ import { tint } from '@presentation/lib/cn';
 interface AvatarProps {
   /** Category/name-derived color (hex). */
   color: string;
-  /** Material Symbols icon; when omitted, `letter` is shown instead. */
+  /** Icon id; when omitted, `letter` is shown instead. */
   icon?: string;
   letter?: string;
   /** Size preset: list badge (40px) or timeline badge (36px). */

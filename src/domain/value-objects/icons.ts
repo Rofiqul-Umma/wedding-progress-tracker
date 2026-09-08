@@ -4,14 +4,14 @@ import { iconForCategory } from './status';
 export interface IconGroup {
   /** i18n key for the group heading, e.g. 'icons.group.venue'. */
   labelKey: string;
-  /** Material Symbols Rounded glyph names. */
+  /** Icon ids, each a key of `ICON_MAP`. */
   names: string[];
 }
 
 /**
- * The icons offered by the picker. Deliberately a curated set rather than the
- * whole Material Symbols catalog: an unknown name renders as literal text, so
- * only names verified to exist in the Rounded font belong here.
+ * The icons offered by the picker. Deliberately a curated set: every name here
+ * must have artwork in `ICON_MAP` (enforced by `icons.test.ts`), and the ids are
+ * stored in user plans, so they are stable and must not be renamed.
  */
 export const ICON_GROUPS: IconGroup[] = [
   {

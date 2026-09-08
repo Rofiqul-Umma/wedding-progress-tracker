@@ -16,6 +16,7 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import {
   totalSpent,
   totalBudget,
@@ -51,20 +52,28 @@ interface DerivedRow {
   preview: PreviewTarget;
 }
 
-const COMPARATORS: Record<BudgetSort, (a: BudgetItem, b: BudgetItem) => number> = {
+/**
+ * Sorting by category compares the *displayed* label, so A–Z matches what the
+ * reader sees — which differs between English and Indonesian.
+ */
+const comparators = (
+  label: (raw?: string) => string,
+): Record<BudgetSort, (a: BudgetItem, b: BudgetItem) => number> => ({
   'amount-desc': (a, b) => (+b.actual || 0) - (+a.actual || 0),
   'amount-asc': (a, b) => (+a.actual || 0) - (+b.actual || 0),
   name: (a, b) => (a.item || '').localeCompare(b.item || ''),
-  cat: (a, b) => (a.category || '').localeCompare(b.category || ''),
-};
+  cat: (a, b) => label(a.category).localeCompare(label(b.category)),
+});
 
-/** The same orderings as `COMPARATORS`, over the derived rows' own fields. */
-const DERIVED_COMPARATORS: Record<BudgetSort, (a: DerivedRow, b: DerivedRow) => number> = {
+/** The same orderings as `comparators`, over the derived rows' own fields. */
+const derivedComparators = (
+  label: (raw?: string) => string,
+): Record<BudgetSort, (a: DerivedRow, b: DerivedRow) => number> => ({
   'amount-desc': (a, b) => b.amount - a.amount,
   'amount-asc': (a, b) => a.amount - b.amount,
   name: (a, b) => a.name.localeCompare(b.name),
-  cat: (a, b) => a.category.localeCompare(b.category),
-};
+  cat: (a, b) => label(a.category).localeCompare(label(b.category)),
+});
 
 export function BudgetPage() {
   const { t } = useTranslation();
@@ -73,6 +82,7 @@ export function BudgetPage() {
   const { budgetForm } = useForms();
   const { togglePaid, deleteBudget } = usePlanActions();
   const { money } = useFormat();
+  const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<BudgetFilter>('all');
@@ -92,7 +102,7 @@ export function BudgetPage() {
       id: i.id,
       name: i.name,
       category: i.category,
-      meta: [i.category, i.store, qty > 1 ? `${qty} × ${money(+i.price || 0)}` : '']
+      meta: [catLabel(i.category), i.store, qty > 1 ? `${qty} × ${money(+i.price || 0)}` : '']
         .filter(Boolean)
         .join(' · '),
       amount: shoppingLineTotal(i),
@@ -105,7 +115,9 @@ export function BudgetPage() {
       id: vendor.id,
       name: vendor.name,
       category: vendor.category,
-      meta: [vendor.category, t(`status.vendor.${vendor.status}`)].filter(Boolean).join(' · '),
+      meta: [catLabel(vendor.category), t(`status.vendor.${vendor.status}`)]
+        .filter(Boolean)
+        .join(' · '),
       amount,
       icon: itemIcon(vendor.icon, vendor.category),
       preview: { kind: 'vendor', id: vendor.id },
@@ -128,14 +140,18 @@ export function BudgetPage() {
 
   const items = state.budget
     .filter((b) => filter === 'all' || (filter === 'paid' ? b.paid : !b.paid))
-    .sort(COMPARATORS[sort]);
-  const visible = items.filter((b) => matches(`${b.item} ${b.category}`));
+    .sort(comparators(catLabel)[sort]);
+  // The translated label is searchable alongside the stored one, so "attire"
+  // finds a "Busana" line while the UI is in English.
+  const visible = items.filter((b) =>
+    matches(`${b.item} ${b.category} ${catLabel(b.category)}`),
+  );
 
   const derivedVisible = (rows: DerivedRow[]) =>
     derivedShown
       ? rows
           .filter((r) => matches(`${r.name} ${r.category} ${r.meta}`))
-          .sort(DERIVED_COMPARATORS[sort])
+          .sort(derivedComparators(catLabel)[sort])
       : [];
   const shoppingRows = derivedVisible(fromShopping);
   const vendorRows = derivedVisible(fromVendors);
@@ -201,7 +217,7 @@ export function BudgetPage() {
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14.5px] font-bold">{b.item}</div>
                   <div className="mt-0.5 truncate text-[12.5px] text-muted">
-                    {b.category}
+                    {catLabel(b.category)}
                     {b.estimated ? ` · ${t('budget.est', { amount: money(b.estimated) })}` : ''}
                   </div>
                 </div>
@@ -245,7 +261,9 @@ export function BudgetPage() {
                       className="inline-block h-[9px] w-[9px] rounded-[3px]"
                       style={{ background: categoryColor(c.name) }}
                     />
-                    <span className="text-[13.5px] font-bold">{c.name}</span>
+                    {/* The bucket key stays raw — only its label is translated,
+                        so the groupings and colors never shift with language. */}
+                    <span className="text-[13.5px] font-bold">{catLabel(c.name)}</span>
                     <span className="ml-auto text-[13px] font-semibold text-muted tnum">
                       {money(c.actual)}
                       {c.estimated > 0 && (

@@ -2,12 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { ICON_GROUPS, ICON_NAMES, itemIcon } from './icons';
 
 describe('ICON_GROUPS', () => {
-  it('uses well-formed Material Symbols names', () => {
+  it('uses well-formed icon ids', () => {
     for (const group of ICON_GROUPS) {
       expect(group.labelKey).toMatch(/^icons\.group\.\w+$/);
       expect(group.names.length).toBeGreaterThan(0);
       for (const name of group.names) {
-        // Anything else renders as literal text inside the icon span.
+        // These ids are persisted in user plans, so the shape is a contract.
         expect(name).toMatch(/^[a-z][a-z0-9_]*$/);
       }
     }

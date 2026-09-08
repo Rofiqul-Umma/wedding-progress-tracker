@@ -1,6 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@presentation/state/PlanStore';
-import type { FormDescriptor, Field } from '@presentation/components/forms/types';
+import type {
+  FormDescriptor,
+  Field,
+  FieldOption,
+} from '@presentation/components/forms/types';
 import type {
   Vendor,
   BudgetItem,
@@ -10,6 +14,11 @@ import type {
   Contact,
 } from '@domain/entities/types';
 import { VENDOR_STATUSES, SES_ORDER, SHOP_ORDER } from '@domain/value-objects/status';
+import {
+  BASE_CATEGORIES,
+  categoryLabel,
+  type CategoryKind,
+} from '@domain/value-objects/categories';
 import { addVendor, updateVendor } from '@application/use-cases/vendors';
 import { addBudgetItem, updateBudgetItem } from '@application/use-cases/budget';
 import { addTask, updateTask } from '@application/use-cases/tasks';
@@ -35,13 +44,30 @@ export function useForms() {
   const { state, setState } = usePlan();
   const { t } = useTranslation();
 
+  /**
+   * Options for a category dropdown: the base list for this collection, plus
+   * any category already used in the user's own plan, so a custom label added
+   * last week is one click away instead of retyped. Sorted by what is shown,
+   * which differs per language.
+   */
+  function catOptions(kind: CategoryKind, used: string[]): FieldOption[] {
+    const values = new Set<string>(BASE_CATEGORIES[kind].map((c) => c.value));
+    for (const u of used) {
+      const v = u.trim();
+      if (v) values.add(v);
+    }
+    return [...values]
+      .map((value) => ({ value, label: categoryLabel(value, t) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }
+
   function vendorForm(v?: Vendor): FormDescriptor {
     const editing = !!v;
     const hasContacts = state.contacts.length > 0;
     const linked = !!(v?.contactId && state.contacts.some((c) => c.id === v.contactId));
     const fields: Field[] = [
       { name: 'name', label: t('forms.vendor.name'), value: v?.name, placeholder: t('forms.vendor.namePh') },
-      { name: 'category', label: t('forms.vendor.category'), value: v?.category, placeholder: t('forms.vendor.categoryPh'), half: true },
+      { name: 'category', label: t('forms.vendor.category'), type: 'category', value: v?.category, options: catOptions('vendor', state.vendors.map((x) => x.category)), half: true },
       { name: 'icon', label: t('forms.vendor.icon'), type: 'icon', value: v?.icon ?? '', autoFrom: 'category' },
       {
         name: 'cost',
@@ -137,7 +163,7 @@ export function useForms() {
       title: editing ? t('forms.budget.updateTitle') : t('forms.budget.addTitle'),
       fields: [
         { name: 'item', label: t('forms.budget.item'), value: b?.item, placeholder: t('forms.budget.itemPh') },
-        { name: 'category', label: t('forms.budget.category'), value: b?.category, placeholder: t('forms.budget.categoryPh') },
+        { name: 'category', label: t('forms.budget.category'), type: 'category', value: b?.category, options: catOptions('budget', state.budget.map((x) => x.category)) },
         { name: 'estimated', label: t('forms.budget.estimated'), type: 'number', value: b?.estimated, half: true },
         { name: 'actual', label: t('forms.budget.actual'), type: 'number', value: b?.actual, half: true },
         { name: 'paid', label: t('forms.budget.paid'), type: 'checkbox', value: b?.paid ?? false },
@@ -165,7 +191,7 @@ export function useForms() {
       fields: [
         { name: 'title', label: t('forms.task.title'), value: task?.title, placeholder: t('forms.task.titlePh') },
         { name: 'due', label: t('forms.task.due'), type: 'date', value: task?.due, half: true },
-        { name: 'cat', label: t('forms.task.cat'), value: task?.cat, placeholder: t('forms.task.catPh'), half: true },
+        { name: 'cat', label: t('forms.task.cat'), type: 'category', value: task?.cat, options: catOptions('task', state.tasks.map((x) => x.cat)), half: true },
         { name: 'icon', label: t('forms.task.icon'), type: 'icon', value: task?.icon ?? '', autoFrom: 'cat' },
         { name: 'url', label: t('forms.task.url'), type: 'url', value: task?.url, placeholder: t('forms.task.urlPh') },
         { name: 'attachment', label: t('forms.task.attachment'), type: 'file', value: serializeAttachment(task?.attachment) },
@@ -197,7 +223,7 @@ export function useForms() {
       title: editing ? t('forms.shopping.updateTitle') : t('forms.shopping.addTitle'),
       fields: [
         { name: 'name', label: t('forms.shopping.name'), value: i?.name, placeholder: t('forms.shopping.namePh') },
-        { name: 'category', label: t('forms.shopping.category'), value: i?.category, placeholder: t('forms.shopping.categoryPh'), half: true },
+        { name: 'category', label: t('forms.shopping.category'), type: 'category', value: i?.category, options: catOptions('shopping', state.shopping.map((x) => x.category)), half: true },
         { name: 'store', label: t('forms.shopping.store'), value: i?.store, placeholder: t('forms.shopping.storePh'), half: true },
         { name: 'icon', label: t('forms.shopping.icon'), type: 'icon', value: i?.icon ?? '', autoFrom: 'category' },
         { name: 'price', label: t('forms.shopping.price'), type: 'number', value: i?.price, half: true },
@@ -243,7 +269,7 @@ export function useForms() {
       title: editing ? t('forms.seserahan.updateTitle') : t('forms.seserahan.addTitle'),
       fields: [
         { name: 'name', label: t('forms.seserahan.name'), value: i?.name, placeholder: t('forms.seserahan.namePh') },
-        { name: 'category', label: t('forms.seserahan.category'), value: i?.category, placeholder: t('forms.seserahan.categoryPh'), half: true },
+        { name: 'category', label: t('forms.seserahan.category'), type: 'category', value: i?.category, options: catOptions('seserahan', state.seserahan.map((x) => x.category)), half: true },
         { name: 'qty', label: t('forms.seserahan.qty'), type: 'number', value: i?.qty ?? 1, half: true },
         { name: 'icon', label: t('forms.seserahan.icon'), type: 'icon', value: i?.icon ?? '', autoFrom: 'category' },
         {

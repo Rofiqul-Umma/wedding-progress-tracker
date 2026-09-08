@@ -5,6 +5,7 @@ import { ProgressBar } from '@presentation/components/ui/ProgressBar';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useUi } from '@presentation/state/UiStore';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import { isImageAttachment } from '@presentation/lib/attachments';
 import { downloadAttachment } from '@presentation/lib/dataUrl';
 import { taskCountdown } from '@domain/services/schedule';
@@ -27,6 +28,7 @@ export function TaskDetail({ task, onEdit }: TaskDetailProps) {
   const { state } = usePlan();
   const { openImage } = useUi();
   const { date } = useFormat();
+  const catLabel = useCategoryLabel();
 
   if (!task) {
     return (
@@ -132,7 +134,7 @@ export function TaskDetail({ task, onEdit }: TaskDetailProps) {
 
       <Field label={t('detail.goalTarget')}>
         <span className="text-[13.5px] font-semibold">
-          {task.cat || t('detail.general')}
+          {catLabel(task.cat) || t('detail.general')}
         </span>
       </Field>
 

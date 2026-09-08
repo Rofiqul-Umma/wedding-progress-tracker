@@ -43,7 +43,7 @@ export interface Vendor {
    */
   items: VendorItem[];
   status: VendorStatus;
-  /** Chosen Material Symbols icon; '' or absent falls back to the category. */
+  /** Chosen icon id; '' or absent falls back to the category. */
   icon?: string;
   /** Amount paid as a down payment (only meaningful when status is 'deposit'). */
   deposit?: number;
@@ -73,7 +73,7 @@ export interface Task {
   cat: string;
   /** Human-readable creation time, e.g. "09:05 AM". */
   created: string;
-  /** Chosen Material Symbols icon; '' or absent falls back to the category. */
+  /** Chosen icon id; '' or absent falls back to the category. */
   icon?: string;
   /** Optional reference link (product page, doc, inspiration). */
   url?: string;
@@ -102,7 +102,7 @@ export interface SeserahanItem {
    * status is derived from these rather than set by hand.
    */
   contents: SeserahanContent[];
-  /** Chosen Material Symbols icon; '' or absent falls back to the category. */
+  /** Chosen icon id; '' or absent falls back to the category. */
   icon?: string;
   /** Optional reference link (product page, inspiration). */
   url: string;
@@ -123,7 +123,7 @@ export interface ShoppingItem {
   /** Quantity to buy. */
   qty: number;
   status: ShoppingStatus;
-  /** Chosen Material Symbols icon; '' or absent falls back to the category. */
+  /** Chosen icon id; '' or absent falls back to the category. */
   icon?: string;
   /** Optional product / reference link. */
   url: string;

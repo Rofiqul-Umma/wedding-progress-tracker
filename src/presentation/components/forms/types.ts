@@ -11,7 +11,12 @@ export type FieldType =
   | 'file'
   | 'checklist'
   | 'lineitems'
-  | 'icon';
+  | 'icon'
+  /**
+   * Like `select`, but with an "add new" escape hatch to free text. Categories
+   * are user data, so the suggestions must never become a closed set.
+   */
+  | 'category';
 
 export interface FieldOption {
   value: string;

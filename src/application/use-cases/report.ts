@@ -18,6 +18,7 @@ import {
   effectiveSeserahanStatus,
 } from '@domain/services/progress';
 import { getNotifications } from '@domain/services/schedule';
+import { categoryCell } from '@domain/value-objects/categories';
 
 /** How a column's cell values should be interpreted and formatted. */
 export type ColType = 'text' | 'money' | 'number' | 'date';
@@ -79,7 +80,7 @@ export function buildReportModel(
       { key: 'over', labelKey: 'report.col.status', type: 'text' },
     ],
     rows: categoryRollup(state.budget).map((c) => ({
-      name: c.name,
+      name: categoryCell(c.name),
       estimated: c.estimated,
       actual: c.actual,
       over: c.over ? 'report.overTarget' : 'report.onTarget',
@@ -99,7 +100,7 @@ export function buildReportModel(
     ],
     rows: state.budget.map((b) => ({
       item: b.item,
-      category: b.category,
+      category: categoryCell(b.category),
       estimated: b.estimated,
       actual: b.actual,
       paid: b.paid ? 'report.yes' : 'report.no',
@@ -122,7 +123,7 @@ export function buildReportModel(
     ],
     rows: state.vendors.map((v) => ({
       name: v.name,
-      category: v.category,
+      category: categoryCell(v.category),
       // A count only — the full breakdown lives in the vendor preview. Emitted
       // as the JSON descriptor `resolveText` decodes, so it localizes in both
       // the on-screen table and the CSV.
@@ -149,7 +150,7 @@ export function buildReportModel(
     ],
     rows: state.tasks.map((t) => ({
       title: t.title,
-      cat: t.cat,
+      cat: categoryCell(t.cat),
       due: t.due,
       done: t.done ? 'report.done' : 'report.open',
     })),
@@ -171,7 +172,7 @@ export function buildReportModel(
       const progress = contentsProgress(s);
       return {
         name: s.name,
-        category: s.category,
+        category: categoryCell(s.category),
         qty: s.qty,
         contents: progress ? `${progress.done}/${progress.total}` : '',
         cost: s.cost,
@@ -194,7 +195,7 @@ export function buildReportModel(
     ],
     rows: state.shopping.map((s) => ({
       name: s.name,
-      category: s.category,
+      category: categoryCell(s.category),
       store: s.store,
       price: s.price,
       qty: s.qty,

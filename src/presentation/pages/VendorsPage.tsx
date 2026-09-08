@@ -16,6 +16,7 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import { effectiveVendorCost, vendorsTotal } from '@domain/services/budget';
 import { vendorsBooked, vendorCategories } from '@domain/services/progress';
 import { categoryColor } from '@domain/value-objects/status';
@@ -34,12 +35,18 @@ const STATUS_CHIP: Record<VendorStatus, ChipVariant> = {
   inquiry: 'gray',
 };
 
-const COMPARATORS: Record<VendorSort, (a: Vendor, b: Vendor) => number> = {
+/**
+ * Sorting by category compares the *displayed* label, so A–Z matches what the
+ * reader sees — which differs between English and Indonesian.
+ */
+const comparators = (
+  label: (raw?: string) => string,
+): Record<VendorSort, (a: Vendor, b: Vendor) => number> => ({
   'cost-desc': (a, b) => effectiveVendorCost(b) - effectiveVendorCost(a),
   'cost-asc': (a, b) => effectiveVendorCost(a) - effectiveVendorCost(b),
   name: (a, b) => (a.name || '').localeCompare(b.name || ''),
-  cat: (a, b) => (a.category || '').localeCompare(b.category || ''),
-};
+  cat: (a, b) => label(a.category).localeCompare(label(b.category)),
+});
 
 export function VendorsPage() {
   const { t } = useTranslation();
@@ -49,6 +56,7 @@ export function VendorsPage() {
   const { vendorForm } = useForms();
   const { deleteVendor } = usePlanActions();
   const { money } = useFormat();
+  const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<VendorFilter>('all');
@@ -97,15 +105,17 @@ export function VendorsPage() {
 
   const list = state.vendors
     .filter((v) => filter === 'all' || v.status === filter)
-    .sort(COMPARATORS[sort]);
+    .sort(comparators(catLabel)[sort]);
 
   const visible = list.filter((v) => {
     const linked = v.contactId && state.contacts.find((c) => c.id === v.contactId);
     // Item names are searchable too, so "engagement" finds the photographer
-    // whose quote breaks out an engagement session.
+    // whose quote breaks out an engagement session. The translated category is
+    // searchable alongside the stored one, so "photo" finds a
+    // "Fotografer & Videografer" vendor while the UI is in English.
     const items = (v.items ?? []).map((i) => i.name).join(' ');
     return matches(
-      `${v.name} ${v.category} ${v.contact || ''} ${linked ? linked.name : ''} ${items}`,
+      `${v.name} ${v.category} ${catLabel(v.category)} ${v.contact || ''} ${linked ? linked.name : ''} ${items}`,
     );
   });
 
@@ -148,7 +158,7 @@ export function VendorsPage() {
                   <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
                     <span className="truncate">{v.name}</span>
                     <Chip variant="gray" className="max-[520px]:hidden">
-                      {v.category}
+                      {catLabel(v.category)}
                     </Chip>
                     {(v.items?.length ?? 0) > 0 && (
                       <Chip variant="gray" className="max-[520px]:hidden">

@@ -100,6 +100,8 @@ export function FormField({
         <ChecklistField field={field} value={value} onValue={onValue} />
       ) : type === 'lineitems' ? (
         <LineItemsField field={field} value={value} onValue={onValue} />
+      ) : type === 'category' ? (
+        <CategoryField field={field} value={value} onValue={onValue} />
       ) : type === 'icon' ? (
         <IconField
           field={field}
@@ -456,6 +458,81 @@ function IconField({
         </>
       )}
     </div>
+  );
+}
+
+/** Sentinel option value that swaps the dropdown for a free-text box. */
+const CAT_NEW = ' new';
+
+/**
+ * Category picker: a dropdown of suggestions with an "add new" escape hatch.
+ *
+ * Categories are user data — they group the budget report, color the badges and
+ * pick the default icon — so the suggestions can never be a closed set. Two
+ * consequences shape this component: a value that is not among the options is
+ * still offered (and selected) rather than silently dropped, and typing a new
+ * one writes it through verbatim.
+ */
+function CategoryField({ field, value, onValue }: SubFieldProps) {
+  const { t } = useTranslation();
+  const [typing, setTyping] = useState(false);
+
+  const options = field.options ?? [];
+  // An existing value the list does not know about — a category from an older
+  // plan, a hand-edited backup, or one the user added themselves.
+  const custom = value && !options.some((o) => o.value === value) ? value : '';
+
+  if (typing) {
+    return (
+      <div className="flex items-center gap-2">
+        <input
+          id={`f-${field.name}`}
+          name={field.name}
+          autoFocus
+          value={value}
+          placeholder={t('forms.common.catNewPh')}
+          onChange={(e) => onValue(field.name, e.target.value)}
+          className={CONTROL}
+        />
+        <button
+          type="button"
+          title={t('forms.common.catBack')}
+          aria-label={t('forms.common.catBack')}
+          className={cn(ATTACH_BTN, 'flex-none px-2.5')}
+          onClick={() => setTyping(false)}
+        >
+          <Icon name="expand_more" size={17} />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <select
+      id={`f-${field.name}`}
+      name={field.name}
+      value={value}
+      onChange={(e) => {
+        if (e.target.value === CAT_NEW) {
+          // Start from blank so the placeholder shows, rather than making the
+          // user clear the category they were replacing.
+          onValue(field.name, '');
+          setTyping(true);
+        } else {
+          onValue(field.name, e.target.value);
+        }
+      }}
+      className={cn(CONTROL, 'cursor-pointer')}
+    >
+      <option value="">{t('forms.common.catNone')}</option>
+      {custom && <option value={custom}>{custom}</option>}
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+      <option value={CAT_NEW}>{t('forms.common.catAddNew')}</option>
+    </select>
   );
 }
 

@@ -16,6 +16,7 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import {
   contentsProgress,
   effectiveSeserahanStatus,
@@ -42,6 +43,7 @@ export function SeserahanPage() {
   const { seserahanForm } = useForms();
   const { cycleSeserahan, deleteSeserahan } = usePlanActions();
   const { money } = useFormat();
+  const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<SesFilter>('all');
@@ -83,9 +85,10 @@ export function SeserahanPage() {
       (i) =>
         effectiveSeserahanStatus(i) === k &&
         // Contents are searchable too, so looking for "mukena" finds the tray
-        // holding it rather than nothing at all.
+        // holding it rather than nothing at all. The translated category joins
+        // the stored one, so "underwear" finds a "Pakaian Dalam" tray.
         matches(
-          `${i.name} ${i.category || ''} ${i.notes || ''} ${i.contents
+          `${i.name} ${i.category || ''} ${catLabel(i.category)} ${i.notes || ''} ${i.contents
             .map((c) => c.name)
             .join(' ')}`,
         ),
@@ -157,8 +160,11 @@ interface SeserahanRowProps {
 function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowProps) {
   const { t } = useTranslation();
   const { money } = useFormat();
+  const catLabel = useCategoryLabel();
   const color = categoryColor(item.category);
-  const meta = [item.category || t('seserahan.item'), item.notes].filter(Boolean).join(' · ');
+  const meta = [catLabel(item.category) || t('seserahan.item'), item.notes]
+    .filter(Boolean)
+    .join(' · ');
   const progress = contentsProgress(item);
   const status = effectiveSeserahanStatus(item);
 

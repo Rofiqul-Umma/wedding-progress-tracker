@@ -15,6 +15,7 @@ import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { categoryColor } from '@domain/value-objects/status';
+import { categoryLabel } from '@domain/value-objects/categories';
 import { itemIcon } from '@domain/value-objects/icons';
 import { contentsProgress, effectiveSeserahanStatus } from '@domain/services/progress';
 import { effectiveVendorCost } from '@domain/services/budget';
@@ -173,7 +174,9 @@ function VendorBody({
       )}
       <div className="grid grid-cols-2 gap-3.5">
         <Field label={t('forms.vendor.category')}>
-          <span className="text-[13.5px] font-semibold">{v.category || '—'}</span>
+          <span className="text-[13.5px] font-semibold">
+            {categoryLabel(v.category, t) || '—'}
+          </span>
         </Field>
         <Field label={t('forms.vendor.cost')}>
           <span className="text-[13.5px] font-semibold tnum">
@@ -270,7 +273,9 @@ function ShoppingBody({
       </Field>
       <div className="grid grid-cols-2 gap-3.5">
         <Field label={t('forms.shopping.category')}>
-          <span className="text-[13.5px] font-semibold">{item.category || '—'}</span>
+          <span className="text-[13.5px] font-semibold">
+            {categoryLabel(item.category, t) || '—'}
+          </span>
         </Field>
         <Field label={t('forms.shopping.store')}>
           <span className="text-[13.5px] font-semibold">{item.store || '—'}</span>
@@ -380,7 +385,9 @@ function SeserahanBody({
       )}
       <div className="grid grid-cols-2 gap-3.5">
         <Field label={t('forms.seserahan.category')}>
-          <span className="text-[13.5px] font-semibold">{item.category || '—'}</span>
+          <span className="text-[13.5px] font-semibold">
+            {categoryLabel(item.category, t) || '—'}
+          </span>
         </Field>
         <Field label={t('forms.seserahan.qty')}>
           <span className="text-[13.5px] font-semibold tnum">

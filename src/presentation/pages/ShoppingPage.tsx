@@ -16,6 +16,7 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import { shopBought, shopPct } from '@domain/services/progress';
 import { shoppingPaid } from '@domain/services/budget';
 import { SHOP_ORDER, categoryColor } from '@domain/value-objects/status';
@@ -38,6 +39,7 @@ export function ShoppingPage() {
   const { shoppingForm } = useForms();
   const { cycleShopping, deleteShopping } = usePlanActions();
   const { money } = useFormat();
+  const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<ShopFilter>('all');
@@ -79,7 +81,11 @@ export function ShoppingPage() {
     rows: items.filter(
       (i) =>
         i.status === k &&
-        matches(`${i.name} ${i.category || ''} ${i.store || ''} ${i.notes || ''}`),
+        // The translated category joins the stored one, so "uniforms" finds a
+        // "Seragam" item while the UI is in English.
+        matches(
+          `${i.name} ${i.category || ''} ${catLabel(i.category)} ${i.store || ''} ${i.notes || ''}`,
+        ),
     ),
   }));
 
@@ -143,8 +149,9 @@ interface ShoppingRowProps {
 function ShoppingRow({ item, onCycle, onOpen, onEdit, onDelete }: ShoppingRowProps) {
   const { t } = useTranslation();
   const { money } = useFormat();
+  const catLabel = useCategoryLabel();
   const color = categoryColor(item.category);
-  const meta = [item.category || t('shopping.item'), item.store, item.notes]
+  const meta = [catLabel(item.category) || t('shopping.item'), item.store, item.notes]
     .filter(Boolean)
     .join(' · ');
   const lineTotal = (+item.price || 0) * (+item.qty || 1);

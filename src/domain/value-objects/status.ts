@@ -54,7 +54,7 @@ export function nextShoppingStatus(s: ShoppingStatus): ShoppingStatus {
   return SHOP_ORDER[(i + 1) % SHOP_ORDER.length];
 }
 
-/** Material Symbols icon name per category (EN + ID category labels). */
+/** Icon id per category (EN + ID category labels). */
 export const CAT_ICON: Record<string, string> = {
   Catering: 'restaurant',
   Attire: 'checkroom',
@@ -77,6 +77,40 @@ export const CAT_ICON: Record<string, string> = {
   Souvenir: 'card_giftcard',
   Jewelry: 'diamond',
   Perhiasan: 'diamond',
+  // Base categories offered by the pickers (see `categories.ts`). Keyed by the
+  // stored value, so an item keeps its icon whichever language is displayed.
+  // (`Venue`, `Catering`, `Dekorasi`, `Busana`, `Aksesoris`, `Souvenir`,
+  // `Perhiasan` and `Makanan` are already covered above.)
+  Transportasi: 'directions_car',
+  Undangan: 'mail',
+  Hiburan: 'music_note',
+  'Wedding Band': 'music_note',
+  MC: 'call',
+  WCC: 'groups',
+  'Dekorasi Lamaran': 'celebration',
+  'Perlengkapan & Dekorasi Acara': 'celebration',
+  'Fotografer & Videografer': 'photo_camera',
+  'Fotografer Lamaran': 'photo_camera',
+  Preweeding: 'photo_camera',
+  Dokumentasi: 'photo_camera',
+  'MUA Lamaran': 'face',
+  'Henna & Nail Art': 'brush',
+  'Perlengkapan Pengantin': 'checkroom',
+  'Buket Lamaran': 'local_florist',
+  Perlengkapan: 'shopping_basket',
+  Dokumen: 'description',
+  Administrasi: 'description',
+  Keuangan: 'receipt_long',
+  Akomodasi: 'hotel',
+  Seragam: 'checkroom',
+  Makeup: 'face',
+  Skincare: 'spa',
+  'Body Care': 'spa',
+  Toiletries: 'shopping_basket',
+  'Pakaian Dalam': 'checkroom',
+  'Alas Kaki': 'shopping_bag',
+  Tas: 'local_mall',
+  'Alat Ibadah': 'auto_stories',
 };
 
 /** Resolve an icon for a category, falling back to a generic flag. */

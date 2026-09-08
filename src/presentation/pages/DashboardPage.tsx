@@ -6,6 +6,7 @@ import { EmptyRow } from '@presentation/components/ui/EmptyState';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav, useSearchMatch } from '@presentation/state/NavStore';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import { categoryColor } from '@domain/value-objects/status';
 import { itemIcon } from '@domain/value-objects/icons';
 import { cn } from '@presentation/lib/cn';
@@ -21,6 +22,7 @@ export function DashboardPage() {
   const { t } = useTranslation();
   const { state } = usePlan();
   const { selectedTaskId, selectTask } = useNav();
+  const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
   // Keep a valid selection: default to the first task when nothing is chosen.
@@ -31,8 +33,9 @@ export function DashboardPage() {
     }
   }, [state.tasks, selectedTaskId, selectTask]);
 
+  // The translated label is searchable alongside the stored one.
   const visible = state.tasks.filter((task) =>
-    matches(`${task.title} ${task.cat || ''}`),
+    matches(`${task.title} ${task.cat || ''} ${catLabel(task.cat)}`),
   );
   const progress = visible.filter((task) => !task.done);
   const done = visible.filter((task) => task.done);
@@ -90,6 +93,7 @@ interface TaskRowProps {
 function TaskRow({ task, selected, onSelect }: TaskRowProps) {
   const { t } = useTranslation();
   const { date } = useFormat();
+  const catLabel = useCategoryLabel();
   const color = categoryColor(task.cat);
   const due = task.due ? date(task.due, SHORT_DATE) : t('dash.noDate');
 
@@ -127,7 +131,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
               selected ? 'text-white/[.66]' : 'text-muted',
             )}
           >
-            {task.cat || t('dash.task')}
+            {catLabel(task.cat) || t('dash.task')}
           </span>
         </span>
       </span>
@@ -145,7 +149,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
           selected ? 'text-white/[.66]' : 'text-muted',
         )}
       >
-        {task.cat || t('dash.general')}
+        {catLabel(task.cat) || t('dash.general')}
       </span>
     </button>
   );

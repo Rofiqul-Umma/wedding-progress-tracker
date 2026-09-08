@@ -13,6 +13,7 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import { tasksDone, openTasks } from '@domain/services/progress';
 import { daysUntil } from '@domain/services/schedule';
 import { categoryColor } from '@domain/value-objects/status';
@@ -30,6 +31,7 @@ export function TasksPage() {
   const { openForm, openPreview } = useUi();
   const { taskForm } = useForms();
   const { toggleTask, deleteTask } = usePlanActions();
+  const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
   const overdue = state.tasks.filter(
@@ -40,7 +42,11 @@ export function TasksPage() {
     if (a.done !== b.done) return a.done ? 1 : -1;
     return (a.due || '9999').localeCompare(b.due || '9999');
   });
-  const visible = sorted.filter((task) => matches(`${task.title} ${task.cat || ''}`));
+  // The translated label is searchable alongside the stored one, so "documents"
+  // finds a "Dokumen" task while the UI is in English.
+  const visible = sorted.filter((task) =>
+    matches(`${task.title} ${task.cat || ''} ${catLabel(task.cat)}`),
+  );
 
   return (
     <>
@@ -91,6 +97,7 @@ function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
   const { t } = useTranslation();
   const { openImage } = useUi();
   const { date } = useFormat();
+  const catLabel = useCategoryLabel();
   const color = categoryColor(task.cat);
   const dd = task.due ? daysUntil(task.due) : null;
   const attachment = task.attachment;
@@ -133,7 +140,7 @@ function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
           {task.title}
         </div>
         <div className="mt-0.5 truncate text-[12.5px] text-muted">
-          {task.cat || t('tasks.task')}
+          {catLabel(task.cat) || t('tasks.task')}
         </div>
       </div>
       {task.url && (
