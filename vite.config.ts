@@ -32,7 +32,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        // `webp` covers the avatar portraits: the planner is offline-first, so
+        // leaving them out would fall the couple back to bare initials offline.
+        globPatterns: ['**/*.{js,css,html,svg,woff2,webp}'],
         navigateFallback: 'index.html',
       },
     }),

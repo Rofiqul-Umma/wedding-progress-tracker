@@ -1,90 +1,79 @@
 /**
  * Cartoon profile pictures for the couple.
  *
- * Deliberately a small curated set drawn in code (see `CartoonAvatar`) rather
- * than uploaded images: the planner is offline-first and the whole plan syncs
- * as JSON, so an avatar has to cost a handful of bytes, not a data URL.
+ * A small curated set of illustrated portraits, shipped as build assets and
+ * referenced by id (see `CartoonAvatar`). The planner is offline-first and the
+ * whole plan syncs as JSON, so what is *stored* has to cost a handful of bytes —
+ * hence an id like `"bride_hijab"` rather than an uploaded data URL.
+ *
+ * The portraits carry their own background and skin tone, baked into the
+ * artwork, so unlike the earlier code-drawn faces there is nothing to configure
+ * beyond the choice itself.
  */
 
 /**
- * The face ids, as a union rather than plain strings: the artwork map in
- * `CartoonAvatar` is keyed by this type, so adding a face here without drawing
- * it is a compile error rather than a blank circle at runtime.
+ * The portrait ids, as a union rather than plain strings: the artwork map in
+ * `CartoonAvatar` is keyed by this type, so adding an id here without supplying
+ * an image is a compile error rather than a broken tile at runtime.
  */
 export const AVATAR_FACE_LIST = [
-  'short',
-  'bun',
-  'long',
-  'curly',
-  'braids',
-  'veil',
-  'hijab',
-  'beard',
-  'glasses',
-  'bald',
-  'ponytail',
-  'cap',
+  'bride_veil',
+  'bride_hijab',
+  'bride_long',
+  'bride_sanggul',
+  'groom_tux',
+  'groom_koko',
+  'groom_suit',
+  'groom_beige',
 ] as const;
 
 export type AvatarFaceId = (typeof AVATAR_FACE_LIST)[number];
 
-/** One cartoon face. Skin/hair are baked in so the set stays visibly varied. */
-export interface AvatarFace {
-  id: AvatarFaceId;
-  /** Face fill. */
-  skin: string;
-  /** Hair / head-covering fill. */
-  hair: string;
-}
-
-/** Four warm skin tones and two dark hair tones, rotated across the set. */
-const SKIN = ['#f2d3b6', '#e0b088', '#c48a5c', '#8d5a34'] as const;
-const HAIR = ['#2f2a26', '#5a3a24'] as const;
-
-export const AVATAR_FACES: AvatarFace[] = [
-  { id: 'short', skin: SKIN[0], hair: HAIR[0] },
-  { id: 'bun', skin: SKIN[1], hair: HAIR[0] },
-  { id: 'long', skin: SKIN[2], hair: HAIR[1] },
-  { id: 'curly', skin: SKIN[3], hair: HAIR[0] },
-  { id: 'braids', skin: SKIN[3], hair: HAIR[0] },
-  { id: 'veil', skin: SKIN[0], hair: HAIR[1] },
-  { id: 'hijab', skin: SKIN[2], hair: HAIR[0] },
-  { id: 'beard', skin: SKIN[1], hair: HAIR[0] },
-  { id: 'glasses', skin: SKIN[0], hair: HAIR[1] },
-  { id: 'bald', skin: SKIN[3], hair: HAIR[0] },
-  { id: 'ponytail', skin: SKIN[2], hair: HAIR[1] },
-  { id: 'cap', skin: SKIN[1], hair: HAIR[0] },
-];
-
-/** Every face id, flattened — used for validation. */
+/** Every portrait id, flattened — used for validation. */
 export const AVATAR_FACE_IDS: ReadonlySet<string> = new Set(AVATAR_FACE_LIST);
 
-/** Background swatches. Each maps to an existing `--color-*` token pair. */
-export const AVATAR_COLORS = [
-  'lime',
-  'info',
-  'warn',
-  'ok',
-  'bad',
-  'neutral',
-] as const;
-
-export type AvatarColor = (typeof AVATAR_COLORS)[number];
+/**
+ * Ids written by the previous, code-drawn avatar set, mapped to the closest
+ * portrait.
+ *
+ * Without this every plan saved before the redesign would silently fall back to
+ * a bare initial. The mapping is by intent — a stored `hijab` becomes the hijab
+ * portrait, a stored `cap` (peci) becomes the koko-and-peci one — so the user's
+ * original choice survives rather than being thrown away.
+ */
+const LEGACY_FACES: Readonly<Record<string, AvatarFaceId>> = {
+  short: 'groom_suit',
+  bun: 'bride_sanggul',
+  long: 'bride_long',
+  sanggul: 'bride_sanggul',
+  pashmina: 'bride_hijab',
+  veil: 'bride_veil',
+  hijab: 'bride_hijab',
+  beard: 'groom_beige',
+  glasses: 'groom_suit',
+  bald: 'groom_tux',
+  ponytail: 'bride_long',
+  cap: 'groom_koko',
+  // Retired one redesign earlier, for being the wrong culture entirely.
+  curly: 'bride_long',
+  braids: 'bride_long',
+};
 
 export interface AvatarChoice {
   face: AvatarFaceId;
-  color: AvatarColor;
 }
-
-const isColor = (v: string): v is AvatarColor =>
-  (AVATAR_COLORS as readonly string[]).includes(v);
 
 const isFace = (v: string): v is AvatarFaceId => AVATAR_FACE_IDS.has(v);
 
 /**
- * Parse the stored `"face:color"` string.
+ * Parse the stored avatar value.
  *
- * Returns `null` when nothing is chosen or the value isn't one we can draw, so
+ * Earlier versions stored `"face:color"` and then `"face:color:skin"`, because
+ * the background and skin tone used to be separate choices. Both are part of
+ * the artwork now, so any trailing segments are read and discarded — old plans
+ * keep working without a migration.
+ *
+ * Returns `null` when nothing is chosen or the id resolves to no portrait, so
  * the caller falls back to the partner's initial. Same defensive posture as
  * `itemIcon`: a hand-edited backup or a hostile import renders a letter rather
  * than breaking the sidebar.
@@ -92,12 +81,13 @@ const isFace = (v: string): v is AvatarFaceId => AVATAR_FACE_IDS.has(v);
 export function parseAvatar(raw: string | undefined): AvatarChoice | null {
   const trimmed = raw?.trim();
   if (!trimmed) return null;
-  const [face, color] = trimmed.split(':').map((p) => p.trim());
-  if (!isFace(face)) return null;
-  // An unrecognized colour is recoverable — the face is the part that matters.
-  return { face, color: color && isColor(color) ? color : 'lime' };
+  const [id] = trimmed.split(':').map((p) => p.trim());
+  if (!id) return null;
+  if (isFace(id)) return { face: id };
+  const legacy = LEGACY_FACES[id];
+  return legacy ? { face: legacy } : null;
 }
 
 export function serializeAvatar(choice: AvatarChoice): string {
-  return `${choice.face}:${choice.color}`;
+  return choice.face;
 }

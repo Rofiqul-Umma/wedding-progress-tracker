@@ -2,11 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from '@presentation/components/ui/Icon';
 import { CartoonAvatar } from '@presentation/components/ui/CartoonAvatar';
 import {
-  AVATAR_COLORS,
-  AVATAR_FACES,
+  AVATAR_FACE_LIST,
   parseAvatar,
   serializeAvatar,
-  type AvatarColor,
 } from '@domain/value-objects/avatars';
 import { cn } from '@presentation/lib/cn';
 
@@ -25,11 +23,14 @@ interface AvatarPickerProps {
 }
 
 /**
- * Pick a cartoon face and a background colour for one partner.
+ * Pick an illustrated portrait for one partner.
  *
- * Collapsed until asked for, like `IconField`: the grid is twelve tiles plus a
- * colour row and would otherwise push the rest of Settings off the screen. The
- * parent owns `open` so only one partner's grid can be expanded at a time.
+ * Collapsed until asked for, like `IconField`: the grid would otherwise push
+ * the rest of Settings off the screen. The parent owns `open` so only one
+ * partner's grid can be expanded at a time.
+ *
+ * There is no colour or skin row — the background and skin tone are part of
+ * each portrait, so the choice is a single tap.
  */
 export function AvatarPicker({
   label,
@@ -41,9 +42,6 @@ export function AvatarPicker({
 }: AvatarPickerProps) {
   const { t } = useTranslation();
   const choice = parseAvatar(value);
-  // Face tiles preview in the colour that's currently selected, so choosing a
-  // face shows the final combination rather than a neutral swatch.
-  const color: AvatarColor = choice?.color ?? 'lime';
 
   return (
     <div className="grid gap-2.5 rounded-[12px] border border-line bg-panel/40 p-3">
@@ -68,73 +66,24 @@ export function AvatarPicker({
               {t('settings.avatarFace')}
             </span>
             <div className="flex flex-wrap gap-2">
-              {AVATAR_FACES.map((face) => {
-                const selected = choice?.face === face.id;
+              {AVATAR_FACE_LIST.map((id) => {
+                const selected = choice?.face === id;
                 return (
                   <button
-                    key={face.id}
+                    key={id}
                     type="button"
                     aria-pressed={selected}
                     aria-label={t('settings.avatarPickFace', {
-                      name: t(`avatars.face.${face.id}`),
+                      name: t(`avatars.face.${id}`),
                     })}
-                    title={t(`avatars.face.${face.id}`)}
-                    onClick={() => onChange(serializeAvatar({ face: face.id, color }))}
+                    title={t(`avatars.face.${id}`)}
+                    onClick={() => onChange(serializeAvatar({ face: id }))}
                     className={cn(
-                      'grid h-[46px] w-[46px] place-items-center rounded-full border-2 transition-colors',
-                      selected
-                        ? 'border-lime'
-                        : 'border-transparent hover:border-ink',
-                    )}
-                  >
-                    <CartoonAvatar
-                      value={serializeAvatar({ face: face.id, color })}
-                      size={40}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="grid gap-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wide text-faint">
-              {t('settings.avatarColor')}
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {AVATAR_COLORS.map((c) => {
-                const selected = color === c && !!choice;
-                return (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-pressed={selected}
-                    aria-label={t('settings.avatarPickColor', {
-                      color: t(`avatars.color.${c}`),
-                    })}
-                    title={t(`avatars.color.${c}`)}
-                    // Without a face yet, picking a colour should still do
-                    // something sensible — start from the first face.
-                    onClick={() =>
-                      onChange(
-                        serializeAvatar({
-                          face: choice?.face ?? AVATAR_FACES[0].id,
-                          color: c,
-                        }),
-                      )
-                    }
-                    className={cn(
-                      'grid h-[34px] w-[34px] place-items-center rounded-full border-2 transition-colors',
+                      'grid h-[56px] w-[56px] place-items-center rounded-full border-2 transition-colors',
                       selected ? 'border-lime' : 'border-transparent hover:border-ink',
                     )}
                   >
-                    <CartoonAvatar
-                      value={serializeAvatar({
-                        face: choice?.face ?? AVATAR_FACES[0].id,
-                        color: c,
-                      })}
-                      size={28}
-                    />
+                    <CartoonAvatar value={id} size={48} />
                   </button>
                 );
               })}
