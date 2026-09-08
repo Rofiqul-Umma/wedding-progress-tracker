@@ -18,7 +18,7 @@ export function Check({ checked, onChange, label }: CheckProps) {
       className={cn(
         'grid h-[22px] w-[22px] flex-none place-items-center rounded-[7px] border-2 transition-all',
         checked
-          ? 'border-lime bg-lime text-ink'
+          ? 'border-lime bg-lime text-on-lime'
           : 'border-line-2 bg-app text-transparent hover:border-ink',
       )}
     >

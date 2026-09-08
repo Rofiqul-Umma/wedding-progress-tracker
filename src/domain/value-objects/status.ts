@@ -118,16 +118,23 @@ export function iconForCategory(category?: string): string {
   return (category && CAT_ICON[category]) || 'flag';
 }
 
-/** Palette used to deterministically color category badges. */
+/**
+ * Palette used to deterministically color category badges.
+ *
+ * CSS variables rather than literal hexes so the swatches can lift for
+ * contrast in dark mode — the mid-tone greens and purples that read well on
+ * white go muddy on a dark panel. Defined in `index.css`'s `:root`; consumers
+ * drop them straight into an inline `style` (see `ui/Avatar`, `ui/ProgressBar`).
+ */
 export const CAT_COLORS = [
-  '#2F9E44',
-  '#3D74DA',
-  '#C98A2C',
-  '#D9564F',
-  '#6B5B95',
-  '#12876A',
-  '#B4657A',
-  '#4E7CA1',
+  'var(--color-cat-1)',
+  'var(--color-cat-2)',
+  'var(--color-cat-3)',
+  'var(--color-cat-4)',
+  'var(--color-cat-5)',
+  'var(--color-cat-6)',
+  'var(--color-cat-7)',
+  'var(--color-cat-8)',
 ] as const;
 
 /** Stable hash of a label to a palette color. */

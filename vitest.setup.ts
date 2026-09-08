@@ -36,6 +36,29 @@ Object.defineProperty(globalThis, 'localStorage', {
   writable: true,
 });
 
+/**
+ * jsdom has no `matchMedia`, and `ThemeProvider` (in the provider stack every
+ * component test renders through) queries `prefers-color-scheme`. Report "no
+ * dark preference" and accept listeners without doing anything, so tests run
+ * against the light theme unless they set a mode explicitly.
+ */
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  Object.defineProperty(window, 'matchMedia', {
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }),
+    configurable: true,
+    writable: true,
+  });
+}
+
 afterEach(() => {
   cleanup();
   localStorage.clear();

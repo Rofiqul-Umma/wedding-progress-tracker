@@ -42,7 +42,9 @@ function OverviewCard({ hero, icon, label, value, bar, sub }: CardProps) {
         <span
           className={cn(
             'grid h-[30px] w-[30px] place-items-center rounded-[9px]',
-            hero ? 'bg-black/10 text-lime-ink' : 'bg-panel text-ink',
+            // The hero badge sits on the lime fill, which is identical in both
+            // themes — so both the black wash and its ink stay put.
+            hero ? 'bg-black/10 text-on-lime' : 'bg-panel text-ink',
           )}
         >
           <Icon name={icon} size={18} />
@@ -50,20 +52,27 @@ function OverviewCard({ hero, icon, label, value, bar, sub }: CardProps) {
         <span
           className={cn(
             'text-[12.5px] font-bold',
-            hero ? 'text-lime-ink' : 'text-muted',
+            hero ? 'text-on-lime' : 'text-muted',
           )}
         >
           {label}
         </span>
       </div>
-      <div className="text-[26px] font-extrabold leading-[1.1] tracking-tight tnum">
+      <div
+        className={cn(
+          'text-[26px] font-extrabold leading-[1.1] tracking-tight tnum',
+          // Otherwise the hero number inherits `ink`, which inverts to near-white
+          // in dark mode and vanishes against the (unchanged) lime fill.
+          hero && 'text-on-lime',
+        )}
+      >
         {value}
       </div>
       {bar && <ProgressBar value={bar.value} color={bar.color} height={7} />}
       <div
         className={cn(
           'mt-auto text-xs font-semibold',
-          hero ? 'text-lime-ink' : 'text-faint',
+          hero ? 'text-on-lime' : 'text-faint',
         )}
       >
         {sub}

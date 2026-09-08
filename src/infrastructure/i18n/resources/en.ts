@@ -19,6 +19,11 @@ export const en = {
     en: 'English',
     id: 'Bahasa Indonesia',
   },
+  theme: {
+    light: 'Light',
+    dark: 'Dark',
+    system: 'Match system',
+  },
   nav: {
     dashboard: 'Goal Timeline',
     dashboardShort: 'Timeline',
@@ -465,6 +470,8 @@ export const en = {
     preferences: 'Preferences',
     currency: 'Currency',
     currencyNote: 'Applied to every amount shown across the planner.',
+    theme: 'Appearance',
+    themeNote: 'Applies right away, and only on this device.',
     weddingDetails: 'Wedding details',
     p1: 'Partner 1',
     p2: 'Partner 2',

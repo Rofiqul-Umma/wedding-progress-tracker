@@ -32,7 +32,7 @@ export function MobileDrawer() {
 
   return (
     <div
-      className="fade-in fixed inset-0 z-[95] hidden bg-ink/40 backdrop-blur-[3px] max-[860px]:flex print:hidden"
+      className="fade-in fixed inset-0 z-[95] hidden bg-scrim backdrop-blur-[3px] max-[860px]:flex print:hidden"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeNav();
       }}

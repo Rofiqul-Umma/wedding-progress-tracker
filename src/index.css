@@ -3,6 +3,10 @@
 /* ============================================================
    Evermore — design tokens (ported from the original palette)
    Each --color-* token generates bg-/text-/border- utilities.
+
+   This block is the LIGHT theme. Dark overrides the same names
+   near the bottom of the file, so no component knows about the
+   theme — it just uses `bg-app` / `text-ink` and follows along.
    ============================================================ */
 @theme {
   --color-bg: #e8e8e4;
@@ -17,10 +21,22 @@
   --color-muted: #8b8e88;
   --color-faint: #b2b5ae;
 
+  /* `ink` is both "primary text" and "the dark emphasis fill" (toast, primary
+     button, selected row). In dark mode it inverts, so anything painted ON an
+     ink fill needs its own token rather than a literal white. Same idea for
+     the hover shade and the modal scrims. */
+  --color-on-ink: #ffffff;
+  --color-ink-hover: #000000;
+  --color-scrim: rgba(20, 22, 20, 0.42);
+  --color-scrim-strong: rgba(20, 22, 20, 0.8);
+
   --color-lime: #c7f23f;
   --color-lime-2: #b7e634;
   --color-lime-soft: #eaf9c0;
+  /* Accent text on a normal (app/panel/lime-soft) surface — flips with theme. */
   --color-lime-ink: #3c4a0c;
+  /* Text on a lime FILL. Lime is identical in both themes, so this never flips. */
+  --color-on-lime: #2b350a;
 
   --color-ok: #2f9e44;
   --color-ok-soft: #e6f4e6;
@@ -54,6 +70,81 @@
   --sa-right: env(safe-area-inset-right, 0px);
   --sa-bottom: env(safe-area-inset-bottom, 0px);
   --sa-left: env(safe-area-inset-left, 0px);
+
+  /* ---- category swatches ----
+     Deliberately NOT in `@theme`: these are only ever read from an inline
+     `style` (see `CAT_COLORS` in domain/value-objects/status.ts), never from a
+     utility class, and Tailwind v4 tree-shakes `@theme` variables no utility
+     references. Each is used as both a foreground and, via `tint()`, a 13%
+     background, so the dark set is lifted for contrast on a dark surface. */
+  --color-cat-1: #2f9e44;
+  --color-cat-2: #3d74da;
+  --color-cat-3: #c98a2c;
+  --color-cat-4: #d9564f;
+  --color-cat-5: #6b5b95;
+  --color-cat-6: #12876a;
+  --color-cat-7: #b4657a;
+  --color-cat-8: #4e7ca1;
+}
+
+/* ============================================================
+   Dark theme
+   ============================================================
+   Applied by `infrastructure/theme/applyTheme.ts` (and, before first paint,
+   by the inline script in index.html) setting `data-theme` on <html>.
+
+   Two structural details matter here:
+
+   1. This block is UNLAYERED, so it wins over the `:root` rule `@theme`
+      emits inside `@layer theme` no matter how the specificities compare.
+   2. It's wrapped in `@media screen`, so printing always falls back to the
+      light palette. Without that, a dark-mode user would send white text to
+      a white page — see the `@media print` report rules at the bottom.
+   ------------------------------------------------------------ */
+@media screen {
+  [data-theme='dark'] {
+    color-scheme: dark;
+
+    --color-bg: #0e100f;
+    --color-app: #17191a;
+    --color-panel: #1e2122;
+    --color-panel-2: #252829;
+    --color-line: #2a2d2e;
+    --color-line-2: #363a3b;
+
+    --color-ink: #f0f1ee;
+    --color-ink-2: #d6d8d3;
+    --color-muted: #9a9e97;
+    --color-faint: #70746e;
+
+    --color-on-ink: #17191a;
+    --color-ink-hover: #ffffff;
+    --color-scrim: rgba(0, 0, 0, 0.66);
+    --color-scrim-strong: rgba(0, 0, 0, 0.86);
+
+    /* --color-lime / --color-lime-2 / --color-on-lime stay put: the brand
+       fill is the one surface that shouldn't change between themes. */
+    --color-lime-soft: #2c3712;
+    --color-lime-ink: #cbf055;
+
+    --color-ok: #4ac66a;
+    --color-ok-soft: #16301c;
+    --color-info: #6f9ff0;
+    --color-info-soft: #16223a;
+    --color-warn: #e0a84a;
+    --color-warn-soft: #33270f;
+    --color-bad: #ef7a72;
+    --color-bad-soft: #37191a;
+
+    --color-cat-1: #5fd07d;
+    --color-cat-2: #7ba6f0;
+    --color-cat-3: #e0ae5f;
+    --color-cat-4: #ef8a84;
+    --color-cat-5: #a695d2;
+    --color-cat-6: #4cc3a6;
+    --color-cat-7: #dd9aab;
+    --color-cat-8: #8bb4d4;
+  }
 }
 
 @layer base {

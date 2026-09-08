@@ -6,6 +6,33 @@
   <title>Evermore — Wedding Planner</title>
   <meta name="description" content="Plan your wedding — timeline, vendors, budget, tasks, seserahan and contacts, all on your device." />
   <meta name="theme-color" content="#ffffff" />
+  <!-- Paint the right theme before the first frame. React mounts too late to
+       avoid a white flash for dark-mode users, so this duplicates a little of
+       infrastructure/theme (the 'evermore.theme' key, the 'system' default and
+       the theme-color values) on purpose — that module is the source of truth;
+       keep them in step. -->
+  <script>
+    (function () {
+      try {
+        var m = localStorage.getItem('evermore.theme');
+        if (m !== 'light' && m !== 'dark') m = 'system';
+        var dark =
+          m === 'dark' ||
+          (m === 'system' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var t = dark ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+        document.documentElement.style.colorScheme = t;
+        if (dark) {
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute('content', '#17191a');
+        }
+      } catch (e) {
+        /* storage or matchMedia unavailable — light is a safe first paint */
+      }
+    })();
+  </script>
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/icon.svg" />
   <meta name="apple-mobile-web-app-capable" content="yes" />

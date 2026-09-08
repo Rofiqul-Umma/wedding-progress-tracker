@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ModalShell } from '@presentation/components/ui/ModalShell';
 import { Button } from '@presentation/components/ui/Button';
@@ -7,6 +7,7 @@ import { Icon } from '@presentation/components/ui/Icon';
 import { AvatarPicker } from '@presentation/components/AvatarPicker';
 import { CONTROL, LABEL } from '@presentation/components/forms/FormField';
 import { usePlan } from '@presentation/state/PlanStore';
+import { useTheme } from '@presentation/state/ThemeStore';
 import { useRoom } from '@presentation/state/RoomStore';
 import { useAccount } from '@presentation/state/AccountStore';
 import { useNav } from '@presentation/state/NavStore';
@@ -17,12 +18,14 @@ import { CURRENCIES } from '@infrastructure/format/money';
 import { downloadBlob, planFileSlug } from '@presentation/lib/download';
 import { serializePlan } from '@application/use-cases/data';
 import type { Lang } from '@domain/entities/types';
+import { THEME_MODES, type ThemeMode } from '@domain/value-objects/theme';
 import type { PlanBackupMeta } from '@infrastructure/persistence/PlanBackupRepository';
 import { cn } from '@presentation/lib/cn';
 
-export function SettingsModal({ onClose }: { onClose: () => void }) {
+export function SettingsModal({ onClose: close }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { state, setState } = usePlan();
+  const theme = useTheme();
   const room = useRoom();
   const account = useAccount();
   const { go } = useNav();
@@ -47,7 +50,20 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
   // grows two full grids tall.
   const [avatarSlot, setAvatarSlot] = useState<1 | 2 | null>(null);
 
+  // Theme is the one preference that applies live rather than on Save — you
+  // can't judge it from a dropdown label. Remembering the entering mode keeps
+  // Cancel honest; `ModalShell` funnels Esc and backdrop clicks through
+  // `onClose` too, so all three paths revert.
+  const enteringTheme = useRef(theme.mode);
+  const setTheme = theme.setMode;
+  const onClose = useCallback(() => {
+    setTheme(enteringTheme.current);
+    close();
+  }, [close, setTheme]);
+
   function save() {
+    // Committed: the live preview becomes the kept choice.
+    enteringTheme.current = theme.mode;
     setState((s) =>
       saveSettings(s, {
         settings: { currency: currency || 'USD', lang },
@@ -191,6 +207,24 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               ))}
             </select>
             <p className="text-xs text-faint">{t('settings.currencyNote')}</p>
+          </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="set-theme" className={LABEL}>
+              {t('settings.theme')}
+            </label>
+            <select
+              id="set-theme"
+              value={theme.mode}
+              onChange={(e) => setTheme(e.target.value as ThemeMode)}
+              className={cn(CONTROL, 'cursor-pointer')}
+            >
+              {THEME_MODES.map((m) => (
+                <option key={m} value={m}>
+                  {t(`theme.${m}`)}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-faint">{t('settings.themeNote')}</p>
           </div>
         </section>
 

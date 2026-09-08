@@ -24,7 +24,7 @@ export function RoomPresence() {
       {shown.map((p, i) => (
         <div
           key={p.clientId}
-          className="rounded-[13px] ring-2 ring-white"
+          className="rounded-[13px] ring-2 ring-app"
           style={{ marginLeft: i === 0 ? 0 : -8 }}
         >
           <Avatar color={p.color} letter={p.name.charAt(0).toUpperCase()} size={30} />
@@ -32,7 +32,7 @@ export function RoomPresence() {
       ))}
       {extra > 0 && (
         <div
-          className="grid h-[30px] w-[30px] place-items-center rounded-[11px] bg-panel text-[13px] font-bold text-muted ring-2 ring-white"
+          className="grid h-[30px] w-[30px] place-items-center rounded-[11px] bg-panel text-[13px] font-bold text-muted ring-2 ring-app"
           style={{ marginLeft: -8 }}
         >
           +{extra}

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { PlanProvider } from '@presentation/state/PlanStore';
+import { ThemeProvider } from '@presentation/state/ThemeStore';
 import { RoomProvider } from '@presentation/state/RoomStore';
 import { NavProvider } from '@presentation/state/NavStore';
 import { UiProvider } from '@presentation/state/UiStore';
@@ -11,20 +12,24 @@ import { RoomNotices } from '@presentation/components/RoomNotices';
 /** Composition root for the app-wide context providers. */
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <RoomProvider>
-      <PlanProvider>
-        <AccountProvider>
-          <SyncCoordinator />
-          <NavProvider>
-            <UiProvider>
-              <ToastProvider>
-                <RoomNotices />
-                {children}
-              </ToastProvider>
-            </UiProvider>
-          </NavProvider>
-        </AccountProvider>
-      </PlanProvider>
-    </RoomProvider>
+    // Theme is outermost and depends on nothing else: it's device-local, so it
+    // deliberately sits outside the plan (and therefore outside sync).
+    <ThemeProvider>
+      <RoomProvider>
+        <PlanProvider>
+          <AccountProvider>
+            <SyncCoordinator />
+            <NavProvider>
+              <UiProvider>
+                <ToastProvider>
+                  <RoomNotices />
+                  {children}
+                </ToastProvider>
+              </UiProvider>
+            </NavProvider>
+          </AccountProvider>
+        </PlanProvider>
+      </RoomProvider>
+    </ThemeProvider>
   );
 }

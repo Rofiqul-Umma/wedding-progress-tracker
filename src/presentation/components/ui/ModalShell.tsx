@@ -68,7 +68,7 @@ export function ModalShell({
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-ink/40 backdrop-blur-[3px] pt-[calc(1.25rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
+      className="fixed inset-0 z-[100] grid place-items-center bg-scrim backdrop-blur-[3px] pt-[calc(1.25rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

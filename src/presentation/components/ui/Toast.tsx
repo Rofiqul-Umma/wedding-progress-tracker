@@ -66,7 +66,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         className={cn(
           // Lifted above the home indicator, and width-capped so a long
           // message wraps instead of running under the curved edges.
-          'fixed bottom-[calc(1.5rem+var(--sa-bottom))] left-1/2 z-[200] flex max-w-[calc(100vw-2.5rem-var(--sa-left)-var(--sa-right))] -translate-x-1/2 items-center gap-2.5 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300',
+          'fixed bottom-[calc(1.5rem+var(--sa-bottom))] left-1/2 z-[200] flex max-w-[calc(100vw-2.5rem-var(--sa-left)-var(--sa-right))] -translate-x-1/2 items-center gap-2.5 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-on-ink shadow-lg transition-all duration-300',
           data.show
             ? 'translate-y-0 opacity-100'
             : 'pointer-events-none translate-y-5 opacity-0',
@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <button
             type="button"
             onClick={runAction}
-            className="ml-1.5 flex-none rounded-[9px] bg-lime px-3 py-1.5 text-[13px] font-bold text-ink transition-colors hover:bg-lime-2"
+            className="ml-1.5 flex-none rounded-[9px] bg-lime px-3 py-1.5 text-[13px] font-bold text-on-lime transition-colors hover:bg-lime-2"
           >
             {data.action}
           </button>

@@ -109,7 +109,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
       <span
         className={cn(
           'text-[12.5px] font-semibold',
-          selected ? 'text-white/[.66]' : 'text-faint',
+          selected ? 'text-on-ink/[.66]' : 'text-faint',
         )}
       >
         {task.created || '09:05 AM'}
@@ -120,7 +120,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
           <span
             className={cn(
               'block truncate text-[14.5px] font-bold',
-              selected && 'text-white',
+              selected && 'text-on-ink',
             )}
           >
             {task.title}
@@ -128,7 +128,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
           <span
             className={cn(
               'mt-px block truncate text-[12.5px]',
-              selected ? 'text-white/[.66]' : 'text-muted',
+              selected ? 'text-on-ink/[.66]' : 'text-muted',
             )}
           >
             {catLabel(task.cat) || t('dash.task')}
@@ -138,7 +138,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
       <span
         className={cn(
           'truncate text-[13px]',
-          selected ? 'text-white/[.66]' : 'text-muted',
+          selected ? 'text-on-ink/[.66]' : 'text-muted',
         )}
       >
         {due}
@@ -146,7 +146,7 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
       <span
         className={cn(
           'truncate text-[13px] max-[560px]:hidden',
-          selected ? 'text-white/[.66]' : 'text-muted',
+          selected ? 'text-on-ink/[.66]' : 'text-muted',
         )}
       >
         {catLabel(task.cat) || t('dash.general')}

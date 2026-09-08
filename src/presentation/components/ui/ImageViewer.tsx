@@ -46,7 +46,7 @@ export function ImageViewer() {
       role="dialog"
       aria-modal="true"
       aria-label={image.alt}
-      className="fixed inset-0 z-[110] grid place-items-center bg-ink/80 backdrop-blur-[3px] pt-[calc(4.5rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
+      className="fixed inset-0 z-[110] grid place-items-center bg-scrim-strong backdrop-blur-[3px] pt-[calc(4.5rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeImage();
       }}

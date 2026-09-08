@@ -9,7 +9,7 @@ import {
 import { cn } from '@presentation/lib/cn';
 
 const BTN =
-  'inline-flex items-center gap-1.5 rounded-xl border border-line-2 bg-panel px-3 py-2 text-[13px] font-bold text-ink transition-colors hover:bg-white';
+  'inline-flex items-center gap-1.5 rounded-xl border border-line-2 bg-panel px-3 py-2 text-[13px] font-bold text-ink transition-colors hover:bg-app';
 
 interface AvatarPickerProps {
   /** The partner's name (or the slot label when unnamed). */

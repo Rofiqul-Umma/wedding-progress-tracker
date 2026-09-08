@@ -23,6 +23,11 @@ export const id = {
     en: 'English',
     id: 'Bahasa Indonesia',
   },
+  theme: {
+    light: 'Terang',
+    dark: 'Gelap',
+    system: 'Ikuti sistem',
+  },
   nav: {
     dashboard: 'Linimasa Tujuan',
     dashboardShort: 'Linimasa',
@@ -465,6 +470,8 @@ export const id = {
     preferences: 'Preferensi',
     currency: 'Mata uang',
     currencyNote: 'Diterapkan pada setiap jumlah di seluruh perencana.',
+    theme: 'Tampilan',
+    themeNote: 'Langsung diterapkan, dan hanya di perangkat ini.',
     weddingDetails: 'Detail pernikahan',
     p1: 'Pasangan 1',
     p2: 'Pasangan 2',

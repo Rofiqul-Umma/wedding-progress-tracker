@@ -12,7 +12,7 @@ export type ChipVariant =
 
 const VARIANTS: Record<ChipVariant, string> = {
   lime: 'bg-lime-soft text-lime-ink',
-  dark: 'bg-ink text-white',
+  dark: 'bg-ink text-on-ink',
   gray: 'bg-panel text-muted',
   ok: 'bg-ok-soft text-ok',
   info: 'bg-info-soft text-info',

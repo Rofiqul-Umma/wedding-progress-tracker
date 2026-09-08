@@ -116,7 +116,7 @@ export function Topbar() {
         </p>
       </div>
       <div className="ml-auto flex items-center gap-2.5">
-        <label className="flex w-[220px] items-center gap-2 rounded-xl border border-transparent bg-panel px-[13px] py-[9px] transition-colors focus-within:border-ink focus-within:bg-white max-[860px]:w-[150px] max-[460px]:hidden">
+        <label className="flex w-[220px] items-center gap-2 rounded-xl border border-transparent bg-panel px-[13px] py-[9px] transition-colors focus-within:border-ink focus-within:bg-app max-[860px]:w-[150px] max-[460px]:hidden">
           <Icon name="search" size={19} className="text-faint" />
           <input
             type="search"

@@ -52,7 +52,7 @@ export function CartoonAvatar({
       <span
         aria-hidden
         className={cn(
-          'grid flex-none place-items-center rounded-full bg-ink font-bold text-white',
+          'grid flex-none place-items-center rounded-full bg-ink font-bold text-on-ink',
           className,
         )}
         style={{ width: size, height: size, fontSize: Math.round(size * 0.41) }}

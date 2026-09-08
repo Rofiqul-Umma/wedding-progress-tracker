@@ -64,7 +64,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               className={cn(
                 'flex w-full items-center gap-3 rounded-xl px-3.5 py-[11px] text-left text-sm font-semibold transition-colors duration-150 ease-planner',
                 active
-                  ? 'bg-lime font-bold text-ink shadow-sm'
+                  ? 'bg-lime font-bold text-on-lime shadow-sm'
                   : 'text-muted hover:bg-panel hover:text-ink',
               )}
             >
@@ -74,7 +74,8 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 <span
                   className={cn(
                     'rounded-full px-2 py-px text-[11px] font-bold',
-                    active ? 'bg-black/10 text-lime-ink' : 'bg-panel text-muted',
+                    // On the lime active pill, which doesn't change with theme.
+                    active ? 'bg-black/10 text-on-lime' : 'bg-panel text-muted',
                   )}
                 >
                   {count}

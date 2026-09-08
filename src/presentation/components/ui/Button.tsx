@@ -18,11 +18,11 @@ const VARIANTS: Record<Variant, string> = {
   default:
     'border-line-2 bg-app text-ink hover:-translate-y-px hover:shadow-md',
   primary:
-    'border-ink bg-ink text-white hover:bg-black hover:-translate-y-px hover:shadow-md',
-  lime: 'border-lime bg-lime text-ink hover:bg-lime-2 hover:-translate-y-px hover:shadow-md',
+    'border-ink bg-ink text-on-ink hover:bg-ink-hover hover:-translate-y-px hover:shadow-md',
+  lime: 'border-lime bg-lime text-on-lime hover:bg-lime-2 hover:-translate-y-px hover:shadow-md',
   ghost: 'border-transparent bg-transparent text-ink hover:bg-panel',
   dangerGhost:
-    'border-[#F0D2D0] bg-transparent text-bad hover:bg-bad-soft',
+    'border-bad/25 bg-transparent text-bad hover:bg-bad-soft',
 };
 
 export function Button({
