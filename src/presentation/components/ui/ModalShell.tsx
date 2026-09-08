@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useBackDismiss } from '@presentation/hooks/useBackDismiss';
 import { cn } from '@presentation/lib/cn';
 
 interface ModalShellProps {
@@ -24,6 +25,12 @@ export function ModalShell({
   ariaLabel,
 }: ModalShellProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+
+  // The shell only exists while the dialog is open, so `open` is always true.
+  // Registering here rather than in UiStore matters: callers wrap `onClose`
+  // (Settings reverts its live theme preview through it), and Back has to take
+  // exactly the same path as Esc and the backdrop.
+  useBackDismiss(true, onClose);
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;

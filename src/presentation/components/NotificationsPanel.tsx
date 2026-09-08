@@ -4,6 +4,7 @@ import { Icon } from './ui/Icon';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav } from '@presentation/state/NavStore';
 import { useFormat } from '@presentation/hooks/useFormat';
+import { useBackDismiss } from '@presentation/hooks/useBackDismiss';
 import { getNotifications } from '@domain/services/schedule';
 import { cn } from '@presentation/lib/cn';
 
@@ -22,6 +23,8 @@ export function NotificationsPanel() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const list = getNotifications(state);
+
+  useBackDismiss(open, () => setOpen(false));
 
   useEffect(() => {
     if (!open) return;

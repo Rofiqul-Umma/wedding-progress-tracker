@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SidebarContent } from './Sidebar';
 import { useUi } from '@presentation/state/UiStore';
+import { useBackDismiss } from '@presentation/hooks/useBackDismiss';
 
 const FOCUSABLE = 'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
@@ -13,6 +14,8 @@ export function MobileDrawer() {
   const { t } = useTranslation();
   const { navOpen, closeNav } = useUi();
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useBackDismiss(navOpen, closeNav);
 
   useEffect(() => {
     if (!navOpen) return;

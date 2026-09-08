@@ -15,6 +15,7 @@ import type {
   Peer,
 } from '@domain/repositories/RoomRepository';
 import { firebaseEnabled } from '@infrastructure/firebase/env';
+import { setCanonicalUrl } from '@presentation/lib/backDismiss';
 
 export type RoomStatus = 'idle' | 'connecting' | 'connected' | 'error';
 export type RoomError = 'notFound' | 'generic';
@@ -62,7 +63,11 @@ function setRoomParam(roomId: string | null): void {
   const url = new URL(window.location.href);
   if (roomId) url.searchParams.set('room', roomId);
   else url.searchParams.delete('room');
-  window.history.replaceState(null, '', url.toString());
+  // Not a bare `replaceState`: this only ever runs from inside Settings, i.e.
+  // while a back-dismissable history entry is current. Routing it through
+  // backDismiss keeps the room id on the address bar after that entry is popped
+  // — otherwise "Copy link" would silently lose it.
+  setCanonicalUrl(url.toString());
 }
 
 /** Loads the firebase-backed room modules (kept out of the main bundle). */

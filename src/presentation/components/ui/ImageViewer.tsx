@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
 import { useUi } from '@presentation/state/UiStore';
+import { useBackDismiss } from '@presentation/hooks/useBackDismiss';
 import { dataUrlToBlob } from '@presentation/lib/dataUrl';
 import { downloadBlob } from '@presentation/lib/download';
 
@@ -17,6 +18,10 @@ export function ImageViewer() {
   const { image, closeImage } = useUi();
   const { t } = useTranslation();
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Above the early return: the viewer opens on top of the preview dialog, so
+  // its entry must sit on top of the preview's too.
+  useBackDismiss(!!image, closeImage);
 
   useEffect(() => {
     if (!image) return;
