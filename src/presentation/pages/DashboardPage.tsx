@@ -44,8 +44,13 @@ export function DashboardPage() {
     <>
       <OverviewCards />
 
-      <div className="mx-0 mb-1.5 mt-[18px] grid grid-cols-[96px_1fr_128px_118px] gap-3 px-[14px] max-[560px]:grid-cols-[70px_1fr_88px]">
-        <span className="text-xs font-semibold text-faint">{t('dash.colCreated')}</span>
+      {/* Below 560px only the task and its due date survive: the created time
+          and the target column cost more width than they earn, and squeezing
+          them in truncated every task title to a few characters. */}
+      <div className="mx-0 mb-1.5 mt-[18px] grid grid-cols-[96px_1fr_128px_118px] gap-3 px-[14px] max-[560px]:mt-3 max-[560px]:grid-cols-[1fr_auto] max-[560px]:gap-2 max-[560px]:px-2.5">
+        <span className="text-xs font-semibold text-faint max-[560px]:hidden">
+          {t('dash.colCreated')}
+        </span>
         <span className="text-xs font-semibold text-faint">{t('dash.colTask')}</span>
         <span className="text-xs font-semibold text-faint">{t('dash.colDue')}</span>
         <span className="text-xs font-semibold text-faint max-[560px]:hidden">
@@ -102,24 +107,24 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
       type="button"
       onClick={onSelect}
       className={cn(
-        'grid w-full grid-cols-[96px_1fr_128px_118px] items-center gap-3 rounded-[14px] px-[14px] py-3 text-left transition-colors max-[560px]:grid-cols-[70px_1fr_88px]',
+        'grid w-full grid-cols-[96px_1fr_128px_118px] items-center gap-3 rounded-[14px] px-[14px] py-3 text-left transition-colors max-[560px]:grid-cols-[1fr_auto] max-[560px]:gap-2 max-[560px]:px-2.5 max-[560px]:py-2.5',
         selected ? 'bg-ink' : 'hover:bg-panel',
       )}
     >
       <span
         className={cn(
-          'text-[12.5px] font-semibold',
+          'text-[12.5px] font-semibold max-[560px]:hidden',
           selected ? 'text-on-ink/[.66]' : 'text-faint',
         )}
       >
         {task.created || '09:05 AM'}
       </span>
-      <span className="flex min-w-0 items-center gap-3">
+      <span className="flex min-w-0 items-center gap-3 max-[560px]:gap-2.5">
         <Avatar color={color} icon={itemIcon(task.icon, task.cat)} size={36} />
         <span className="block min-w-0">
           <span
             className={cn(
-              'block truncate text-[14.5px] font-bold',
+              'block truncate text-[14.5px] font-bold max-[560px]:text-[13.5px]',
               selected && 'text-on-ink',
             )}
           >
@@ -127,17 +132,22 @@ function TaskRow({ task, selected, onSelect }: TaskRowProps) {
           </span>
           <span
             className={cn(
-              'mt-px block truncate text-[12.5px]',
+              'mt-px block truncate text-[12.5px] max-[560px]:text-[11.5px]',
               selected ? 'text-on-ink/[.66]' : 'text-muted',
             )}
           >
+            {/* The created time loses its own column on a phone, so it rides
+                along with the category rather than disappearing entirely. */}
+            <span className="hidden max-[560px]:inline">
+              {task.created || '09:05 AM'} ·{' '}
+            </span>
             {catLabel(task.cat) || t('dash.task')}
           </span>
         </span>
       </span>
       <span
         className={cn(
-          'truncate text-[13px]',
+          'truncate text-[13px] max-[560px]:text-[11.5px] max-[560px]:font-semibold',
           selected ? 'text-on-ink/[.66]' : 'text-muted',
         )}
       >

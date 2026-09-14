@@ -36,22 +36,32 @@ function OverviewCard({ hero, icon, label, value, bar, sub }: CardProps) {
       className={cn(
         'flex flex-col gap-[9px] rounded-card border p-4 shadow-sm',
         hero ? 'border-lime bg-lime' : 'border-line bg-app',
+        // Compact mode: the four metric cards pair up two-across, so only the
+        // hero still spans the full width.
+        'max-[560px]:gap-1.5 max-[560px]:p-3',
+        hero && 'max-[560px]:col-span-2',
       )}
     >
-      <div className="flex items-center gap-[9px]">
+      <div className="flex items-center gap-[9px] max-[560px]:gap-2">
         <span
           className={cn(
-            'grid h-[30px] w-[30px] place-items-center rounded-[9px]',
+            'grid h-[30px] w-[30px] place-items-center rounded-[9px] max-[560px]:h-6 max-[560px]:w-6 max-[560px]:rounded-lg',
             // The hero badge sits on the lime fill, which is identical in both
             // themes — so both the black wash and its ink stay put.
             hero ? 'bg-black/10 text-on-lime' : 'bg-panel text-ink',
           )}
         >
-          <Icon name={icon} size={18} />
+          {/* Lucide writes width/height as attributes, which CSS overrides —
+              so the glyph can shrink with the badge without a second size. */}
+          <Icon
+            name={icon}
+            size={18}
+            className="max-[560px]:h-[15px] max-[560px]:w-[15px]"
+          />
         </span>
         <span
           className={cn(
-            'text-[12.5px] font-bold',
+            'text-[12.5px] font-bold max-[560px]:text-[11.5px]',
             hero ? 'text-on-lime' : 'text-muted',
           )}
         >
@@ -61,6 +71,7 @@ function OverviewCard({ hero, icon, label, value, bar, sub }: CardProps) {
       <div
         className={cn(
           'text-[26px] font-extrabold leading-[1.1] tracking-tight tnum',
+          hero ? 'max-[560px]:text-[25px]' : 'max-[560px]:text-[21px]',
           // Otherwise the hero number inherits `ink`, which inverts to near-white
           // in dark mode and vanishes against the (unchanged) lime fill.
           hero && 'text-on-lime',
@@ -71,7 +82,7 @@ function OverviewCard({ hero, icon, label, value, bar, sub }: CardProps) {
       {bar && <ProgressBar value={bar.value} color={bar.color} height={7} />}
       <div
         className={cn(
-          'mt-auto text-xs font-semibold',
+          'mt-auto text-xs font-semibold max-[560px]:text-[11px] max-[560px]:leading-snug',
           hero ? 'text-on-lime' : 'text-faint',
         )}
       >
@@ -152,7 +163,10 @@ export function OverviewCards() {
   ];
 
   return (
-    <div className="mb-[22px] grid grid-cols-[repeat(auto-fit,minmax(178px,1fr))] gap-3.5">
+    // `auto-fit` can only fit one 178px column on a phone, which stacked all
+    // five cards full-width and pushed the timeline off-screen. Below 560px the
+    // four metric cards go two-across instead, with the hero spanning both.
+    <div className="mb-[22px] grid grid-cols-[repeat(auto-fit,minmax(178px,1fr))] gap-3.5 max-[560px]:mb-4 max-[560px]:grid-cols-2 max-[560px]:gap-2.5">
       {cards}
     </div>
   );
