@@ -175,7 +175,7 @@ export function BudgetPage() {
       />
 
       {anyRows && (
-        <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-3.5">
+        <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-3.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-nowrap max-[560px]:gap-2">
           <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
           <SortSelect
             id="budgetSort"

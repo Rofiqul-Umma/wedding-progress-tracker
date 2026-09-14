@@ -122,7 +122,10 @@ export function VendorsPage() {
   return (
     <>
       {strip}
-      <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-3.5">
+      {/* `flex-wrap` dropped the sort control onto a second line on a phone,
+          costing 92px of chrome before the first vendor. Below 560px the pills
+          scroll within the row instead so the pair stays one line. */}
+      <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-3.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-nowrap max-[560px]:gap-2">
         <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
         <SortSelect
           id="vendorSort"
@@ -157,11 +160,11 @@ export function VendorsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
                     <span className="truncate">{v.name}</span>
-                    <Chip variant="gray" className="max-[520px]:hidden">
+                    <Chip variant="gray" className="max-[560px]:hidden">
                       {catLabel(v.category)}
                     </Chip>
                     {(v.items?.length ?? 0) > 0 && (
-                      <Chip variant="gray" className="max-[520px]:hidden">
+                      <Chip variant="gray" className="max-[560px]:hidden">
                         {t('vendors.itemCount', { count: v.items.length })}
                       </Chip>
                     )}
@@ -205,7 +208,7 @@ export function VendorsPage() {
                     rel="noopener noreferrer"
                     title={t('vendors.openSocial')}
                     aria-label={t('vendors.openSocial')}
-                    className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
+                    className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[560px]:hidden"
                   >
                     <Icon name="public" size={17} />
                   </a>

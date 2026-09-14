@@ -141,7 +141,7 @@ export function Topbar() {
         <NotificationsPanel />
         {page !== 'reports' && (
           <Button variant="primary" icon="add" onClick={openAdd} aria-label={addLabel}>
-            <span className="max-[520px]:hidden">{addLabel}</span>
+            <span className="max-[560px]:hidden">{addLabel}</span>
           </Button>
         )}
       </div>

@@ -1,8 +1,10 @@
 import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import { cn } from '@presentation/lib/cn';
 
+// 560px is the app-wide compact breakpoint (dashboard cards, stat strip, filter
+// bars), so rows switch at the same width rather than 40px later.
 const BASE =
-  'group flex items-center gap-[13px] border-t border-line px-[18px] py-[13px] max-[520px]:gap-2.5 max-[520px]:px-3.5';
+  'group flex items-center gap-[13px] border-t border-line px-[18px] py-[13px] max-[560px]:gap-2.5 max-[560px]:px-3.5 max-[560px]:py-2.5';
 
 /** Interactive controls inside a row that should NOT trigger the row's activation. */
 const INTERACTIVE = 'a,button,input,select,textarea,label';

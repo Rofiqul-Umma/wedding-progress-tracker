@@ -31,7 +31,7 @@ export function RowActions({
     <div
       className={cn(
         'flex flex-none gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100',
-        mobileHidden && 'max-[520px]:hidden',
+        mobileHidden && 'max-[560px]:hidden',
         className,
       )}
     >

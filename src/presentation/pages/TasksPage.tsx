@@ -150,7 +150,7 @@ function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
           rel="noopener noreferrer"
           title={t('tasks.openLink')}
           aria-label={t('tasks.openLink')}
-          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
+          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[560px]:hidden"
         >
           <Icon name="link" size={17} />
         </a>
@@ -161,7 +161,7 @@ function TaskRow({ task, onToggle, onOpen, onEdit, onDelete }: TaskRowProps) {
           onClick={() => openAttachment(attachment)}
           title={t('tasks.viewFile')}
           aria-label={t('tasks.viewFile')}
-          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
+          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[560px]:hidden"
         >
           <Icon name="attach_file" size={17} />
         </button>

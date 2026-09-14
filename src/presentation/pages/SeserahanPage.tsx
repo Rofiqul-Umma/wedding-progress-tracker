@@ -106,9 +106,9 @@ export function SeserahanPage() {
         ]}
       />
 
-      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-4 max-[560px]:mb-2 max-[560px]:flex-nowrap max-[560px]:gap-2.5">
         <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
-        <div className="flex min-w-[180px] flex-[0_1_300px] items-center gap-3">
+        <div className="flex min-w-[180px] flex-[0_1_300px] items-center gap-3 max-[560px]:min-w-[84px] max-[560px]:flex-[0_1_110px] max-[560px]:gap-2">
           <ProgressBar
             value={pct}
             color="var(--color-lime-2)"
@@ -204,7 +204,7 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
           rel="noopener noreferrer"
           title={t('seserahan.openLink')}
           aria-label={t('seserahan.openLink')}
-          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[520px]:hidden"
+          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] border border-line-2 bg-app text-muted transition-colors hover:bg-panel hover:text-ink max-[560px]:hidden"
         >
           <Icon name="link" size={17} />
         </a>
