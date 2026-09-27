@@ -203,8 +203,35 @@
   }
 }
 .fade-in {
-  animation: fade 0.32s var(--ease-planner);
+  animation: fade 0.32s var(--ease-planner) both;
 }
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.backdrop-fade-in {
+  animation: backdropFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.modal-pop-in {
+  animation: modalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @keyframes drawerIn {
   from {
     transform: translateX(-100%);
@@ -214,8 +241,38 @@
   }
 }
 .drawer-in {
-  animation: drawerIn 0.26s var(--ease-planner);
+  animation: drawerIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+@keyframes imagePopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.image-pop-in {
+  animation: imagePopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.popover-in {
+  transform-origin: top right;
+  animation: popoverIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @keyframes contactFlash {
   0% {
     box-shadow: 0 0 0 0 rgba(199, 242, 63, 0);

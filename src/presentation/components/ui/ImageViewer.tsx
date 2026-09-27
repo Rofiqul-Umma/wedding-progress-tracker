@@ -51,7 +51,7 @@ export function ImageViewer() {
       role="dialog"
       aria-modal="true"
       aria-label={image.alt}
-      className="fixed inset-0 z-[110] grid place-items-center bg-scrim-strong backdrop-blur-[3px] pt-[calc(4.5rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
+      className="backdrop-fade-in fixed inset-0 z-[110] grid place-items-center bg-scrim-strong backdrop-blur-[3px] pt-[calc(4.5rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeImage();
       }}
@@ -59,7 +59,7 @@ export function ImageViewer() {
       <img
         src={image.src}
         alt={image.alt}
-        className="max-h-full max-w-full rounded-[14px] object-contain shadow-lg"
+        className="image-pop-in max-h-full max-w-full rounded-[14px] object-contain shadow-lg"
       />
       {/* Offset from the notch and the rounded corner so the controls stay
           tappable on a curved-edge phone. */}

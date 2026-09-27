@@ -60,7 +60,7 @@ export function AvatarPicker({
       </div>
 
       {open && (
-        <>
+        <div className="fade-in grid gap-2.5">
           <div className="grid gap-1.5">
             <span className="text-[11px] font-bold uppercase tracking-wide text-faint">
               {t('settings.avatarFace')}
@@ -102,7 +102,7 @@ export function AvatarPicker({
               </button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
