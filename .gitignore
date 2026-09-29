@@ -5,3 +5,8 @@ coverage
 *.local
 .DS_Store
 npm-debug.log*
+
+# Firebase CLI writes these next to firebase.json on every command.
+firebase-debug.log*
+firestore-debug.log*
+.firebase/
