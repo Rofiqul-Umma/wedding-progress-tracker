@@ -1,18 +1,38 @@
 rules_version = '2';
 
-// Security model: rooms are shared by an unguessable id. Any signed-in user
-// (anonymous auth) who knows a room id may read and edit that room's plan —
-// this matches the product's "open link, anyone edits" collaboration model.
-// The unguessable id is the only access gate; there is no per-room ACL.
+// Security model
+// --------------
+// Two kinds of plan space, both holding the same six collections:
+//
+//   users/{uid}   private, readable only by the matching Google account
+//   rooms/{id}    shared by an unguessable id — anyone signed in who knows the
+//                 id may read and edit, matching the product's "open the link,
+//                 anyone edits" collaboration model. There is no per-room ACL.
+//
+// The unguessable id is the room's only gate, so no rule may ever grant `list`
+// on /rooms: `read` = `get` + `list`, and a list permission that doesn't depend
+// on `resource` would let any anonymous client enumerate every room and defeat
+// the gate entirely. Subcollections below a room still need the id to reach, so
+// they keep `read` (the client subscribes with a collection query).
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Private personal plans: only the matching Google account may read/write.
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // ---- Private personal plans -------------------------------------------
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      // `get`, never `list`: a query over /users can't bind {uid}, so it is
+      // denied either way — spelling it out keeps the intent from drifting.
+      allow get: if isOwner(uid);
+      allow create, update, delete: if isOwner(uid);
 
       match /{collectionName}/{docId} {
-        allow read, write: if request.auth != null
-          && request.auth.uid == uid
+        allow read, write: if isOwner(uid)
           && collectionName in [
             'vendors',
             'budget',
@@ -24,25 +44,43 @@ service cloud.firestore {
       }
     }
 
+    // ---- Link-shared collaborative rooms ----------------------------------
     match /rooms/{roomId} {
-      allow read, write: if request.auth != null;
+      allow get: if signedIn();
+      allow create, update, delete: if signedIn();
+      // Deliberately absent: `list`. See the header note — it would expose
+      // every room to any anonymous client.
 
-      // Plan collections. Listed explicitly (not a wildcard) so the broad rule
-      // never overlaps the stricter presence rule below — Firestore grants access
-      // if ANY matching rule allows it, so an overlap would defeat the presence
-      // impersonation guard.
-      match /vendors/{docId}   { allow read, write: if request.auth != null; }
-      match /budget/{docId}    { allow read, write: if request.auth != null; }
-      match /tasks/{docId}     { allow read, write: if request.auth != null; }
-      match /seserahan/{docId} { allow read, write: if request.auth != null; }
-      match /shopping/{docId}  { allow read, write: if request.auth != null; }
-      match /contacts/{docId}  { allow read, write: if request.auth != null; }
+      // Plan collections. Listed explicitly rather than as a wildcard so this
+      // broad rule never overlaps the stricter presence rule below: Firestore
+      // grants access if ANY matching rule allows it, so an overlap would
+      // silently defeat the impersonation guard.
+      match /vendors/{docId}   { allow read, write: if signedIn(); }
+      match /budget/{docId}    { allow read, write: if signedIn(); }
+      match /tasks/{docId}     { allow read, write: if signedIn(); }
+      match /seserahan/{docId} { allow read, write: if signedIn(); }
+      match /shopping/{docId}  { allow read, write: if signedIn(); }
+      match /contacts/{docId}  { allow read, write: if signedIn(); }
 
-      // Presence: anyone in the room can see who's here, but a client may only
-      // write its own presence doc (docId == its auth uid) — no impersonation.
+      // Presence: everyone in the room sees who else is here, but a client may
+      // only write the doc named after its own auth uid — no impersonating a
+      // collaborator. `clientId` is the uid (RoomStore.tsx:59).
       match /presence/{clientId} {
-        allow read: if request.auth != null;
-        allow write: if request.auth != null && request.auth.uid == clientId;
+        allow read: if signedIn();
+
+        // `request.resource.data` is the post-merge document, so the heartbeat's
+        // `setDoc(..., { merge: true })` still satisfies `hasOnly` — and the
+        // room's presence list can't be repurposed as free storage.
+        allow create, update: if isOwner(clientId)
+          && request.resource.data.keys().hasOnly(['name', 'color', 'lastSeen'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() <= 64
+          && request.resource.data.color is string
+          && request.resource.data.color.size() <= 32;
+
+        // Split out from the above: on a delete `request.resource` is null, so
+        // the shape check would reject the client's own disconnect cleanup.
+        allow delete: if isOwner(clientId);
       }
     }
   }
