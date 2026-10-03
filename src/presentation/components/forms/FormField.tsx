@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Field, FormValues } from './types';
 import { Icon } from '@presentation/components/ui/Icon';
+import { Select } from '@presentation/components/ui/Select';
 import {
   FileTooLargeError,
   isImageAttachment,
@@ -70,19 +71,13 @@ export function FormField({
         {field.label}
       </label>
       {type === 'select' ? (
-        <select
+        <Select
           id={`f-${field.name}`}
           name={field.name}
           value={value}
           onChange={(e) => onValue(field.name, e.target.value)}
-          className={cn(CONTROL, 'cursor-pointer')}
-        >
-          {field.options?.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+          options={field.options}
+        />
       ) : type === 'textarea' ? (
         <textarea
           id={`f-${field.name}`}
@@ -508,7 +503,7 @@ function CategoryField({ field, value, onValue }: SubFieldProps) {
   }
 
   return (
-    <select
+    <Select
       id={`f-${field.name}`}
       name={field.name}
       value={value}
@@ -522,7 +517,6 @@ function CategoryField({ field, value, onValue }: SubFieldProps) {
           onValue(field.name, e.target.value);
         }
       }}
-      className={cn(CONTROL, 'cursor-pointer')}
     >
       <option value="">{t('forms.common.catNone')}</option>
       {custom && <option value={custom}>{custom}</option>}
@@ -532,7 +526,7 @@ function CategoryField({ field, value, onValue }: SubFieldProps) {
         </option>
       ))}
       <option value={CAT_NEW}>{t('forms.common.catAddNew')}</option>
-    </select>
+    </Select>
   );
 }
 

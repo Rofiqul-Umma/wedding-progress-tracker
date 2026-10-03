@@ -184,6 +184,9 @@
   textarea {
     font-family: inherit;
   }
+  select::-ms-expand {
+    display: none;
+  }
 }
 
 /* Tabular figures for aligned numbers (counts, money, countdowns). */

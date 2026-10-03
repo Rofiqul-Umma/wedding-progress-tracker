@@ -4,6 +4,7 @@ import { ModalShell } from '@presentation/components/ui/ModalShell';
 import { Button } from '@presentation/components/ui/Button';
 import { Chip } from '@presentation/components/ui/Chip';
 import { Icon } from '@presentation/components/ui/Icon';
+import { Select } from '@presentation/components/ui/Select';
 import { AvatarPicker } from '@presentation/components/AvatarPicker';
 import { CONTROL, LABEL } from '@presentation/components/forms/FormField';
 import { usePlan } from '@presentation/state/PlanStore';
@@ -179,51 +180,48 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
             <label htmlFor="set-lang" className={LABEL}>
               {t('lang.label')}
             </label>
-            <select
+            <Select
               id="set-lang"
               value={lang}
               onChange={(e) => setLang(e.target.value as Lang)}
-              className={cn(CONTROL, 'cursor-pointer')}
             >
               <option value="en">{t('lang.en')}</option>
               <option value="id">{t('lang.id')}</option>
-            </select>
+            </Select>
             <p className="text-xs text-faint">{t('lang.note')}</p>
           </div>
           <div className="grid gap-1.5">
             <label htmlFor="set-currency" className={LABEL}>
               {t('settings.currency')}
             </label>
-            <select
+            <Select
               id="set-currency"
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              className={cn(CONTROL, 'cursor-pointer')}
             >
               {CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.label}
                 </option>
               ))}
-            </select>
+            </Select>
             <p className="text-xs text-faint">{t('settings.currencyNote')}</p>
           </div>
           <div className="grid gap-1.5">
             <label htmlFor="set-theme" className={LABEL}>
               {t('settings.theme')}
             </label>
-            <select
+            <Select
               id="set-theme"
               value={theme.mode}
               onChange={(e) => setTheme(e.target.value as ThemeMode)}
-              className={cn(CONTROL, 'cursor-pointer')}
             >
               {THEME_MODES.map((m) => (
                 <option key={m} value={m}>
                   {t(`theme.${m}`)}
                 </option>
               ))}
-            </select>
+            </Select>
             <p className="text-xs text-faint">{t('settings.themeNote')}</p>
           </div>
         </section>

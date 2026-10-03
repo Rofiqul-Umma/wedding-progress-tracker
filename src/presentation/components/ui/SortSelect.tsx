@@ -1,7 +1,6 @@
-interface SortOption {
-  value: string;
-  label: string;
-}
+import { Select, type SelectOption } from './Select';
+
+export type SortOption = SelectOption;
 
 interface SortSelectProps {
   id: string;
@@ -21,19 +20,14 @@ export function SortSelect({ id, label, value, options, onChange }: SortSelectPr
       <label htmlFor={id} className="text-xs font-semibold text-muted max-[560px]:sr-only">
         {label}
       </label>
-      <select
+      <Select
         id={id}
+        variant="compact"
         value={value}
         aria-label={label}
         onChange={(e) => onChange(e.target.value)}
-        className="cursor-pointer rounded-[10px] border border-line-2 bg-app px-[11px] py-2 text-[13px] font-semibold text-ink transition-colors focus:border-ink focus:outline-none max-[560px]:max-w-[116px] max-[560px]:px-1.5 max-[560px]:py-[5px] max-[560px]:text-[12px]"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+        options={options}
+      />
     </div>
   );
 }
