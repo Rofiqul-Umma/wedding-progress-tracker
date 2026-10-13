@@ -31,6 +31,7 @@ describe('buildReportModel', () => {
       'seserahan',
       'shopping',
       'contacts',
+      'guests',
       'actionItems',
     ]);
   });
@@ -45,12 +46,13 @@ describe('buildReportModel', () => {
     expect(byId.seserahan).toHaveLength(state.seserahan.length);
     expect(byId.shopping).toHaveLength(state.shopping.length);
     expect(byId.contacts).toHaveLength(state.contacts.length);
+    expect(byId.guests).toHaveLength(state.guests.length);
   });
 
   it('yields all sections with zero rows for an empty plan', () => {
     const empty = migrate({});
     const model = buildReportModel(empty);
-    expect(model.sections).toHaveLength(8);
+    expect(model.sections).toHaveLength(9);
     for (const s of model.sections) expect(s.rows).toHaveLength(0);
   });
 });

@@ -24,6 +24,7 @@ export function blankState(prev: Settings): PlanState {
     seserahan: [],
     shopping: [],
     contacts: [],
+    guests: [],
   };
 }
 

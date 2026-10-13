@@ -2,7 +2,7 @@ rules_version = '2';
 
 // Security model
 // --------------
-// Two kinds of plan space, both holding the same six collections:
+// Two kinds of plan space, both holding the same seven collections:
 //
 //   users/{uid}   private, readable only by the matching Google account
 //   rooms/{id}    shared by an unguessable id — anyone signed in who knows the
@@ -39,7 +39,8 @@ service cloud.firestore {
             'tasks',
             'seserahan',
             'shopping',
-            'contacts'
+            'contacts',
+            'guests'
           ];
       }
     }
@@ -61,6 +62,7 @@ service cloud.firestore {
       match /seserahan/{docId} { allow read, write: if signedIn(); }
       match /shopping/{docId}  { allow read, write: if signedIn(); }
       match /contacts/{docId}  { allow read, write: if signedIn(); }
+      match /guests/{docId}    { allow read, write: if signedIn(); }
 
       // Presence: everyone in the room sees who else is here, but a client may
       // only write the doc named after its own auth uid — no impersonating a

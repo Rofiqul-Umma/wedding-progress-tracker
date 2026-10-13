@@ -31,6 +31,13 @@ import {
   cycleShoppingStatus,
 } from './shopping';
 import { addContact, deleteContact } from './contacts';
+import {
+  addGuest,
+  updateGuest,
+  deleteGuest,
+  insertGuest,
+  cycleGuestRsvp,
+} from './guests';
 
 function base(): PlanState {
   return {
@@ -42,6 +49,7 @@ function base(): PlanState {
     seserahan: [],
     shopping: [],
     contacts: [],
+    guests: [],
   };
 }
 
@@ -368,5 +376,58 @@ describe('contact use cases', () => {
     const r = deleteContact(s, s.contacts[0].id);
     expect(r.removed?.name).toBe('Renee');
     expect(r.state.contacts).toHaveLength(0);
+  });
+});
+
+describe('guest use cases', () => {
+  it('adds, updates, and cycles RSVP of a guest', () => {
+    let s = addGuest(base(), {
+      name: 'Sofia Rossi',
+      category: 'Keluarga',
+      rsvp: 'pending',
+      pax: 2,
+      table: 'Table 1',
+      phone: '12345',
+      dietary: 'Vegetarian',
+      notes: 'VIP table',
+    });
+    expect(s.guests).toHaveLength(1);
+    expect(s.guests[0].name).toBe('Sofia Rossi');
+    expect(s.guests[0].pax).toBe(2);
+
+    s = updateGuest(s, s.guests[0].id, { pax: 3 });
+    expect(s.guests[0].pax).toBe(3);
+
+    // pending -> attending -> declined -> pending
+    s = cycleGuestRsvp(s, s.guests[0].id);
+    expect(s.guests[0].rsvp).toBe('attending');
+    s = cycleGuestRsvp(s, s.guests[0].id);
+    expect(s.guests[0].rsvp).toBe('declined');
+    s = cycleGuestRsvp(s, s.guests[0].id);
+    expect(s.guests[0].rsvp).toBe('pending');
+  });
+
+  it('deletes then restores a guest at original index (undo)', () => {
+    let s = base();
+    for (const name of ['Guest 1', 'Guest 2', 'Guest 3']) {
+      s = addGuest(s, {
+        name,
+        category: 'Teman',
+        rsvp: 'attending',
+        pax: 1,
+        table: '',
+        phone: '',
+        dietary: '',
+        notes: '',
+      });
+    }
+    const target = s.guests[1];
+    const r = deleteGuest(s, target.id);
+    expect(r.removed?.name).toBe('Guest 2');
+    expect(r.index).toBe(1);
+    expect(r.state.guests.map((g) => g.name)).toEqual(['Guest 1', 'Guest 3']);
+
+    const restored = insertGuest(r.state, r.removed!, r.index);
+    expect(restored.guests.map((g) => g.name)).toEqual(['Guest 1', 'Guest 2', 'Guest 3']);
   });
 });

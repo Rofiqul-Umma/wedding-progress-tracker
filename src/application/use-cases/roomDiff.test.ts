@@ -35,6 +35,7 @@ function base(): PlanState {
     seserahan: [],
     shopping: [],
     contacts: [],
+    guests: [],
   };
 }
 

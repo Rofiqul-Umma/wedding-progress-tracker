@@ -14,5 +14,6 @@ export const PAGES: PageDef[] = [
   { id: 'shopping', icon: 'shopping_bag' },
   { id: 'seserahan', icon: 'redeem' },
   { id: 'contacts', icon: 'contacts' },
+  { id: 'guests', icon: 'groups' },
   { id: 'reports', icon: 'summarize' },
 ];

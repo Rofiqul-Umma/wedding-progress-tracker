@@ -391,9 +391,11 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
             <Button size="sm" icon="upload" onClick={() => fileRef.current?.click()}>
               {t('settings.import')}
             </Button>
-            <Button size="sm" icon="auto_awesome" onClick={onSample}>
-              {t('settings.sample')}
-            </Button>
+            {import.meta.env.DEV && (
+              <Button size="sm" icon="auto_awesome" onClick={onSample}>
+                {t('settings.sample')}
+              </Button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="dangerGhost" icon="delete_forever" onClick={onClear}>

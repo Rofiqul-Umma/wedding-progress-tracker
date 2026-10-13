@@ -16,6 +16,8 @@ import {
   vendorsBooked,
   contentsProgress,
   effectiveSeserahanStatus,
+  attendingPax,
+  guestsTotalPax,
 } from '@domain/services/progress';
 import { getNotifications } from '@domain/services/schedule';
 import { categoryCell } from '@domain/value-objects/categories';
@@ -221,6 +223,32 @@ export function buildReportModel(
     })),
   });
 
+  // Guests
+  sections.push({
+    id: 'guests',
+    titleKey: 'report.sec.guests',
+    columns: [
+      { key: 'name', labelKey: 'report.col.name', type: 'text' },
+      { key: 'category', labelKey: 'report.col.category', type: 'text' },
+      { key: 'rsvp', labelKey: 'report.col.status', type: 'text' },
+      { key: 'pax', labelKey: 'report.col.pax', type: 'number' },
+      { key: 'table', labelKey: 'report.col.table', type: 'text' },
+      { key: 'phone', labelKey: 'report.col.phone', type: 'text' },
+      { key: 'dietary', labelKey: 'report.col.dietary', type: 'text' },
+      { key: 'notes', labelKey: 'report.col.notes', type: 'text' },
+    ],
+    rows: (state.guests ?? []).map((g) => ({
+      name: g.name,
+      category: categoryCell(g.category),
+      rsvp: `status.rsvp.${g.rsvp}`,
+      pax: g.pax,
+      table: g.table,
+      phone: g.phone,
+      dietary: g.dietary,
+      notes: g.notes,
+    })),
+  });
+
   // Action items (overdue/soon tasks + outstanding payments)
   sections.push({
     id: 'actionItems',
@@ -284,6 +312,10 @@ export function buildReportStats(
     {
       labelKey: 'report.stat.shopping',
       value: `${shopBought(state.shopping)} / ${state.shopping.length}`,
+    },
+    {
+      labelKey: 'report.stat.guestsAttending',
+      value: `${attendingPax(state.guests ?? [])} / ${guestsTotalPax(state.guests ?? [])} pax`,
     },
   ];
 }

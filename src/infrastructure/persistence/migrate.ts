@@ -117,5 +117,25 @@ export function migrate(input: unknown): PlanState {
           social: str(c.social) || str(c.email),
         }))
       : [],
+    guests: Array.isArray(s.guests)
+      ? (s.guests as Obj[]).map((g) => {
+          const rsvpRaw = str(g.rsvp);
+          const rsvp =
+            rsvpRaw === 'attending' || rsvpRaw === 'declined'
+              ? rsvpRaw
+              : 'pending';
+          return {
+            id: str(g.id) || uid(),
+            name: str(g.name),
+            category: str(g.category),
+            rsvp,
+            pax: Math.max(1, Math.round(num(g.pax)) || 1),
+            table: str(g.table),
+            phone: str(g.phone),
+            dietary: str(g.dietary),
+            notes: str(g.notes),
+          };
+        })
+      : [],
   };
 }

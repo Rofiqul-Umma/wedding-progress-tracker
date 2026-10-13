@@ -15,7 +15,13 @@ export interface BaseCategory {
 }
 
 /** Which collection a category list is offered for. */
-export type CategoryKind = 'vendor' | 'budget' | 'task' | 'shopping' | 'seserahan';
+export type CategoryKind =
+  | 'vendor'
+  | 'budget'
+  | 'task'
+  | 'shopping'
+  | 'seserahan'
+  | 'guest';
 
 const c = (value: string, key: string): BaseCategory => ({ value, key });
 
@@ -88,6 +94,13 @@ export const BASE_CATEGORIES: Record<CategoryKind, readonly BaseCategory[]> = {
     c('Tas', 'tas'),
     c('Alat Ibadah', 'alatIbadah'),
     c('Makanan', 'makanan'),
+  ],
+  guest: [
+    c('Keluarga', 'keluarga'),
+    c('Teman', 'teman'),
+    c('Rekan Kerja', 'rekanKerja'),
+    c('VIP', 'vip'),
+    c('Tetangga', 'tetangga'),
   ],
 };
 

@@ -20,6 +20,7 @@ describe('migrate', () => {
     expect(s.seserahan).toEqual([]);
     expect(s.shopping).toEqual([]);
     expect(s.contacts).toEqual([]);
+    expect(s.guests).toEqual([]);
   });
 
   it('never throws on garbage input', () => {
@@ -238,5 +239,33 @@ describe('migrate', () => {
     expect(s.tasks[0].icon).toBe('');
     expect(s.seserahan[0].icon).toBe('');
     expect(s.shopping[0].icon).toBe('');
+  });
+
+  it('supplies and sanitizes guests collection', () => {
+    const s = migrate({
+      guests: [
+        {
+          id: 'g1',
+          name: 'Sofia',
+          category: 'Keluarga',
+          rsvp: 'attending',
+          pax: 2,
+          table: 'Table 1',
+        },
+        {
+          id: 'g2',
+          name: 'Marcus',
+          rsvp: 'invalid_status',
+          pax: -5,
+        },
+      ],
+    });
+    expect(s.guests).toHaveLength(2);
+    expect(s.guests[0].rsvp).toBe('attending');
+    expect(s.guests[0].pax).toBe(2);
+    expect(s.guests[1].rsvp).toBe('pending');
+    expect(s.guests[1].pax).toBe(1);
+    expect(s.guests[1].category).toBe('');
+    expect(s.guests[1].table).toBe('');
   });
 });

@@ -14,6 +14,7 @@ import { TasksPage } from '@presentation/pages/TasksPage';
 import { ShoppingPage } from '@presentation/pages/ShoppingPage';
 import { SeserahanPage } from '@presentation/pages/SeserahanPage';
 import { ContactsPage } from '@presentation/pages/ContactsPage';
+import { GuestsPage } from '@presentation/pages/GuestsPage';
 import { ReportsPage } from '@presentation/pages/ReportsPage';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav } from '@presentation/state/NavStore';
@@ -28,6 +29,7 @@ const PAGE_COMPONENTS = {
   shopping: ShoppingPage,
   seserahan: SeserahanPage,
   contacts: ContactsPage,
+  guests: GuestsPage,
   reports: ReportsPage,
 } as const;
 

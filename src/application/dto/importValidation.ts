@@ -7,6 +7,7 @@ const ARRAY_KEYS = [
   'seserahan',
   'shopping',
   'contacts',
+  'guests',
 ] as const;
 
 /**

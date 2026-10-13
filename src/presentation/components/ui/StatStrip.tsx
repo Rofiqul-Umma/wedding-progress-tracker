@@ -27,7 +27,10 @@ export function StatStrip({ items }: { items: Stat[] }) {
       {items.map((s) => (
         <div
           key={s.label}
-          className="flex min-w-[90px] flex-col gap-1 max-[560px]:min-w-0 max-[560px]:gap-0.5"
+          className={cn(
+            'flex min-w-[90px] flex-col gap-1 max-[560px]:min-w-0 max-[560px]:gap-0.5',
+            !dense && items.length % 2 === 1 && 'max-[560px]:last:col-span-2',
+          )}
         >
           <span
             className={cn(

@@ -54,6 +54,35 @@ export function nextShoppingStatus(s: ShoppingStatus): ShoppingStatus {
   return SHOP_ORDER[(i + 1) % SHOP_ORDER.length];
 }
 
+/** Guest RSVP status. */
+export type RsvpStatus = 'pending' | 'attending' | 'declined';
+
+export const RSVP_STATUSES: readonly RsvpStatus[] = [
+  'pending',
+  'attending',
+  'declined',
+] as const;
+
+/** Ordered lifecycle for cycling RSVP status on click. */
+export const RSVP_ORDER: readonly RsvpStatus[] = [
+  'pending',
+  'attending',
+  'declined',
+] as const;
+
+/** Chip visual variant per RSVP status. */
+export const RSVP_CHIP_VARIANT: Record<RsvpStatus, string> = {
+  pending: 'warn',
+  attending: 'lime',
+  declined: 'gray',
+};
+
+/** Advance an RSVP status to the next stage in the cycle. */
+export function nextRsvpStatus(s: RsvpStatus): RsvpStatus {
+  const i = RSVP_ORDER.indexOf(s);
+  return RSVP_ORDER[(i + 1) % RSVP_ORDER.length];
+}
+
 /** Icon id per category (EN + ID category labels). */
 export const CAT_ICON: Record<string, string> = {
   Catering: 'restaurant',

@@ -20,6 +20,8 @@ export function useOpenAdd(): () => void {
         return openForm(forms.seserahanForm());
       case 'contacts':
         return openForm(forms.contactForm());
+      case 'guests':
+        return openForm(forms.guestForm());
       case 'dashboard':
       case 'tasks':
       default:

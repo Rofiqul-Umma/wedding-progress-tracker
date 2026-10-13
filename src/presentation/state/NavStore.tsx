@@ -15,6 +15,7 @@ export type PageId =
   | 'shopping'
   | 'seserahan'
   | 'contacts'
+  | 'guests'
   | 'reports';
 
 interface NavContextValue {

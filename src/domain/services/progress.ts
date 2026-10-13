@@ -1,10 +1,11 @@
 import type {
+  Guest,
   SeserahanItem,
   ShoppingItem,
   Task,
   Vendor,
 } from '@domain/entities/types';
-import type { SeserahanStatus } from '@domain/value-objects/status';
+import type { RsvpStatus, SeserahanStatus } from '@domain/value-objects/status';
 
 /* ---- Tasks ---- */
 export function tasksDone(tasks: Task[]): number {
@@ -66,4 +67,42 @@ export function vendorsBooked(vendors: Vendor[]): number {
 /** Number of distinct vendor categories. */
 export function vendorCategories(vendors: Vendor[]): number {
   return new Set(vendors.map((v) => v.category)).size;
+}
+
+/* ---- Guests ---- */
+export function guestsTotalPax(guests: Guest[]): number {
+  return guests.reduce((sum, g) => sum + (g.pax || 1), 0);
+}
+export function attendingPax(guests: Guest[]): number {
+  return guests
+    .filter((g) => g.rsvp === 'attending')
+    .reduce((sum, g) => sum + (g.pax || 1), 0);
+}
+export function pendingPax(guests: Guest[]): number {
+  return guests
+    .filter((g) => g.rsvp === 'pending')
+    .reduce((sum, g) => sum + (g.pax || 1), 0);
+}
+export function declinedPax(guests: Guest[]): number {
+  return guests
+    .filter((g) => g.rsvp === 'declined')
+    .reduce((sum, g) => sum + (g.pax || 1), 0);
+}
+export function guestsCountByRsvp(
+  guests: Guest[],
+): Record<RsvpStatus, number> {
+  return {
+    pending: guests.filter((g) => g.rsvp === 'pending').length,
+    attending: guests.filter((g) => g.rsvp === 'attending').length,
+    declined: guests.filter((g) => g.rsvp === 'declined').length,
+  };
+}
+export function guestsAttendingCount(guests: Guest[]): number {
+  return guests.filter((g) => g.rsvp === 'attending').length;
+}
+export function guestsPendingCount(guests: Guest[]): number {
+  return guests.filter((g) => g.rsvp === 'pending').length;
+}
+export function guestsDeclinedCount(guests: Guest[]): number {
+  return guests.filter((g) => g.rsvp === 'declined').length;
 }

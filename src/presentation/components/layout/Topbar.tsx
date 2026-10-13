@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@presentation/components/ui/Icon';
 import { Button } from '@presentation/components/ui/Button';
@@ -11,7 +12,14 @@ import { useUi } from '@presentation/state/UiStore';
 import { useToast } from '@presentation/components/ui/Toast';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { useOpenAdd } from '@presentation/hooks/useOpenAdd';
-import { openTasks, sesDone, shopBought } from '@domain/services/progress';
+import {
+  openTasks,
+  sesDone,
+  shopBought,
+  attendingPax,
+  guestsAttendingCount,
+  guestsPendingCount,
+} from '@domain/services/progress';
 import { vendorsTotal } from '@domain/services/budget';
 
 function greetingKey(): 'morning' | 'afternoon' | 'evening' {
@@ -28,6 +36,7 @@ export function Topbar() {
   const { money } = useFormat();
   const openAdd = useOpenAdd();
   const toast = useToast();
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const inRoom = enabled && status === 'connected';
   const share = async () => {
@@ -82,6 +91,15 @@ export function Topbar() {
       sub = t('topbar.contactsSub', { count: state.contacts.length });
       addLabel = t('topbar.addContact');
       break;
+    case 'guests':
+      title = t('topbar.guestsTitle');
+      sub = t('topbar.guestsSub', {
+        attending: guestsAttendingCount(state.guests ?? []),
+        pax: attendingPax(state.guests ?? []),
+        pending: guestsPendingCount(state.guests ?? []),
+      });
+      addLabel = t('topbar.addGuest');
+      break;
     case 'reports':
       title = t('topbar.reportsTitle');
       sub = t('topbar.reportsSub');
@@ -97,6 +115,44 @@ export function Topbar() {
       });
       addLabel = t('topbar.addTask');
       break;
+  }
+
+  if (mobileSearchOpen) {
+    return (
+      <header className="flex flex-none items-center gap-2 border-b border-line px-4 py-3 pl-[calc(1rem+var(--sa-left))] pr-[calc(1rem+var(--sa-right))] pt-[calc(1rem+var(--sa-top))] print:hidden">
+        <div className="flex flex-1 items-center gap-2 rounded-xl border border-ink bg-panel px-3 py-2">
+          <Icon name="search" size={19} className="text-faint" />
+          <input
+            type="search"
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('common.search')}
+            aria-label={t('common.searchAria')}
+            className="w-full border-0 bg-transparent text-[16px] outline-none"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              className="text-muted hover:text-ink"
+              aria-label={t('forms.common.remove')}
+            >
+              <Icon name="close" size={18} />
+            </button>
+          )}
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setMobileSearchOpen(false);
+          }}
+        >
+          {t('common.cancel')}
+        </Button>
+      </header>
+    );
   }
 
   return (
@@ -124,9 +180,15 @@ export function Topbar() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('common.search')}
             aria-label={t('common.searchAria')}
-            className="w-full border-0 bg-transparent text-[13.5px] outline-none"
+            className="w-full border-0 bg-transparent text-[16px] sm:text-[13.5px] outline-none"
           />
         </label>
+        <IconButton
+          icon="search"
+          label={t('common.search')}
+          onClick={() => setMobileSearchOpen(true)}
+          className="hidden max-[460px]:grid"
+        />
         {inRoom && <RoomPresence />}
         {inRoom && (
           <Button

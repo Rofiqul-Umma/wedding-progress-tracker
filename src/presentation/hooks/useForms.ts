@@ -12,8 +12,14 @@ import type {
   SeserahanItem,
   ShoppingItem,
   Contact,
+  Guest,
 } from '@domain/entities/types';
-import { VENDOR_STATUSES, SES_ORDER, SHOP_ORDER } from '@domain/value-objects/status';
+import {
+  VENDOR_STATUSES,
+  SES_ORDER,
+  SHOP_ORDER,
+  RSVP_STATUSES,
+} from '@domain/value-objects/status';
 import {
   BASE_CATEGORIES,
   categoryLabel,
@@ -25,6 +31,7 @@ import { addTask, updateTask } from '@application/use-cases/tasks';
 import { addSeserahan, updateSeserahan } from '@application/use-cases/seserahan';
 import { addShopping, updateShopping } from '@application/use-cases/shopping';
 import { addContact, updateContact } from '@application/use-cases/contacts';
+import { addGuest, updateGuest } from '@application/use-cases/guests';
 import { nowTime } from '@infrastructure/format/date';
 import { parseAttachment, serializeAttachment } from '@presentation/lib/attachments';
 import { parseContents, serializeContents } from '@presentation/lib/checklist';
@@ -344,5 +351,104 @@ export function useForms() {
     };
   }
 
-  return { vendorForm, budgetForm, taskForm, seserahanForm, shoppingForm, contactForm };
+  function guestForm(g?: Guest): FormDescriptor {
+    const editing = !!g;
+    return {
+      eyebrow: editing ? t('forms.guest.editEyebrow') : t('forms.guest.newEyebrow'),
+      title: editing ? t('forms.guest.updateTitle') : t('forms.guest.addTitle'),
+      fields: [
+        {
+          name: 'name',
+          label: t('forms.guest.name'),
+          value: g?.name,
+          placeholder: t('forms.guest.namePh'),
+          half: true,
+        },
+        {
+          name: 'category',
+          label: t('forms.guest.category'),
+          type: 'category',
+          value: g?.category,
+          placeholder: t('forms.guest.categoryPh'),
+          options: catOptions(
+            'guest',
+            (state.guests ?? []).map((x) => x.category),
+          ),
+          half: true,
+        },
+        {
+          name: 'rsvp',
+          label: t('forms.guest.rsvp'),
+          type: 'select',
+          value: g?.rsvp ?? 'pending',
+          options: RSVP_STATUSES.map((s) => ({
+            value: s,
+            label: t(`status.rsvp.${s}`),
+          })),
+          half: true,
+        },
+        {
+          name: 'pax',
+          label: t('forms.guest.pax'),
+          type: 'number',
+          value: g?.pax ?? 1,
+          half: true,
+        },
+        {
+          name: 'table',
+          label: t('forms.guest.table'),
+          value: g?.table,
+          placeholder: t('forms.guest.tablePh'),
+          half: true,
+        },
+        {
+          name: 'phone',
+          label: t('forms.guest.phone'),
+          value: g?.phone,
+          half: true,
+        },
+        {
+          name: 'dietary',
+          label: t('forms.guest.dietary'),
+          value: g?.dietary,
+          placeholder: t('forms.guest.dietaryPh'),
+        },
+        {
+          name: 'notes',
+          label: t('forms.guest.notes'),
+          type: 'textarea',
+          value: g?.notes,
+          placeholder: t('forms.guest.notesPh'),
+        },
+      ],
+      submit: (values) => {
+        if (!values.name.trim()) return t('forms.guest.errName');
+        const rsvp = RSVP_STATUSES.includes(values.rsvp as Guest['rsvp'])
+          ? (values.rsvp as Guest['rsvp'])
+          : 'pending';
+        const data: Omit<Guest, 'id'> = {
+          name: values.name.trim(),
+          category: values.category.trim(),
+          rsvp,
+          pax: Math.max(1, Math.round(numOr(values.pax, 1))),
+          table: values.table.trim(),
+          phone: values.phone.trim(),
+          dietary: values.dietary.trim(),
+          notes: values.notes.trim(),
+        };
+        setState((s) => (g ? updateGuest(s, g.id, data) : addGuest(s, data)));
+        return true;
+      },
+    };
+  }
+
+  return {
+    vendorForm,
+    budgetForm,
+    taskForm,
+    seserahanForm,
+    shoppingForm,
+    contactForm,
+    guestForm,
+  };
 }

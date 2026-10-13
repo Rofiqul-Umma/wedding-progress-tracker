@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { SeserahanItem, Task, Vendor } from '@domain/entities/types';
+import type { Guest, SeserahanItem, Task, Vendor } from '@domain/entities/types';
 import {
   tasksDone,
   openTasks,
@@ -11,6 +11,14 @@ import {
   effectiveSeserahanStatus,
   vendorsBooked,
   vendorCategories,
+  guestsTotalPax,
+  attendingPax,
+  pendingPax,
+  declinedPax,
+  guestsCountByRsvp,
+  guestsAttendingCount,
+  guestsPendingCount,
+  guestsDeclinedCount,
 } from './progress';
 
 const task = (done: boolean): Task => ({
@@ -128,5 +136,47 @@ describe('vendor progress', () => {
   });
   it('counts distinct categories', () => {
     expect(vendorCategories(vendors)).toBe(2);
+  });
+});
+
+describe('guest progress', () => {
+  const guest = (rsvp: Guest['rsvp'], pax: number): Guest => ({
+    id: 'g' + Math.random(),
+    name: '',
+    category: '',
+    rsvp,
+    pax,
+    table: '',
+    phone: '',
+    dietary: '',
+    notes: '',
+  });
+
+  const guests: Guest[] = [
+    guest('attending', 2),
+    guest('attending', 1),
+    guest('pending', 3),
+    guest('declined', 1),
+  ];
+
+  it('calculates total pax', () => {
+    expect(guestsTotalPax(guests)).toBe(7);
+  });
+
+  it('calculates pax by rsvp status', () => {
+    expect(attendingPax(guests)).toBe(3);
+    expect(pendingPax(guests)).toBe(3);
+    expect(declinedPax(guests)).toBe(1);
+  });
+
+  it('calculates counts by rsvp status', () => {
+    expect(guestsAttendingCount(guests)).toBe(2);
+    expect(guestsPendingCount(guests)).toBe(1);
+    expect(guestsDeclinedCount(guests)).toBe(1);
+    expect(guestsCountByRsvp(guests)).toEqual({
+      attending: 2,
+      pending: 1,
+      declined: 1,
+    });
   });
 });

@@ -2,6 +2,7 @@ import type {
   VendorStatus,
   SeserahanStatus,
   ShoppingStatus,
+  RsvpStatus,
 } from '@domain/value-objects/status';
 
 /** UI language. */
@@ -143,6 +144,19 @@ export interface Contact {
   notes: string;
 }
 
+/** An invited wedding guest. */
+export interface Guest {
+  id: string;
+  name: string;
+  category: string;
+  rsvp: RsvpStatus;
+  pax: number;
+  table: string;
+  phone: string;
+  dietary: string;
+  notes: string;
+}
+
 /** Top-level wedding details. */
 export interface Wedding {
   p1: string;
@@ -173,6 +187,7 @@ export interface PlanState {
   seserahan: SeserahanItem[];
   shopping: ShoppingItem[];
   contacts: Contact[];
+  guests: Guest[];
 }
 
 /** The array-typed collections of a plan (used for generic CRUD). */
@@ -182,4 +197,5 @@ export type PlanCollectionKey =
   | 'tasks'
   | 'seserahan'
   | 'shopping'
-  | 'contacts';
+  | 'contacts'
+  | 'guests';

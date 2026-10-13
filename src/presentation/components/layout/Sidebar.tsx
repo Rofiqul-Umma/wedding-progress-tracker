@@ -18,6 +18,7 @@ export function useNavCounts(): Record<PageId, number> {
     shopping: state.shopping.filter((i) => i.status !== 'purchased').length,
     seserahan: sesOpen(state.seserahan),
     contacts: state.contacts.length,
+    guests: (state.guests ?? []).length,
     reports: 0,
   };
 }

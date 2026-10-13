@@ -20,8 +20,17 @@ import {
 } from '@application/use-cases/shopping';
 import { deleteVendor, insertVendor } from '@application/use-cases/vendors';
 import { deleteContact, insertContact } from '@application/use-cases/contacts';
-import { nextSeserahanStatus, nextShoppingStatus } from '@domain/value-objects/status';
-import { seed } from '@infrastructure/persistence/seed';
+import {
+  deleteGuest,
+  insertGuest,
+  cycleGuestRsvp,
+} from '@application/use-cases/guests';
+import {
+  nextRsvpStatus,
+  nextSeserahanStatus,
+  nextShoppingStatus,
+} from '@domain/value-objects/status';
+import { seed, sampleGuests } from '@infrastructure/persistence/seed';
 import { migrate } from '@infrastructure/persistence/migrate';
 import { clearData, serializePlan } from '@application/use-cases/data';
 import { isValidImport } from '@application/dto/importValidation';
@@ -162,8 +171,37 @@ export function usePlanActions() {
     });
   }
 
+  function cycleGuestRsvpAction(id: string) {
+    const item = state.guests.find((x) => x.id === id);
+    setState((s) => cycleGuestRsvp(s, id));
+    if (item) {
+      const next = nextRsvpStatus(item.rsvp);
+      toast(t(`status.rsvp.${next}`));
+    }
+  }
+
+  function deleteGuestAction(id: string) {
+    const r = deleteGuest(state, id);
+    if (!r.removed) return;
+    const removed = r.removed;
+    setState(r.state);
+    toast(t('toast.removed', { label: t('entity.guest') }), {
+      icon: 'delete',
+      action: t('toast.undo'),
+      onAction: () => {
+        setState((s) => insertGuest(s, removed, r.index));
+        toast(t('toast.restoredItem', { label: t('entity.guest') }));
+      },
+    });
+  }
+
   function loadSample() {
     setState(seed());
+    toast(t('toast.sampleLoaded'));
+  }
+
+  function loadSampleGuests() {
+    setState((s) => ({ ...s, guests: sampleGuests() }));
     toast(t('toast.sampleLoaded'));
   }
 
@@ -222,7 +260,10 @@ export function usePlanActions() {
     deleteSeserahan: deleteSeserahanAction,
     deleteShopping: deleteShoppingAction,
     deleteContact: deleteContactAction,
+    cycleGuestRsvp: cycleGuestRsvpAction,
+    deleteGuest: deleteGuestAction,
     loadSample,
+    loadSampleGuests,
     clearAll,
     exportData,
     importData,

@@ -13,6 +13,7 @@ export const PLAN_COLLECTIONS: PlanCollectionKey[] = [
   'seserahan',
   'shopping',
   'contacts',
+  'guests',
 ];
 
 /** Backward-compatible room name; rooms and personal accounts sync the same data. */
