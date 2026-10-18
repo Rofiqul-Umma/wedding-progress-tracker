@@ -51,6 +51,7 @@ export interface PlanSpaceHandlers {
   onState(state: PlanState): void;
   onError(err: unknown): void;
   onAttachmentTooLarge?(): void;
+  onLocalWrite?(diff: PlanDiff, next: PlanState): void;
 }
 
 export interface PlanSpaceConnection {
@@ -240,6 +241,7 @@ export async function connectPlanSpace(
       if (diff.isEmpty) return;
       baseline = next;
       void applyPlanDiff(paths, diff, handlers.onAttachmentTooLarge).catch(handlers.onError);
+      handlers.onLocalWrite?.(diff, next);
     },
     disconnect() {
       for (const unsubscribe of unsubs) unsubscribe();

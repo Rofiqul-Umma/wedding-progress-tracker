@@ -13,6 +13,8 @@ import {
   planSpaceExists,
   type PlanSpacePaths,
 } from './FirestorePlanSpace';
+import { summarizePlanDiff } from '@application/use-cases/roomDiff';
+import { sendRoomPushNotification } from './messaging';
 import type { PlanState, PlanCollectionKey } from '@domain/entities/types';
 import type {
   RoomRepository,
@@ -24,6 +26,7 @@ import type {
 
 const HEARTBEAT_MS = 20_000;
 const STALE_MS = 60_000;
+const PUSH_DEBOUNCE_MS = 2_500;
 
 function roomPaths(roomId: string): PlanSpacePaths {
   const root = doc(db, 'rooms', roomId);
@@ -50,7 +53,25 @@ export class FirestoreRoomRepository implements RoomRepository {
   async connect(roomId: string, handlers: RoomHandlers, me: Me): Promise<RoomConnection> {
     await signInAnon();
 
-    const plan = await connectPlanSpace(roomPaths(roomId), handlers);
+    let pushTimer: number | undefined;
+    const plan = await connectPlanSpace(roomPaths(roomId), {
+      ...handlers,
+      onLocalWrite: (diff) => {
+        const summary = summarizePlanDiff(diff);
+        if (!summary) return;
+        if (pushTimer !== undefined) window.clearTimeout(pushTimer);
+        pushTimer = window.setTimeout(() => {
+          pushTimer = undefined;
+          void sendRoomPushNotification({
+            roomId,
+            actorName: me.name,
+            page: summary.page,
+            itemTitle: summary.itemTitle,
+            collection: summary.collection,
+          });
+        }, PUSH_DEBOUNCE_MS);
+      },
+    });
     const presenceRef = doc(db, 'rooms', roomId, 'presence', me.clientId);
     const beat = () =>
       void setDoc(
@@ -92,6 +113,7 @@ export class FirestoreRoomRepository implements RoomRepository {
         plan.disconnect();
         unsubscribePresence();
         window.clearInterval(heartbeat);
+        if (pushTimer !== undefined) window.clearTimeout(pushTimer);
         window.removeEventListener('beforeunload', onUnload);
         void deleteDoc(presenceRef).catch(() => {});
       },

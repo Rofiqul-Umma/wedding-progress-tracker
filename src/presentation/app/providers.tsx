@@ -5,6 +5,7 @@ import { RoomProvider } from '@presentation/state/RoomStore';
 import { NavProvider } from '@presentation/state/NavStore';
 import { UiProvider } from '@presentation/state/UiStore';
 import { AccountProvider } from '@presentation/state/AccountStore';
+import { PushProvider } from '@presentation/state/PushStore';
 import { ToastProvider } from '@presentation/components/ui/Toast';
 import { SyncCoordinator } from '@presentation/components/SyncCoordinator';
 import { RoomNotices } from '@presentation/components/RoomNotices';
@@ -22,8 +23,10 @@ export function Providers({ children }: { children: ReactNode }) {
             <NavProvider>
               <UiProvider>
                 <ToastProvider>
-                  <RoomNotices />
-                  {children}
+                  <PushProvider>
+                    <RoomNotices />
+                    {children}
+                  </PushProvider>
                 </ToastProvider>
               </UiProvider>
             </NavProvider>

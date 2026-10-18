@@ -35,7 +35,9 @@ export default defineConfig({
         // `webp` covers the avatar portraits: the planner is offline-first, so
         // leaving them out would fall the couple back to bare initials offline.
         globPatterns: ['**/*.{js,css,html,svg,woff2,webp}'],
+        globIgnores: ['**/firebase-messaging-sw.js'],
         navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/firebase-messaging-sw\.js$/],
       },
     }),
   ],

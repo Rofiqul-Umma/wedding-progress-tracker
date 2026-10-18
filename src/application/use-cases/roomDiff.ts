@@ -97,3 +97,66 @@ export function diffPlan(prev: PlanState, next: PlanState): PlanDiff {
   diff.isEmpty = isEmpty;
   return diff;
 }
+
+export interface DiffPushSummary {
+  collection: PlanCollectionKey | 'plan';
+  page:
+    | 'dashboard'
+    | 'vendors'
+    | 'budget'
+    | 'tasks'
+    | 'shopping'
+    | 'seserahan'
+    | 'contacts'
+    | 'guests';
+  itemTitle: string;
+}
+
+function extractItemLabel(item: Record<string, unknown>): string {
+  if (typeof item.title === 'string' && item.title.trim()) return item.title.trim();
+  if (typeof item.name === 'string' && item.name.trim()) return item.name.trim();
+  if (typeof item.item === 'string' && item.item.trim()) return item.item.trim();
+  return '';
+}
+
+/** Summarize a PlanDiff into a concise target page and item title for push notifications. */
+export function summarizePlanDiff(diff: PlanDiff): DiffPushSummary | null {
+  if (diff.isEmpty) return null;
+
+  for (const key of PLAN_COLLECTIONS) {
+    const delta = diff.collections[key];
+    if (delta.upserts.length > 0) {
+      return {
+        collection: key,
+        page: key,
+        itemTitle: extractItemLabel(delta.upserts[0]),
+      };
+    }
+    if (delta.deletes.length > 0) {
+      return {
+        collection: key,
+        page: key,
+        itemTitle: '',
+      };
+    }
+  }
+
+  if (diff.wedding) {
+    const couple = [diff.wedding.p1, diff.wedding.p2].filter(Boolean).join(' & ');
+    return {
+      collection: 'plan',
+      page: 'dashboard',
+      itemTitle: couple || diff.wedding.venue || '',
+    };
+  }
+
+  if (diff.settings) {
+    return {
+      collection: 'plan',
+      page: 'dashboard',
+      itemTitle: '',
+    };
+  }
+
+  return null;
+}

@@ -26,7 +26,7 @@ import type { AccountUser } from '@domain/repositories/AccountRepository';
  * only ever loaded via a dynamic `import()` from the room layer — keeping the
  * SDK out of the main bundle and out of the test/dev graph entirely.
  */
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 
@@ -167,4 +167,20 @@ export function signOutUser(): Promise<void> {
 /** Subscribe to persisted non-anonymous account state. */
 export function subscribeAuth(listener: (user: AccountUser | null) => void): () => void {
   return onAuthStateChanged(auth, (user) => listener(accountUser(user)));
+}
+
+/** Return the active Firebase Auth uid (anonymous or Google), if signed in. */
+export function getCurrentUid(): string | null {
+  return auth.currentUser?.uid ?? null;
+}
+
+/** Return a valid Firebase Auth ID token for authenticated API requests. */
+export async function getCurrentIdToken(): Promise<string | null> {
+  await auth.authStateReady();
+  if (!auth.currentUser) return null;
+  try {
+    return await auth.currentUser.getIdToken();
+  } catch {
+    return null;
+  }
 }

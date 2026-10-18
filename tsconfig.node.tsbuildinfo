@@ -1,1 +1,1 @@
-{"root":["./vite.config.ts"],"version":"5.9.3"}
+{"root":["./vite.config.ts","./api/cron-notifications.ts","./api/room-notify.ts","./api/_lib/firebaseadmin.ts","./api/_lib/pushformat.ts"],"version":"5.9.3"}

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { PlanState } from '@domain/entities/types';
-import { diffPlan, ROOM_COLLECTIONS } from './roomDiff';
+import { diffPlan, ROOM_COLLECTIONS, summarizePlanDiff } from './roomDiff';
 
 function base(): PlanState {
   return {
@@ -138,5 +138,25 @@ describe('diffPlan', () => {
     // A batch caps at 500 ops, so applying this diff must span >1 chunk.
     const chunks = Math.ceil(d.collections.contacts.upserts.length / 500);
     expect(chunks).toBeGreaterThan(1);
+  });
+
+  it('summarizes diffs for push notifications', () => {
+    expect(summarizePlanDiff(diffPlan(base(), base()))).toBeNull();
+
+    const taskNext = base();
+    taskNext.tasks[0] = { ...taskNext.tasks[0], done: true };
+    expect(summarizePlanDiff(diffPlan(base(), taskNext))).toEqual({
+      collection: 'tasks',
+      page: 'tasks',
+      itemTitle: 'Cake',
+    });
+
+    const weddingNext = base();
+    weddingNext.wedding = { ...weddingNext.wedding, venue: 'Garden' };
+    expect(summarizePlanDiff(diffPlan(base(), weddingNext))).toEqual({
+      collection: 'plan',
+      page: 'dashboard',
+      itemTitle: 'Amara & Julian',
+    });
   });
 });

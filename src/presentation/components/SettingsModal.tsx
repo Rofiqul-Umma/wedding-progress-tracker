@@ -11,6 +11,7 @@ import { usePlan } from '@presentation/state/PlanStore';
 import { useTheme } from '@presentation/state/ThemeStore';
 import { useRoom } from '@presentation/state/RoomStore';
 import { useAccount } from '@presentation/state/AccountStore';
+import { usePush } from '@presentation/state/PushStore';
 import { useNav } from '@presentation/state/NavStore';
 import { useToast } from '@presentation/hooks/useToast';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
@@ -29,6 +30,7 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
   const theme = useTheme();
   const room = useRoom();
   const account = useAccount();
+  const push = usePush();
   const { go } = useNav();
   const toast = useToast();
   const { exportData, importData, loadSample, clearAll } = usePlanActions();
@@ -224,6 +226,42 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
             </Select>
             <p className="text-xs text-faint">{t('settings.themeNote')}</p>
           </div>
+          {push.supported && (
+            <div className="grid gap-1.5">
+              <span className={LABEL}>{t('notif.pushLabel')}</span>
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-line bg-panel/35 px-3 py-2.5">
+                {push.status === 'denied' ? (
+                  <span className="text-xs text-muted">{t('notif.pushDenied')}</span>
+                ) : push.status === 'enabled' ? (
+                  <>
+                    <span className="flex items-center gap-1.5 text-xs font-semibold text-lime-ink">
+                      <span className="h-1.5 w-1.5 rounded-full bg-lime" />
+                      {t('notif.pushActive')}
+                    </span>
+                    <Button size="sm" onClick={() => void push.disable()}>
+                      {t('notif.pushDisable')}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xs text-muted">{t('notif.pushNote')}</span>
+                    <Button
+                      size="sm"
+                      variant="lime"
+                      icon="notifications"
+                      disabled={push.status === 'enabling'}
+                      onClick={() => void push.enable()}
+                    >
+                      {t(push.status === 'enabling' ? 'notif.pushEnabling' : 'notif.pushEnable')}
+                    </Button>
+                  </>
+                )}
+              </div>
+              {push.status === 'error' && (
+                <p className="text-xs text-bad">{t('notif.pushError')}</p>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Wedding details */}

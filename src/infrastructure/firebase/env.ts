@@ -17,3 +17,14 @@ export const firebaseConfig = {
 export const firebaseEnabled = Boolean(
   firebaseConfig.apiKey && firebaseConfig.projectId,
 );
+
+/** Public VAPID key for Firebase Cloud Messaging web push subscriptions. */
+export const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+
+/** True when Firebase and Web Push (FCM) config are present. */
+export const pushEnabled = Boolean(
+  firebaseEnabled &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId &&
+    vapidKey,
+);

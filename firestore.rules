@@ -24,6 +24,15 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == uid;
     }
 
+    function isValidPushToken(data) {
+      return data.keys().hasOnly(['token', 'lang', 'currency', 'tzOffsetMin', 'updatedAt'])
+        && data.token is string && data.token.size() >= 16 && data.token.size() <= 512
+        && data.lang in ['en', 'id']
+        && data.currency is string && data.currency.size() >= 1 && data.currency.size() <= 8
+        && data.tzOffsetMin is int && data.tzOffsetMin >= -840 && data.tzOffsetMin <= 840
+        && data.updatedAt is timestamp;
+    }
+
     // ---- Private personal plans -------------------------------------------
     match /users/{uid} {
       // `get`, never `list`: a query over /users can't bind {uid}, so it is
@@ -42,6 +51,11 @@ service cloud.firestore {
             'contacts',
             'guests'
           ];
+      }
+
+      match /pushTokens/{tokenId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && isValidPushToken(request.resource.data);
       }
     }
 
@@ -83,6 +97,15 @@ service cloud.firestore {
         // Split out from the above: on a delete `request.resource` is null, so
         // the shape check would reject the client's own disconnect cleanup.
         allow delete: if isOwner(clientId);
+      }
+
+      // Push tokens: only the owner of `clientId` may read (`get`), create,
+      // update, or delete their own push token document. Other room participants
+      // must NOT be able to `get` or `list` other members' tokens (the backend
+      // Admin SDK reads them server-side).
+      match /pushTokens/{clientId} {
+        allow get, delete: if isOwner(clientId);
+        allow create, update: if isOwner(clientId) && isValidPushToken(request.resource.data);
       }
     }
   }
