@@ -692,6 +692,8 @@ export const id = {
     pushDenied: 'Notifikasi diblokir di pengaturan browser Anda.',
     pushError: 'Tidak dapat mengaktifkan notifikasi push. Coba lagi.',
     pushNote: 'Terima pengingat harian jatuh tempo dan pembaruan ruang bersama di perangkat ini.',
+    pushIosGuide: 'Untuk mengaktifkan notifikasi di iPhone/iPad, ketuk Bagikan di Safari lalu pilih “Tambah ke Layar Utama”.',
+    pushUnsupported: 'Notifikasi push memerlukan browser yang didukung dan koneksi aman (HTTPS).',
     pushEnabledToast: 'Notifikasi push diaktifkan ♥',
     pushDisabledToast: 'Notifikasi push dinonaktifkan',
   },

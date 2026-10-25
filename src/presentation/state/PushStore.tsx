@@ -24,6 +24,8 @@ export interface PushContextValue {
   supported: boolean;
   /** Whether Firebase Cloud Messaging (VAPID + project config) is configured. */
   fcmConfigured: boolean;
+  /** Whether running on iOS Safari in browser mode (requires Add to Home Screen for Web Push). */
+  iosInstallRequired: boolean;
   status: PushStatus;
   enable: () => Promise<boolean>;
   disable: () => Promise<void>;
@@ -72,6 +74,27 @@ function browserSupportsNotification(): boolean {
   return typeof window !== 'undefined' && 'Notification' in window;
 }
 
+function checkIsIos(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+}
+
+function checkIsStandalone(): boolean {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigator as any).standalone === true
+  );
+}
+
+function checkIosInstallRequired(): boolean {
+  return checkIsIos() && !checkIsStandalone() && !browserSupportsNotification();
+}
+
 function initialStatus(): PushStatus {
   if (!browserSupportsNotification()) return 'idle';
   if (Notification.permission === 'denied') return 'denied';
@@ -91,6 +114,7 @@ export function PushProvider({ children }: { children: ReactNode }) {
   const { money } = useFormat();
 
   const [supported] = useState<boolean>(browserSupportsNotification);
+  const [iosInstallRequired] = useState<boolean>(checkIosInstallRequired);
   const [status, setStatus] = useState<PushStatus>(initialStatus);
   const [token, setToken] = useState<string | null>(() => readStorage(PUSH_TOKEN_KEY));
 
@@ -352,6 +376,7 @@ export function PushProvider({ children }: { children: ReactNode }) {
       value={{
         supported,
         fcmConfigured: pushEnabled,
+        iosInstallRequired,
         status,
         enable,
         disable,

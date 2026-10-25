@@ -695,6 +695,8 @@ export const en = {
     pushDenied: 'Notifications are blocked in your browser settings.',
     pushError: 'Could not enable push notifications. Try again.',
     pushNote: 'Get daily due-date reminders and shared room updates on this device.',
+    pushIosGuide: 'To enable push notifications on iPhone/iPad, tap Share in Safari and select “Add to Home Screen”.',
+    pushUnsupported: 'Push notifications require a supported browser and a secure (HTTPS) connection.',
     pushEnabledToast: 'Push notifications enabled ♥',
     pushDisabledToast: 'Push notifications turned off',
   },

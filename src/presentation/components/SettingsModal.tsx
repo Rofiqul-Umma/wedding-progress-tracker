@@ -226,7 +226,15 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
             </Select>
             <p className="text-xs text-faint">{t('settings.themeNote')}</p>
           </div>
-          {push.supported && (
+          {push.iosInstallRequired ? (
+            <div className="grid gap-1.5">
+              <span className={LABEL}>{t('notif.pushLabel')}</span>
+              <div className="flex items-start gap-2 rounded-[10px] border border-line bg-panel/35 p-3 text-xs text-muted">
+                <Icon name="upload" size={16} className="mt-0.5 text-lime-ink flex-none" />
+                <span>{t('notif.pushIosGuide')}</span>
+              </div>
+            </div>
+          ) : push.supported ? (
             <div className="grid gap-1.5">
               <span className={LABEL}>{t('notif.pushLabel')}</span>
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-line bg-panel/35 px-3 py-2.5">
@@ -261,7 +269,7 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
                 <p className="text-xs text-bad">{t('notif.pushError')}</p>
               )}
             </div>
-          )}
+          ) : null}
         </section>
 
         {/* Wedding details */}
