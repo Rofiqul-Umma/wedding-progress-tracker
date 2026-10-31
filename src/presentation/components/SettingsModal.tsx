@@ -277,7 +277,7 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
           <div className="text-xs font-extrabold uppercase tracking-[0.04em] text-muted">
             {t('settings.weddingDetails')}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextInput id="set-p1" label={t('settings.p1')} value={p1} onChange={setP1} />
             <TextInput id="set-p2" label={t('settings.p2')} value={p2} onChange={setP2} />
             <TextInput
@@ -567,8 +567,8 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
                     {t('room.create')}
                   </Button>
                 </div>
-                <div className="flex items-end gap-2">
-                  <div className="grid flex-1 gap-1.5">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <div className="grid min-w-0 flex-1 gap-1.5">
                     <label htmlFor="room-join" className={LABEL}>
                       {t('room.join')}
                     </label>
@@ -585,6 +585,7 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
                     icon="login"
                     onClick={onJoinRoom}
                     disabled={room.status === 'connecting' || !joinInput.trim()}
+                    className="w-fit flex-none"
                   >
                     {t('room.join')}
                   </Button>
@@ -627,7 +628,7 @@ interface TextInputProps {
 
 function TextInput({ id, label, value, onChange, type = 'text', placeholder }: TextInputProps) {
   return (
-    <div className="grid gap-1.5">
+    <div className="grid min-w-0 gap-1.5">
       <label htmlFor={id} className={LABEL}>
         {label}
       </label>

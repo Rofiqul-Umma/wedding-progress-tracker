@@ -34,7 +34,7 @@ interface FormFieldProps {
 }
 
 export const CONTROL =
-  'w-full rounded-xl border border-line-2 bg-panel px-[13px] py-[11px] text-[16px] sm:text-[14.5px] text-ink transition-colors focus:border-ink focus:bg-app focus:outline-none focus:ring-[3px] focus:ring-ink/10';
+  'w-full min-w-0 max-w-full rounded-xl border border-line-2 bg-panel px-[13px] py-[11px] text-[16px] sm:text-[14.5px] text-ink transition-colors focus:border-ink focus:bg-app focus:outline-none focus:ring-[3px] focus:ring-ink/10';
 export const LABEL = 'text-[12.5px] font-bold text-muted';
 
 const ATTACH_BTN =
@@ -66,7 +66,7 @@ export function FormField({
   }
 
   return (
-    <div className={cn('grid gap-1.5', !field.half && 'col-span-full')}>
+    <div className={cn('grid min-w-0 gap-1.5', !field.half && 'col-span-full')}>
       <label htmlFor={`f-${field.name}`} className={LABEL}>
         {field.label}
       </label>
