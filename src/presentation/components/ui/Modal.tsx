@@ -52,16 +52,16 @@ export function Modal({ form, onClose }: ModalProps) {
 
   return (
     <ModalShell onClose={onClose} labelledBy="modal-title">
-      <div className="px-6 pb-1 pt-[22px]">
+      <div className="px-6 pb-1 pt-[22px] max-[560px]:px-4 max-[560px]:pt-3.5">
         <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-lime-ink">
           {form.eyebrow}
         </div>
-        <h3 id="modal-title" className="mt-[5px] text-[22px] font-bold tracking-tight">
+        <h3 id="modal-title" className="mt-[5px] text-[22px] font-bold tracking-tight max-[560px]:text-xl">
           {form.title}
         </h3>
       </div>
       <div
-        className="grid grid-cols-1 gap-3.5 px-6 pb-2 pt-4 sm:grid-cols-2"
+        className="grid grid-cols-1 gap-3.5 px-6 pb-2 pt-4 sm:grid-cols-2 max-[560px]:px-4"
         onKeyDown={(e) => {
           if (
             e.key === 'Enter' &&
@@ -87,7 +87,7 @@ export function Modal({ form, onClose }: ModalProps) {
             />
           ))}
       </div>
-      <div className="flex justify-end gap-2.5 px-6 pb-[22px] pt-3.5">
+      <div className="sticky bottom-0 z-10 flex justify-end gap-2.5 border-t border-transparent bg-app/95 px-6 pb-[22px] pt-3.5 backdrop-blur-xs max-[560px]:grid max-[560px]:grid-cols-2 max-[560px]:border-line max-[560px]:px-4 max-[560px]:pb-4">
         <Button variant="ghost" onClick={onClose}>
           {t('common.cancel')}
         </Button>

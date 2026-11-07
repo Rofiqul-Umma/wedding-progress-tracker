@@ -178,14 +178,38 @@
   }
   button {
     cursor: pointer;
+    touch-action: manipulation;
   }
   input,
   select,
   textarea {
     font-family: inherit;
+    touch-action: manipulation;
   }
   select::-ms-expand {
     display: none;
+  }
+}
+
+/* Stop scroll chains from bubbling into the document/backdrop on nested scroll regions. */
+#app-shell section,
+#app-shell aside,
+[role='dialog'],
+[role='region'] {
+  overscroll-behavior: contain;
+}
+
+/* Progressive enhancement for balanced multi-line pill/tag rows. */
+.flex-balance {
+  flex-wrap: wrap;
+  flex-wrap: balance;
+}
+
+/* Coarse pointers (touchscreens): enlarge tap targets to comfortable dimensions. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='search']):not([type='file']),
+  textarea {
+    min-block-size: 44px;
   }
 }
 

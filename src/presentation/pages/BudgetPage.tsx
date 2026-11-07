@@ -208,7 +208,11 @@ export function BudgetPage() {
             <EmptyRow>{t('budget.emptyItems')}</EmptyRow>
           ) : visible.length ? (
             visible.map((b) => (
-              <Row key={b.id}>
+              <Row
+                key={b.id}
+                onActivate={() => openForm(budgetForm(b))}
+                activateLabel={t('budget.editAria', { name: b.item })}
+              >
                 <Check
                   checked={b.paid}
                   onChange={() => togglePaid(b.id)}

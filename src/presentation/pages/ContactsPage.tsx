@@ -59,7 +59,7 @@ export function ContactsPage() {
   return (
     <>
       <StatStrip items={[{ label: t('contacts.strip'), value: state.contacts.length }]} />
-      <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
+      <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-4 max-[560px]:gap-3">
         {visible.map((c) => (
           <Card
             key={c.id}
@@ -82,7 +82,7 @@ export function ContactsPage() {
                   deleteLabel={t('contacts.deleteAria', { name: c.name })}
                 />
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pr-14">
                 <Avatar color={categoryColor(c.name)} letter={c.name[0] || '?'} />
                 <div className="min-w-0">
                   <div className="truncate text-[15px] font-bold">{c.name}</div>

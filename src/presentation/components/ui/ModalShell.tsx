@@ -75,7 +75,7 @@ export function ModalShell({
 
   return (
     <div
-      className="backdrop-fade-in fixed inset-0 z-[100] grid place-items-center bg-scrim backdrop-blur-[3px] pt-[calc(1.25rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))]"
+      className="backdrop-fade-in fixed inset-0 z-[100] grid place-items-center bg-scrim backdrop-blur-[3px] pt-[calc(1.25rem+var(--sa-top))] pb-[calc(1.25rem+var(--sa-bottom))] pl-[calc(1.25rem+var(--sa-left))] pr-[calc(1.25rem+var(--sa-right))] max-[560px]:items-end max-[560px]:px-0 max-[560px]:pb-0 max-[560px]:pt-[calc(0.75rem+var(--sa-top))]"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -90,11 +90,15 @@ export function ModalShell({
         className={cn(
           // `max-h-full` resolves against the inset-padded backdrop, so the
           // dialog never slides under a notch or home indicator the way a
-          // fixed `90vh` would.
-          'modal-pop-in max-h-full w-full overflow-auto rounded-[20px] bg-app shadow-lg',
+          // fixed `90vh` would. On narrow screens (≤560px), dock as a bottom sheet.
+          'modal-pop-in max-h-full w-full overflow-auto overscroll-contain rounded-[20px] bg-app shadow-lg max-[560px]:max-h-[92dvh] max-[560px]:rounded-b-none max-[560px]:rounded-t-[22px] max-[560px]:pb-[var(--sa-bottom)]',
           size === 'lg' ? 'max-w-[560px]' : 'max-w-[520px]',
         )}
       >
+        <div
+          aria-hidden="true"
+          className="mx-auto mt-2.5 hidden h-1 w-9 rounded-full bg-line-2 max-[560px]:block"
+        />
         {children}
       </div>
     </div>

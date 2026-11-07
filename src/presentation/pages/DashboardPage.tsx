@@ -5,6 +5,7 @@ import { Avatar } from '@presentation/components/ui/Avatar';
 import { EmptyRow } from '@presentation/components/ui/EmptyState';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useNav, useSearchMatch } from '@presentation/state/NavStore';
+import { useUi } from '@presentation/state/UiStore';
 import { useFormat } from '@presentation/hooks/useFormat';
 import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
 import { categoryColor } from '@domain/value-objects/status';
@@ -22,8 +23,22 @@ export function DashboardPage() {
   const { t } = useTranslation();
   const { state } = usePlan();
   const { selectedTaskId, selectTask } = useNav();
+  const { openPreview } = useUi();
   const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
+
+  const handleTaskActivate = (taskId: string) => {
+    selectTask(taskId);
+    // On viewports <= 1040px the right-hand TaskDetail aside is hidden, so
+    // tapping a task row opens the preview sheet instead of silently selecting.
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(max-width: 1040px)').matches
+    ) {
+      openPreview({ kind: 'task', id: taskId });
+    }
+  };
 
   // Keep a valid selection: default to the first task when nothing is chosen.
   useEffect(() => {
@@ -65,7 +80,7 @@ export function DashboardPage() {
             key={task.id}
             task={task}
             selected={task.id === selectedTaskId}
-            onSelect={() => selectTask(task.id)}
+            onSelect={() => handleTaskActivate(task.id)}
           />
         ))
       ) : (
@@ -79,7 +94,7 @@ export function DashboardPage() {
             key={task.id}
             task={task}
             selected={task.id === selectedTaskId}
-            onSelect={() => selectTask(task.id)}
+            onSelect={() => handleTaskActivate(task.id)}
           />
         ))
       ) : (

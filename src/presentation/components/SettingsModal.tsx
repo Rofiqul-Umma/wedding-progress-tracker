@@ -163,16 +163,16 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
 
   return (
     <ModalShell onClose={onClose} size="lg" labelledBy="settings-title">
-      <div className="px-6 pb-1 pt-[22px]">
+      <div className="px-6 pb-1 pt-[22px] max-[560px]:px-4 max-[560px]:pt-3.5">
         <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-lime-ink">
           {t('settings.eyebrow')}
         </div>
-        <h3 id="settings-title" className="mt-[5px] text-[22px] font-bold tracking-tight">
+        <h3 id="settings-title" className="mt-[5px] text-[22px] font-bold tracking-tight max-[560px]:text-xl">
           {t('settings.title')}
         </h3>
       </div>
 
-      <div className="grid gap-4 px-6 pb-2 pt-4">
+      <div className="grid gap-4 px-6 pb-2 pt-4 max-[560px]:px-4">
         {/* Preferences */}
         <section className="grid gap-3">
           <div className="text-xs font-extrabold uppercase tracking-[0.04em] text-muted">
@@ -605,7 +605,7 @@ export function SettingsModal({ onClose: close }: { onClose: () => void }) {
         )}
       </div>
 
-      <div className="flex justify-end gap-2.5 px-6 pb-[22px] pt-3.5">
+      <div className="sticky bottom-0 z-10 flex justify-end gap-2.5 border-t border-transparent bg-app/95 px-6 pb-[22px] pt-3.5 backdrop-blur-xs max-[560px]:grid max-[560px]:grid-cols-2 max-[560px]:border-line max-[560px]:px-4 max-[560px]:pb-4">
         <Button variant="ghost" onClick={onClose}>
           {t('common.cancel')}
         </Button>

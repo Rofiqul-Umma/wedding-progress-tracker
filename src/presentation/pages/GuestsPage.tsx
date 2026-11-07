@@ -205,7 +205,7 @@ export function GuestsPage() {
               <div className="truncate text-[15px] font-bold leading-tight">
                 {g.name}
               </div>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              <div className="mt-1 flex flex-balance items-center gap-1.5">
                 <span className="inline-flex items-center gap-1 rounded-full bg-lime-soft px-2 py-0.5 text-[11px] font-bold text-lime-ink">
                   {sideDisplayName(gSide)}
                 </span>
@@ -332,39 +332,45 @@ export function GuestsPage() {
         ]}
       />
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2.5 max-w-full">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 max-[560px]:mt-3 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
+        <div className="flex flex-wrap items-center gap-2.5 max-w-full max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
           <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
           <SegmentedFilter
             options={sideSegments}
             value={sideFilter}
             onChange={setSideFilter}
           />
-          <Select
-            id="guestCategoryFilter"
-            variant="compact"
-            value={categoryFilter}
-            aria-label={t('guests.filterCategoryAria')}
-            options={categoryOptions}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          />
-          <Select
-            id="guestInvitationFilter"
-            variant="compact"
-            value={invitationFilter}
-            aria-label={t('guests.filterInvitationAria')}
-            options={invitationOptions}
-            onChange={(e) =>
-              setInvitationFilter(e.target.value as GuestInvitationFilter)
-            }
-          />
+          <div className="flex flex-wrap items-center gap-2 max-[560px]:grid max-[560px]:grid-cols-2">
+            <Select
+              id="guestCategoryFilter"
+              variant="compact"
+              value={categoryFilter}
+              aria-label={t('guests.filterCategoryAria')}
+              options={categoryOptions}
+              containerClassName="max-[560px]:w-full"
+              className="max-[560px]:w-full max-[560px]:max-w-none"
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            />
+            <Select
+              id="guestInvitationFilter"
+              variant="compact"
+              value={invitationFilter}
+              aria-label={t('guests.filterInvitationAria')}
+              options={invitationOptions}
+              containerClassName="max-[560px]:w-full"
+              className="max-[560px]:w-full max-[560px]:max-w-none"
+              onChange={(e) =>
+                setInvitationFilter(e.target.value as GuestInvitationFilter)
+              }
+            />
+          </div>
         </div>
         <button
           type="button"
           aria-pressed={groupBySide}
           onClick={() => setGroupBySide((v) => !v)}
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] font-semibold transition-colors',
+            'inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] font-semibold transition-colors max-[560px]:w-full',
             groupBySide
               ? 'border-ink bg-ink text-on-ink shadow-sm'
               : 'border-line bg-panel text-muted hover:text-ink',
@@ -404,7 +410,7 @@ export function GuestsPage() {
                       })}
                     </span>
                   </div>
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-4 max-[560px]:gap-3">
                     {items.map(renderGuestCard)}
                   </div>
                 </section>
@@ -412,7 +418,7 @@ export function GuestsPage() {
             })}
           </div>
         ) : (
-          <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
+          <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-4 max-[560px]:gap-3">
             {visible.map(renderGuestCard)}
           </div>
         )

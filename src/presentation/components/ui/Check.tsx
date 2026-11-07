@@ -16,7 +16,7 @@ export function Check({ checked, onChange, label }: CheckProps) {
       aria-pressed={checked}
       aria-label={label}
       className={cn(
-        'grid h-[22px] w-[22px] flex-none place-items-center rounded-[7px] border-2 transition-all',
+        'relative grid min-h-6 min-w-6 flex-none place-items-center rounded-[7px] border-2 transition-all touch-manipulation [@media(pointer:coarse)]:min-h-7 [@media(pointer:coarse)]:min-w-7',
         checked
           ? 'border-lime bg-lime text-on-lime'
           : 'border-line-2 bg-app text-transparent hover:border-ink',

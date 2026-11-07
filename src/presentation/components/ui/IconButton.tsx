@@ -18,7 +18,7 @@ export function IconButton({ icon, onClick, label, danger, className }: IconButt
       aria-label={label}
       title={label}
       className={cn(
-        'grid h-8 w-8 flex-none place-items-center rounded-[9px] text-faint transition-colors',
+        'grid min-h-8 min-w-8 flex-none place-items-center rounded-[9px] text-faint transition-colors touch-manipulation [@media(pointer:coarse)]:min-h-9 [@media(pointer:coarse)]:min-w-9',
         danger ? 'hover:bg-bad-soft hover:text-bad' : 'hover:bg-panel-2 hover:text-ink',
         className,
       )}

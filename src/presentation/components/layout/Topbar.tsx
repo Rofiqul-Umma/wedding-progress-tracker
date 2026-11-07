@@ -125,6 +125,10 @@ export function Topbar() {
           <input
             type="search"
             autoFocus
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            enterKeyHint="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('common.search')}
@@ -176,6 +180,10 @@ export function Topbar() {
           <Icon name="search" size={19} className="text-faint" />
           <input
             type="search"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            enterKeyHint="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('common.search')}

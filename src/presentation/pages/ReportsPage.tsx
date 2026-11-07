@@ -60,7 +60,7 @@ export function ReportsPage() {
   return (
     <div id="report-root" className="flex flex-col gap-6">
       {/* Export toolbar — hidden when printing */}
-      <div className="flex flex-wrap items-center justify-end gap-2.5 print:hidden">
+      <div className="flex flex-wrap items-center justify-end gap-2.5 max-[560px]:grid max-[560px]:w-full max-[560px]:grid-cols-2 print:hidden">
         <Button variant="default" icon="table_view" onClick={exportExcel}>
           {t('report.exportExcel')}
         </Button>
@@ -102,22 +102,35 @@ function SectionTable({
   emptyLabel: string;
 }) {
   const numeric = (type: string) => type === 'money' || type === 'number';
+  const headingId = `report-section-${section.id}`;
 
   return (
     <section className="break-inside-avoid">
-      <h3 className="mb-2.5 text-[15px] font-bold tracking-tight">{fmt.t(section.titleKey)}</h3>
+      <h3 id={headingId} className="mb-2.5 text-[15px] font-bold tracking-tight">
+        {fmt.t(section.titleKey)}
+      </h3>
       <Card>
         {section.rows.length === 0 ? (
           <div className="px-4 py-6 text-center text-[13px] text-faint">{emptyLabel}</div>
         ) : (
-          <div className="overflow-x-auto print:overflow-visible">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-labelledby={headingId}
+            className="overflow-x-auto overscroll-contain print:overflow-visible"
+          >
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-line bg-panel/50 text-left">
-                  {section.columns.map((col) => (
+                  {section.columns.map((col, idx) => (
                     <th
                       key={col.key}
-                      className={`whitespace-nowrap px-3.5 py-2.5 font-bold text-muted print:whitespace-normal ${numeric(col.type) ? 'text-right tnum' : ''}`}
+                      scope="col"
+                      className={`whitespace-nowrap px-3.5 py-2.5 font-bold text-muted print:whitespace-normal ${
+                        idx === 0
+                          ? 'sticky left-0 z-10 bg-panel max-[560px]:max-w-[160px] max-[560px]:truncate print:static'
+                          : ''
+                      } ${numeric(col.type) ? 'text-right tnum' : ''}`}
                     >
                       {fmt.t(col.labelKey)}
                     </th>
@@ -127,10 +140,14 @@ function SectionTable({
               <tbody>
                 {section.rows.map((row, i) => (
                   <tr key={i} className="border-b border-line last:border-b-0">
-                    {section.columns.map((col) => (
+                    {section.columns.map((col, idx) => (
                       <td
                         key={col.key}
-                        className={`whitespace-nowrap px-3.5 py-2.5 print:whitespace-normal ${numeric(col.type) ? 'text-right tnum' : ''}`}
+                        className={`whitespace-nowrap px-3.5 py-2.5 print:whitespace-normal ${
+                          idx === 0
+                            ? 'sticky left-0 z-10 bg-app font-semibold max-[560px]:max-w-[160px] max-[560px]:truncate print:static'
+                            : ''
+                        } ${numeric(col.type) ? 'text-right tnum' : ''}`}
                       >
                         {formatCell(row[col.key], col.type, fmt) || '—'}
                       </td>
