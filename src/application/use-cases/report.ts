@@ -224,11 +224,14 @@ export function buildReportModel(
   });
 
   // Guests
+  const p1Name = state.wedding.p1.trim();
+  const p2Name = state.wedding.p2.trim();
   sections.push({
     id: 'guests',
     titleKey: 'report.sec.guests',
     columns: [
       { key: 'name', labelKey: 'report.col.name', type: 'text' },
+      { key: 'side', labelKey: 'report.col.side', type: 'text' },
       { key: 'category', labelKey: 'report.col.category', type: 'text' },
       { key: 'rsvp', labelKey: 'report.col.status', type: 'text' },
       { key: 'pax', labelKey: 'report.col.pax', type: 'number' },
@@ -239,6 +242,12 @@ export function buildReportModel(
     ],
     rows: (state.guests ?? []).map((g) => ({
       name: g.name,
+      side:
+        g.side === 'p1'
+          ? p1Name || 'guests.sideP1'
+          : g.side === 'p2'
+            ? p2Name || 'guests.sideP2'
+            : 'guests.sideBoth',
       category: categoryCell(g.category),
       rsvp: `status.rsvp.${g.rsvp}`,
       pax: g.pax,

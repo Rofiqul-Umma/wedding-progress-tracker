@@ -98,5 +98,24 @@ describe('GuestsPage (integration)', () => {
     expect(screen.queryByText('Sofia & David Rossi')).not.toBeInTheDocument();
     expect(screen.queryByText('Marcus Vance')).not.toBeInTheDocument();
   });
+
+  it('groups guests by Bride 1 (p1) and Bride 2 (p2) and filters by side', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<GuestsPage />);
+
+    // Both Bride 1 (Amara) and Bride 2 (Julian) group sections are shown
+    const p1Section = screen.getByRole('region', { name: 'Amara' });
+    const p2Section = screen.getByRole('region', { name: 'Julian' });
+    expect(within(p1Section).getByText('Sofia & David Rossi')).toBeInTheDocument();
+    expect(within(p2Section).getByText('Liam & Chloe Bennett')).toBeInTheDocument();
+
+    // Filter to Bride 2 (Julian) only
+    const p2Tab = screen.getByRole('button', { name: /^Julian\s+5$/i });
+    await user.click(p2Tab);
+
+    expect(screen.getByText('Liam & Chloe Bennett')).toBeInTheDocument();
+    expect(screen.getByText('Bambang & Siti Rahayu')).toBeInTheDocument();
+    expect(screen.queryByText('Sofia & David Rossi')).not.toBeInTheDocument();
+  });
 });
 

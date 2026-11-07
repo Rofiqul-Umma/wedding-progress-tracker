@@ -19,6 +19,8 @@ import {
   SES_ORDER,
   SHOP_ORDER,
   RSVP_STATUSES,
+  GUEST_SIDES,
+  type GuestSide,
 } from '@domain/value-objects/status';
 import {
   BASE_CATEGORIES,
@@ -353,6 +355,23 @@ export function useForms() {
 
   function guestForm(g?: Guest): FormDescriptor {
     const editing = !!g;
+    const p1Name = state.wedding.p1.trim();
+    const p2Name = state.wedding.p2.trim();
+    const sideOptions: FieldOption[] = [
+      {
+        value: 'p1',
+        label: p1Name
+          ? `${p1Name} (${t('guests.sideP1')})`
+          : t('guests.sideP1'),
+      },
+      {
+        value: 'p2',
+        label: p2Name
+          ? `${p2Name} (${t('guests.sideP2')})`
+          : t('guests.sideP2'),
+      },
+      { value: 'both', label: t('guests.sideBoth') },
+    ];
     return {
       eyebrow: editing ? t('forms.guest.editEyebrow') : t('forms.guest.newEyebrow'),
       title: editing ? t('forms.guest.updateTitle') : t('forms.guest.addTitle'),
@@ -362,6 +381,13 @@ export function useForms() {
           label: t('forms.guest.name'),
           value: g?.name,
           placeholder: t('forms.guest.namePh'),
+        },
+        {
+          name: 'side',
+          label: t('forms.guest.side'),
+          type: 'select',
+          value: g ? (g.side ?? 'both') : 'p1',
+          options: sideOptions,
           half: true,
         },
         {
@@ -426,8 +452,12 @@ export function useForms() {
         const rsvp = RSVP_STATUSES.includes(values.rsvp as Guest['rsvp'])
           ? (values.rsvp as Guest['rsvp'])
           : 'pending';
+        const side = GUEST_SIDES.includes(values.side as GuestSide)
+          ? (values.side as GuestSide)
+          : 'p1';
         const data: Omit<Guest, 'id'> = {
           name: values.name.trim(),
+          side,
           category: values.category.trim(),
           rsvp,
           pax: Math.max(1, Math.round(numOr(values.pax, 1))),

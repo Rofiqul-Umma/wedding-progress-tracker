@@ -262,6 +262,12 @@ export const en = {
     editAria: 'Edit {{name}}',
     deleteAria: 'Delete {{name}}',
     loadSample: 'Load sample guests',
+    sideAll: 'All sides',
+    sideP1: 'Bride 1',
+    sideP2: 'Bride 2',
+    sideBoth: 'Both',
+    groupBySide: 'Group by side',
+    groupSummary: '{{count}} guests · {{pax}} pax',
   },
   status: {
     vendor: {
@@ -478,6 +484,7 @@ export const en = {
       updateTitle: 'Update guest',
       name: 'Full name',
       namePh: 'e.g. Sofia & David Rossi',
+      side: 'Guest side (Bride 1 / Bride 2)',
       category: 'Category / Group',
       categoryPh: 'Family',
       rsvp: 'RSVP status',
@@ -654,6 +661,7 @@ export const en = {
       area: 'Area',
       detail: 'Detail',
       pax: 'Pax',
+      side: 'Side',
       table: 'Table',
       dietary: 'Dietary',
       notes: 'Notes',

@@ -263,9 +263,22 @@ describe('migrate', () => {
     expect(s.guests).toHaveLength(2);
     expect(s.guests[0].rsvp).toBe('attending');
     expect(s.guests[0].pax).toBe(2);
+    expect(s.guests[0].side).toBe('both');
     expect(s.guests[1].rsvp).toBe('pending');
     expect(s.guests[1].pax).toBe(1);
     expect(s.guests[1].category).toBe('');
     expect(s.guests[1].table).toBe('');
+    expect(s.guests[1].side).toBe('both');
+  });
+
+  it('preserves valid guest side (p1 / p2) and defaults invalid side to both', () => {
+    const s = migrate({
+      guests: [
+        { id: 'g1', name: 'A', side: 'p1' },
+        { id: 'g2', name: 'B', side: 'p2' },
+        { id: 'g3', name: 'C', side: 'invalid' },
+      ],
+    });
+    expect(s.guests.map((g) => g.side)).toEqual(['p1', 'p2', 'both']);
   });
 });

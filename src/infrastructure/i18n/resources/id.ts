@@ -262,6 +262,12 @@ export const id = {
     editAria: 'Ubah {{name}}',
     deleteAria: 'Hapus {{name}}',
     loadSample: 'Muat contoh daftar tamu',
+    sideAll: 'Semua pihak',
+    sideP1: 'Mempelai 1',
+    sideP2: 'Mempelai 2',
+    sideBoth: 'Berdua',
+    groupBySide: 'Kelompokkan per pihak',
+    groupSummary: '{{count}} tamu · {{pax}} orang',
   },
   status: {
     vendor: {
@@ -478,6 +484,7 @@ export const id = {
       updateTitle: 'Perbarui data tamu',
       name: 'Nama lengkap',
       namePh: 'mis. Sofia & David Rossi',
+      side: 'Pihak tamu (Mempelai 1 / Mempelai 2)',
       category: 'Kategori / Rombongan',
       categoryPh: 'Keluarga',
       rsvp: 'Status kehadiran (RSVP)',
@@ -653,6 +660,7 @@ export const id = {
       area: 'Area',
       detail: 'Detail',
       pax: 'Pax',
+      side: 'Pihak',
       table: 'Meja',
       dietary: 'Diet/Alergi',
       notes: 'Catatan',

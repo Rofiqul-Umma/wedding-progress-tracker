@@ -3,6 +3,7 @@ import type {
   SeserahanStatus,
   ShoppingStatus,
   RsvpStatus,
+  GuestSide,
 } from '@domain/value-objects/status';
 
 /** UI language. */
@@ -148,6 +149,8 @@ export interface Contact {
 export interface Guest {
   id: string;
   name: string;
+  /** Which side invited this guest ('p1' = Bride 1, 'p2' = Bride 2, 'both' = Mutual). */
+  side?: GuestSide;
   category: string;
   rsvp: RsvpStatus;
   pax: number;

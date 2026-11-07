@@ -63,6 +63,15 @@ export const RSVP_STATUSES: readonly RsvpStatus[] = [
   'declined',
 ] as const;
 
+/** Which partner's side invited the guest ('p1' = Bride 1, 'p2' = Bride 2, 'both' = Mutual). */
+export type GuestSide = 'p1' | 'p2' | 'both';
+
+export const GUEST_SIDES: readonly GuestSide[] = [
+  'p1',
+  'p2',
+  'both',
+] as const;
+
 /** Ordered lifecycle for cycling RSVP status on click. */
 export const RSVP_ORDER: readonly RsvpStatus[] = [
   'pending',

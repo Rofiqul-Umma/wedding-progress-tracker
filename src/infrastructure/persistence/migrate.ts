@@ -124,9 +124,13 @@ export function migrate(input: unknown): PlanState {
             rsvpRaw === 'attending' || rsvpRaw === 'declined'
               ? rsvpRaw
               : 'pending';
+          const sideRaw = str(g.side);
+          const side =
+            sideRaw === 'p1' || sideRaw === 'p2' ? sideRaw : 'both';
           return {
             id: str(g.id) || uid(),
             name: str(g.name),
+            side,
             category: str(g.category),
             rsvp,
             pax: Math.max(1, Math.round(num(g.pax)) || 1),

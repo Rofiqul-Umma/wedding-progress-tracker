@@ -5,7 +5,11 @@ import type {
   Task,
   Vendor,
 } from '@domain/entities/types';
-import type { RsvpStatus, SeserahanStatus } from '@domain/value-objects/status';
+import type {
+  GuestSide,
+  RsvpStatus,
+  SeserahanStatus,
+} from '@domain/value-objects/status';
 
 /* ---- Tasks ---- */
 export function tasksDone(tasks: Task[]): number {
@@ -105,4 +109,11 @@ export function guestsPendingCount(guests: Guest[]): number {
 }
 export function guestsDeclinedCount(guests: Guest[]): number {
   return guests.filter((g) => g.rsvp === 'declined').length;
+}
+/** Normalize a guest's side, defaulting legacy/unset values to 'both'. */
+export function effectiveGuestSide(guest: Pick<Guest, 'side'>): GuestSide {
+  return guest.side === 'p1' || guest.side === 'p2' ? guest.side : 'both';
+}
+export function guestsBySide(guests: Guest[], side: GuestSide): Guest[] {
+  return guests.filter((g) => effectiveGuestSide(g) === side);
 }
