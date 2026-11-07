@@ -266,6 +266,8 @@ export const en = {
     sideP1: 'Bride 1',
     sideP2: 'Bride 2',
     sideBoth: 'Both',
+    catAll: 'All categories',
+    filterCategoryAria: 'Filter by category',
     groupBySide: 'Group by side',
     groupSummary: '{{count}} guests · {{pax}} pax',
   },

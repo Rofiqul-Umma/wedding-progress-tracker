@@ -12,6 +12,7 @@ import { CartoonAvatar } from '@presentation/components/ui/CartoonAvatar';
 import { Chip, type ChipVariant } from '@presentation/components/ui/Chip';
 import { RowActions } from '@presentation/components/ui/RowActions';
 import { Icon } from '@presentation/components/ui/Icon';
+import { Select } from '@presentation/components/ui/Select';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useSearchMatch } from '@presentation/state/NavStore';
 import { useUi } from '@presentation/state/UiStore';
@@ -36,6 +37,7 @@ import {
   type RsvpStatus,
   type GuestSide,
 } from '@domain/value-objects/status';
+import { BASE_CATEGORIES } from '@domain/value-objects/categories';
 import type { Guest } from '@domain/entities/types';
 import { cn } from '@presentation/lib/cn';
 
@@ -53,6 +55,7 @@ export function GuestsPage() {
 
   const [filter, setFilter] = useState<GuestFilter>('all');
   const [sideFilter, setSideFilter] = useState<GuestSideFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [groupBySide, setGroupBySide] = useState<boolean>(true);
 
   const guests: Guest[] = state.guests ?? [];
@@ -127,10 +130,33 @@ export function GuestsPage() {
       : []),
   ];
 
+  const categoryValues = new Set<string>(
+    BASE_CATEGORIES.guest.map((c) => c.value),
+  );
+  for (const g of guests) {
+    const c = g.category?.trim();
+    if (c) categoryValues.add(c);
+  }
+  const categoryOptions = [
+    { value: 'all', label: `${t('guests.catAll')} (${totalCount})` },
+    ...[...categoryValues]
+      .map((cat) => {
+        const count = guests.filter((g) => (g.category?.trim() || '') === cat).length;
+        return {
+          value: cat,
+          label: `${catLabel(cat)} (${count})`,
+          name: catLabel(cat),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  ];
+
   const visible = guests.filter((g) => {
     const gSide = effectiveGuestSide(g);
+    const gCat = g.category?.trim() || '';
     if (filter !== 'all' && g.rsvp !== filter) return false;
     if (sideFilter !== 'all' && gSide !== sideFilter) return false;
+    if (categoryFilter !== 'all' && gCat !== categoryFilter) return false;
     return matches(
       `${g.name} ${sideDisplayName(gSide)} ${sideRoleBadge(gSide) || ''} ${g.category || ''} ${catLabel(g.category)} ${g.table || ''} ${g.phone || ''} ${g.dietary || ''} ${g.notes || ''}`,
     );
@@ -285,6 +311,14 @@ export function GuestsPage() {
             options={sideSegments}
             value={sideFilter}
             onChange={setSideFilter}
+          />
+          <Select
+            id="guestCategoryFilter"
+            variant="compact"
+            value={categoryFilter}
+            aria-label={t('guests.filterCategoryAria')}
+            options={categoryOptions}
+            onChange={(e) => setCategoryFilter(e.target.value)}
           />
         </div>
         <button

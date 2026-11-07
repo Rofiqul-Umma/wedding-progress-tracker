@@ -266,6 +266,8 @@ export const id = {
     sideP1: 'Mempelai 1',
     sideP2: 'Mempelai 2',
     sideBoth: 'Berdua',
+    catAll: 'Semua kategori',
+    filterCategoryAria: 'Filter berdasarkan kategori',
     groupBySide: 'Kelompokkan per pihak',
     groupSummary: '{{count}} tamu · {{pax}} orang',
   },

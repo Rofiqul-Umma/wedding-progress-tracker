@@ -117,5 +117,19 @@ describe('GuestsPage (integration)', () => {
     expect(screen.getByText('Bambang & Siti Rahayu')).toBeInTheDocument();
     expect(screen.queryByText('Sofia & David Rossi')).not.toBeInTheDocument();
   });
+
+  it('filters guests by category', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<GuestsPage />);
+
+    const catSelect = screen.getByRole('combobox', { name: 'Filter by category' });
+    await user.selectOptions(catSelect, 'Keluarga');
+
+    expect(screen.getByText('Sofia & David Rossi')).toBeInTheDocument();
+    expect(screen.getByText('Aunt Beatrice')).toBeInTheDocument();
+    expect(screen.getByText('Bambang & Siti Rahayu')).toBeInTheDocument();
+    expect(screen.queryByText('Liam & Chloe Bennett')).not.toBeInTheDocument();
+    expect(screen.queryByText('Marcus Vance')).not.toBeInTheDocument();
+  });
 });
 
