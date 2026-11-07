@@ -274,11 +274,16 @@ describe('migrate', () => {
   it('preserves valid guest side (p1 / p2) and defaults invalid side to both', () => {
     const s = migrate({
       guests: [
-        { id: 'g1', name: 'A', side: 'p1' },
-        { id: 'g2', name: 'B', side: 'p2' },
-        { id: 'g3', name: 'C', side: 'invalid' },
+        { id: 'g1', name: 'A', side: 'p1', invitationType: 'physical' },
+        { id: 'g2', name: 'B', side: 'p2', invitationType: 'digital' },
+        { id: 'g3', name: 'C', side: 'invalid', invitationType: 'other' },
       ],
     });
     expect(s.guests.map((g) => g.side)).toEqual(['p1', 'p2', 'both']);
+    expect(s.guests.map((g) => g.invitationType)).toEqual([
+      'physical',
+      'digital',
+      'digital',
+    ]);
   });
 });

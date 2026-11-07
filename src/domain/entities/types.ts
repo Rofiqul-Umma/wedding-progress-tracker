@@ -4,6 +4,7 @@ import type {
   ShoppingStatus,
   RsvpStatus,
   GuestSide,
+  GuestInvitationType,
 } from '@domain/value-objects/status';
 
 /** UI language. */
@@ -151,6 +152,8 @@ export interface Guest {
   name: string;
   /** Which side invited this guest ('p1' = Bride 1, 'p2' = Bride 2, 'both' = Mutual). */
   side?: GuestSide;
+  /** Whether the guest receives a digital or physical invitation. */
+  invitationType?: GuestInvitationType;
   category: string;
   rsvp: RsvpStatus;
   pax: number;

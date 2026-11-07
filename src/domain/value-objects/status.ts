@@ -72,6 +72,14 @@ export const GUEST_SIDES: readonly GuestSide[] = [
   'both',
 ] as const;
 
+/** Whether the guest receives a digital or physical (printed) invitation. */
+export type GuestInvitationType = 'digital' | 'physical';
+
+export const GUEST_INVITATION_TYPES: readonly GuestInvitationType[] = [
+  'digital',
+  'physical',
+] as const;
+
 /** Ordered lifecycle for cycling RSVP status on click. */
 export const RSVP_ORDER: readonly RsvpStatus[] = [
   'pending',

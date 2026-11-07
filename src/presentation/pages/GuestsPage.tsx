@@ -29,6 +29,8 @@ import {
   guestsDeclinedCount,
   effectiveGuestSide,
   guestsBySide,
+  effectiveGuestInvitationType,
+  guestsByInvitationType,
 } from '@domain/services/progress';
 import {
   RSVP_CHIP_VARIANT,
@@ -36,6 +38,7 @@ import {
   categoryColor,
   type RsvpStatus,
   type GuestSide,
+  type GuestInvitationType,
 } from '@domain/value-objects/status';
 import { BASE_CATEGORIES } from '@domain/value-objects/categories';
 import type { Guest } from '@domain/entities/types';
@@ -43,6 +46,7 @@ import { cn } from '@presentation/lib/cn';
 
 type GuestFilter = 'all' | RsvpStatus;
 type GuestSideFilter = 'all' | GuestSide;
+type GuestInvitationFilter = 'all' | GuestInvitationType;
 
 export function GuestsPage() {
   const { t } = useTranslation();
@@ -56,6 +60,8 @@ export function GuestsPage() {
   const [filter, setFilter] = useState<GuestFilter>('all');
   const [sideFilter, setSideFilter] = useState<GuestSideFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [invitationFilter, setInvitationFilter] =
+    useState<GuestInvitationFilter>('all');
   const [groupBySide, setGroupBySide] = useState<boolean>(true);
 
   const guests: Guest[] = state.guests ?? [];
@@ -151,19 +157,33 @@ export function GuestsPage() {
       .sort((a, b) => a.name.localeCompare(b.name)),
   ];
 
+  const digitalCount = guestsByInvitationType(guests, 'digital').length;
+  const physicalCount = guestsByInvitationType(guests, 'physical').length;
+  const invitationOptions = [
+    { value: 'all', label: `${t('guests.invAll')} (${totalCount})` },
+    { value: 'digital', label: `${t('guests.invDigital')} (${digitalCount})` },
+    { value: 'physical', label: `${t('guests.invPhysical')} (${physicalCount})` },
+  ];
+
+  const invitationLabel = (inv: GuestInvitationType): string =>
+    inv === 'physical' ? t('guests.invPhysical') : t('guests.invDigital');
+
   const visible = guests.filter((g) => {
     const gSide = effectiveGuestSide(g);
     const gCat = g.category?.trim() || '';
+    const gInv = effectiveGuestInvitationType(g);
     if (filter !== 'all' && g.rsvp !== filter) return false;
     if (sideFilter !== 'all' && gSide !== sideFilter) return false;
     if (categoryFilter !== 'all' && gCat !== categoryFilter) return false;
+    if (invitationFilter !== 'all' && gInv !== invitationFilter) return false;
     return matches(
-      `${g.name} ${sideDisplayName(gSide)} ${sideRoleBadge(gSide) || ''} ${g.category || ''} ${catLabel(g.category)} ${g.table || ''} ${g.phone || ''} ${g.dietary || ''} ${g.notes || ''}`,
+      `${g.name} ${sideDisplayName(gSide)} ${sideRoleBadge(gSide) || ''} ${invitationLabel(gInv)} ${g.category || ''} ${catLabel(g.category)} ${g.table || ''} ${g.phone || ''} ${g.dietary || ''} ${g.notes || ''}`,
     );
   });
 
   const renderGuestCard = (g: Guest) => {
     const gSide = effectiveGuestSide(g);
+    const gInv = effectiveGuestInvitationType(g);
     return (
       <Card key={g.id} pad className="group relative flex flex-col justify-between">
         <div>
@@ -188,6 +208,14 @@ export function GuestsPage() {
               <div className="mt-1 flex flex-wrap items-center gap-1.5">
                 <span className="inline-flex items-center gap-1 rounded-full bg-lime-soft px-2 py-0.5 text-[11px] font-bold text-lime-ink">
                   {sideDisplayName(gSide)}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-panel px-2 py-0.5 text-[11px] font-semibold text-muted">
+                  <Icon
+                    name={gInv === 'physical' ? 'mail' : 'public'}
+                    size={12}
+                    className="text-faint"
+                  />
+                  {invitationLabel(gInv)}
                 </span>
                 {g.category && (
                   <span className="text-xs font-semibold text-muted">
@@ -319,6 +347,16 @@ export function GuestsPage() {
             aria-label={t('guests.filterCategoryAria')}
             options={categoryOptions}
             onChange={(e) => setCategoryFilter(e.target.value)}
+          />
+          <Select
+            id="guestInvitationFilter"
+            variant="compact"
+            value={invitationFilter}
+            aria-label={t('guests.filterInvitationAria')}
+            options={invitationOptions}
+            onChange={(e) =>
+              setInvitationFilter(e.target.value as GuestInvitationFilter)
+            }
           />
         </div>
         <button

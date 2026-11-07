@@ -232,6 +232,7 @@ export function buildReportModel(
     columns: [
       { key: 'name', labelKey: 'report.col.name', type: 'text' },
       { key: 'side', labelKey: 'report.col.side', type: 'text' },
+      { key: 'invitationType', labelKey: 'report.col.invitationType', type: 'text' },
       { key: 'category', labelKey: 'report.col.category', type: 'text' },
       { key: 'rsvp', labelKey: 'report.col.status', type: 'text' },
       { key: 'pax', labelKey: 'report.col.pax', type: 'number' },
@@ -248,6 +249,10 @@ export function buildReportModel(
           : g.side === 'p2'
             ? p2Name || 'guests.sideP2'
             : 'guests.sideBoth',
+      invitationType:
+        g.invitationType === 'physical'
+          ? 'guests.invPhysical'
+          : 'guests.invDigital',
       category: categoryCell(g.category),
       rsvp: `status.rsvp.${g.rsvp}`,
       pax: g.pax,

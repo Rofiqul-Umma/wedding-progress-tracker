@@ -127,10 +127,13 @@ export function migrate(input: unknown): PlanState {
           const sideRaw = str(g.side);
           const side =
             sideRaw === 'p1' || sideRaw === 'p2' ? sideRaw : 'both';
+          const invRaw = str(g.invitationType);
+          const invitationType = invRaw === 'physical' ? 'physical' : 'digital';
           return {
             id: str(g.id) || uid(),
             name: str(g.name),
             side,
+            invitationType,
             category: str(g.category),
             rsvp,
             pax: Math.max(1, Math.round(num(g.pax)) || 1),

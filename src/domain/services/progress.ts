@@ -6,6 +6,7 @@ import type {
   Vendor,
 } from '@domain/entities/types';
 import type {
+  GuestInvitationType,
   GuestSide,
   RsvpStatus,
   SeserahanStatus,
@@ -116,4 +117,16 @@ export function effectiveGuestSide(guest: Pick<Guest, 'side'>): GuestSide {
 }
 export function guestsBySide(guests: Guest[], side: GuestSide): Guest[] {
   return guests.filter((g) => effectiveGuestSide(g) === side);
+}
+/** Normalize a guest's invitation type, defaulting legacy/unset values to 'digital'. */
+export function effectiveGuestInvitationType(
+  guest: Pick<Guest, 'invitationType'>,
+): GuestInvitationType {
+  return guest.invitationType === 'physical' ? 'physical' : 'digital';
+}
+export function guestsByInvitationType(
+  guests: Guest[],
+  type: GuestInvitationType,
+): Guest[] {
+  return guests.filter((g) => effectiveGuestInvitationType(g) === type);
 }

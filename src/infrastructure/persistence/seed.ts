@@ -4,20 +4,20 @@ import { uid } from '@application/use-cases/id';
 /** A rich set of sample wedding guests across different groups and RSVP statuses. */
 export function sampleGuests(): Guest[] {
   return [
-    { id: uid(), name: 'Sofia & David Rossi', side: 'p1', category: 'Keluarga', rsvp: 'attending', pax: 2, table: 'Table 1', phone: '(707) 555-1122', dietary: 'Vegetarian (Sofia)', notes: 'Close family table' },
-    { id: uid(), name: 'Liam & Chloe Bennett', side: 'p2', category: 'Teman', rsvp: 'attending', pax: 2, table: 'Table 3', phone: '(415) 555-8833', dietary: '', notes: 'College friends' },
-    { id: uid(), name: 'Marcus Vance', side: 'p1', category: 'Rekan Kerja', rsvp: 'pending', pax: 1, table: 'Table 4', phone: '(510) 555-4499', dietary: 'Gluten-free', notes: 'RSVP follow-up next week' },
-    { id: uid(), name: 'Aunt Beatrice', side: 'p1', category: 'Keluarga', rsvp: 'attending', pax: 1, table: 'Table 1', phone: '(707) 555-3311', dietary: 'Low sodium', notes: 'Reserved front ceremony seating' },
-    { id: uid(), name: 'Daniel Wu', side: 'p2', category: 'VIP', rsvp: 'declined', pax: 1, table: '', phone: '(408) 555-9012', dietary: '', notes: 'Overseas travel conflict; sent registry gift' },
-    { id: uid(), name: 'Sarah Jenkins & Guest', side: 'p1', category: 'Teman', rsvp: 'attending', pax: 2, table: 'Table 2', phone: '(415) 555-3344', dietary: 'Halal', notes: 'Bridesmaid' },
-    { id: uid(), name: 'Bambang & Siti Rahayu', side: 'p2', category: 'Keluarga', rsvp: 'attending', pax: 3, table: 'Table 1', phone: '+62 812-3456-7890', dietary: 'Halal', notes: 'Paman & Bibi dari pihak pria' },
-    { id: uid(), name: 'Dr. Robert Chang', side: 'both', category: 'VIP', rsvp: 'attending', pax: 2, table: 'VIP Table', phone: '(650) 555-7890', dietary: 'Pescatarian', notes: 'Mentor / Family friend' },
-    { id: uid(), name: 'Maya Indah', side: 'p1', category: 'Rekan Kerja', rsvp: 'pending', pax: 1, table: 'Table 4', phone: '+62 813-9876-5432', dietary: '', notes: 'Partner kantor tim desain' },
-    { id: uid(), name: 'Kevin O’Connor', side: 'p2', category: 'Teman', rsvp: 'attending', pax: 1, table: 'Table 3', phone: '(510) 555-1234', dietary: '', notes: 'Groomsman' },
-    { id: uid(), name: 'Elena Rostova', side: 'p1', category: 'Teman', rsvp: 'declined', pax: 2, table: '', phone: '(415) 555-9876', dietary: '', notes: 'Flight unavailable that weekend' },
-    { id: uid(), name: 'Pak RT Joko & Istri', side: 'both', category: 'Tetangga', rsvp: 'attending', pax: 2, table: 'Table 5', phone: '+62 811-2233-4455', dietary: 'Halal', notes: 'Sesepuh lingkungan' },
-    { id: uid(), name: 'Tariq & Fatima Al-Mansoor', side: 'p2', category: 'Rekan Kerja', rsvp: 'pending', pax: 2, table: 'Table 4', phone: '(408) 555-6677', dietary: 'Halal, No shellfish', notes: 'Colleagues from engineering team' },
-    { id: uid(), name: 'Jessica Miller', side: 'p1', category: 'Teman', rsvp: 'attending', pax: 1, table: 'Table 2', phone: '(510) 555-5511', dietary: 'Vegan', notes: 'High school best friend' },
+    { id: uid(), name: 'Sofia & David Rossi', side: 'p1', invitationType: 'physical', category: 'Keluarga', rsvp: 'attending', pax: 2, table: 'Table 1', phone: '(707) 555-1122', dietary: 'Vegetarian (Sofia)', notes: 'Close family table' },
+    { id: uid(), name: 'Liam & Chloe Bennett', side: 'p2', invitationType: 'digital', category: 'Teman', rsvp: 'attending', pax: 2, table: 'Table 3', phone: '(415) 555-8833', dietary: '', notes: 'College friends' },
+    { id: uid(), name: 'Marcus Vance', side: 'p1', invitationType: 'digital', category: 'Rekan Kerja', rsvp: 'pending', pax: 1, table: 'Table 4', phone: '(510) 555-4499', dietary: 'Gluten-free', notes: 'RSVP follow-up next week' },
+    { id: uid(), name: 'Aunt Beatrice', side: 'p1', invitationType: 'physical', category: 'Keluarga', rsvp: 'attending', pax: 1, table: 'Table 1', phone: '(707) 555-3311', dietary: 'Low sodium', notes: 'Reserved front ceremony seating' },
+    { id: uid(), name: 'Daniel Wu', side: 'p2', invitationType: 'physical', category: 'VIP', rsvp: 'declined', pax: 1, table: '', phone: '(408) 555-9012', dietary: '', notes: 'Overseas travel conflict; sent registry gift' },
+    { id: uid(), name: 'Sarah Jenkins & Guest', side: 'p1', invitationType: 'digital', category: 'Teman', rsvp: 'attending', pax: 2, table: 'Table 2', phone: '(415) 555-3344', dietary: 'Halal', notes: 'Bridesmaid' },
+    { id: uid(), name: 'Bambang & Siti Rahayu', side: 'p2', invitationType: 'physical', category: 'Keluarga', rsvp: 'attending', pax: 3, table: 'Table 1', phone: '+62 812-3456-7890', dietary: 'Halal', notes: 'Paman & Bibi dari pihak pria' },
+    { id: uid(), name: 'Dr. Robert Chang', side: 'both', invitationType: 'physical', category: 'VIP', rsvp: 'attending', pax: 2, table: 'VIP Table', phone: '(650) 555-7890', dietary: 'Pescatarian', notes: 'Mentor / Family friend' },
+    { id: uid(), name: 'Maya Indah', side: 'p1', invitationType: 'digital', category: 'Rekan Kerja', rsvp: 'pending', pax: 1, table: 'Table 4', phone: '+62 813-9876-5432', dietary: '', notes: 'Partner kantor tim desain' },
+    { id: uid(), name: 'Kevin O’Connor', side: 'p2', invitationType: 'digital', category: 'Teman', rsvp: 'attending', pax: 1, table: 'Table 3', phone: '(510) 555-1234', dietary: '', notes: 'Groomsman' },
+    { id: uid(), name: 'Elena Rostova', side: 'p1', invitationType: 'digital', category: 'Teman', rsvp: 'declined', pax: 2, table: '', phone: '(415) 555-9876', dietary: '', notes: 'Flight unavailable that weekend' },
+    { id: uid(), name: 'Pak RT Joko & Istri', side: 'both', invitationType: 'physical', category: 'Tetangga', rsvp: 'attending', pax: 2, table: 'Table 5', phone: '+62 811-2233-4455', dietary: 'Halal', notes: 'Sesepuh lingkungan' },
+    { id: uid(), name: 'Tariq & Fatima Al-Mansoor', side: 'p2', invitationType: 'digital', category: 'Rekan Kerja', rsvp: 'pending', pax: 2, table: 'Table 4', phone: '(408) 555-6677', dietary: 'Halal, No shellfish', notes: 'Colleagues from engineering team' },
+    { id: uid(), name: 'Jessica Miller', side: 'p1', invitationType: 'digital', category: 'Teman', rsvp: 'attending', pax: 1, table: 'Table 2', phone: '(510) 555-5511', dietary: 'Vegan', notes: 'High school best friend' },
   ];
 }
 

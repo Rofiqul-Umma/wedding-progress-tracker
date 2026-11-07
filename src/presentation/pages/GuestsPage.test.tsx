@@ -131,5 +131,20 @@ describe('GuestsPage (integration)', () => {
     expect(screen.queryByText('Liam & Chloe Bennett')).not.toBeInTheDocument();
     expect(screen.queryByText('Marcus Vance')).not.toBeInTheDocument();
   });
+
+  it('filters guests by invitation type (digital or physical)', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<GuestsPage />);
+
+    const invSelect = screen.getByRole('combobox', {
+      name: 'Filter by invitation type',
+    });
+    await user.selectOptions(invSelect, 'physical');
+
+    expect(screen.getByText('Sofia & David Rossi')).toBeInTheDocument();
+    expect(screen.getByText('Dr. Robert Chang')).toBeInTheDocument();
+    expect(screen.queryByText('Liam & Chloe Bennett')).not.toBeInTheDocument();
+    expect(screen.queryByText('Marcus Vance')).not.toBeInTheDocument();
+  });
 });
 

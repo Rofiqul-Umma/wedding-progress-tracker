@@ -20,7 +20,9 @@ import {
   SHOP_ORDER,
   RSVP_STATUSES,
   GUEST_SIDES,
+  GUEST_INVITATION_TYPES,
   type GuestSide,
+  type GuestInvitationType,
 } from '@domain/value-objects/status';
 import {
   BASE_CATEGORIES,
@@ -381,6 +383,7 @@ export function useForms() {
           label: t('forms.guest.name'),
           value: g?.name,
           placeholder: t('forms.guest.namePh'),
+          half: true,
         },
         {
           name: 'side',
@@ -388,6 +391,17 @@ export function useForms() {
           type: 'select',
           value: g ? (g.side ?? 'both') : 'p1',
           options: sideOptions,
+          half: true,
+        },
+        {
+          name: 'invitationType',
+          label: t('forms.guest.invitationType'),
+          type: 'select',
+          value: g?.invitationType ?? 'digital',
+          options: [
+            { value: 'digital', label: t('guests.invDigital') },
+            { value: 'physical', label: t('guests.invPhysical') },
+          ],
           half: true,
         },
         {
@@ -455,9 +469,15 @@ export function useForms() {
         const side = GUEST_SIDES.includes(values.side as GuestSide)
           ? (values.side as GuestSide)
           : 'p1';
+        const invitationType = GUEST_INVITATION_TYPES.includes(
+          values.invitationType as GuestInvitationType,
+        )
+          ? (values.invitationType as GuestInvitationType)
+          : 'digital';
         const data: Omit<Guest, 'id'> = {
           name: values.name.trim(),
           side,
+          invitationType,
           category: values.category.trim(),
           rsvp,
           pax: Math.max(1, Math.round(numOr(values.pax, 1))),
