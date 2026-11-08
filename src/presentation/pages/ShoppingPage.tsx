@@ -188,26 +188,30 @@ function ShoppingRow({ item, onCycle, onOpen, onEdit, onDelete }: ShoppingRowPro
           <Icon name="link" size={17} />
         </a>
       )}
-      {lineTotal > 0 && (
-        <div className="mr-2 text-[15px] font-extrabold tnum">{money(lineTotal)}</div>
-      )}
-      <button
-        type="button"
-        onClick={onCycle}
-        title={t('shopping.cycleAria', {
-          name: item.name,
-          status: t(`status.shop.${item.status}`),
-        })}
-        aria-label={t('shopping.cycleAria', {
-          name: item.name,
-          status: t(`status.shop.${item.status}`),
-        })}
-        className="rounded-full transition-transform hover:-translate-y-px"
-      >
-        <Chip variant={STATUS_CHIP[item.status]} dot>
-          {t(`status.shop.${item.status}`)}
-        </Chip>
-      </button>
+      <div className="flex-none text-right">
+        {lineTotal > 0 && (
+          <div className="mb-1 text-[14.5px] font-extrabold leading-none tnum">
+            {money(lineTotal)}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={onCycle}
+          title={t('shopping.cycleAria', {
+            name: item.name,
+            status: t(`status.shop.${item.status}`),
+          })}
+          aria-label={t('shopping.cycleAria', {
+            name: item.name,
+            status: t(`status.shop.${item.status}`),
+          })}
+          className="rounded-full transition-transform hover:-translate-y-px"
+        >
+          <Chip variant={STATUS_CHIP[item.status]} dot>
+            {t(`status.shop.${item.status}`)}
+          </Chip>
+        </button>
+      </div>
       <RowActions
         onEdit={onEdit}
         onDelete={onDelete}

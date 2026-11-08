@@ -7,9 +7,10 @@ export interface Stat {
 
 /**
  * Above this count the compact layout goes three-across instead of two.
- * Only the report strip (9 stats) is dense; every page strip has four.
+ * Pages with 5+ stats (Guests, Reports) pack into 3 columns on mobile so the
+ * strip stays 2 rows tall instead of 3.
  */
-const DENSE_FROM = 6;
+const DENSE_FROM = 4;
 
 /** The horizontal stat row shown atop most pages. */
 export function StatStrip({ items }: { items: Stat[] }) {

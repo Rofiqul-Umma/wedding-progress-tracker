@@ -7,6 +7,7 @@ import {
   type Segment,
 } from '@presentation/components/ui/SegmentedFilter';
 import { Card } from '@presentation/components/ui/Card';
+import { Row } from '@presentation/components/ui/Row';
 import { Avatar } from '@presentation/components/ui/Avatar';
 import { CartoonAvatar } from '@presentation/components/ui/CartoonAvatar';
 import { Chip, type ChipVariant } from '@presentation/components/ui/Chip';
@@ -181,106 +182,65 @@ export function GuestsPage() {
     );
   });
 
-  const renderGuestCard = (g: Guest) => {
+  const renderGuestRow = (g: Guest) => {
     const gSide = effectiveGuestSide(g);
     const gInv = effectiveGuestInvitationType(g);
-    const hasFooterDetails = Boolean(g.phone || g.notes);
+    const meta = [
+      t('guests.paxUnit', { count: g.pax || 1 }),
+      g.category ? catLabel(g.category) : '',
+      invitationLabel(gInv),
+      g.phone || '',
+      g.notes || '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
 
     return (
-      <Card
+      <Row
         key={g.id}
-        pad
-        className="group relative flex flex-col justify-between max-[560px]:p-3.5"
+        onActivate={() => openForm(guestForm(g))}
+        activateLabel={t('guests.editAria', { name: g.name })}
       >
-        {/* Top row: Avatar + Name/Meta on the left, RSVP chip + Edit/Delete on the right */}
-        <div className="flex items-start justify-between gap-2.5">
-          <div className="flex min-w-0 flex-1 items-start gap-2.5">
-            <Avatar
-              color={categoryColor(g.category || g.name)}
-              letter={g.name[0] || '?'}
-              size={36}
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="truncate text-[14.5px] font-bold leading-snug">
-                  {g.name}
-                </span>
-                <span className="flex-none rounded-full bg-panel px-1.5 py-0.5 text-[10.5px] font-bold text-muted tnum">
-                  {t('guests.paxUnit', { count: g.pax || 1 })}
-                </span>
-              </div>
-
-              <div className="mt-0.5 flex flex-balance items-center gap-x-1.5 gap-y-1 text-[11.5px] font-semibold text-muted">
-                {!groupBySide && (
-                  <span className="inline-flex items-center rounded-full bg-lime-soft px-1.5 py-px text-[10.5px] font-bold text-lime-ink">
-                    {sideDisplayName(gSide)}
-                  </span>
-                )}
-                {g.category && (
-                  <span className="truncate text-ink-2">
-                    {catLabel(g.category)}
-                  </span>
-                )}
-                {g.category && <span className="text-faint">·</span>}
-                <span className="inline-flex items-center gap-1">
-                  <Icon
-                    name={gInv === 'physical' ? 'mail' : 'public'}
-                    size={12}
-                    className="text-faint"
-                  />
-                  {invitationLabel(gInv)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-none items-center gap-1">
-            <button
-              type="button"
-              onClick={() => cycleGuestRsvp(g.id)}
-              aria-label={t('guests.cycleAria', {
-                name: g.name,
-                status: t(`status.rsvp.${g.rsvp}`),
-              })}
-              title={t('guests.cycleAria', {
-                name: g.name,
-                status: t(`status.rsvp.${g.rsvp}`),
-              })}
-              className="cursor-pointer transition-transform hover:scale-105 active:scale-95 touch-manipulation"
-            >
-              <Chip variant={RSVP_CHIP_VARIANT[g.rsvp] as ChipVariant} dot>
-                {t(`status.rsvp.${g.rsvp}`)}
-              </Chip>
-            </button>
-            <RowActions
-              onEdit={() => openForm(guestForm(g))}
-              onDelete={() => deleteGuest(g.id)}
-              editLabel={t('guests.editAria', { name: g.name })}
-              deleteLabel={t('guests.deleteAria', { name: g.name })}
-            />
-          </div>
-        </div>
-
-        {/* Compact secondary row: Phone & Notes share horizontal space */}
-        {hasFooterDetails && (
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-2 text-[12px] text-muted">
-            {g.phone && (
-              <a
-                href={`tel:${g.phone}`}
-                className="inline-flex items-center gap-1 hover:text-ink"
-              >
-                <Icon name="call" size={13} className="text-faint" />
-                {g.phone}
-              </a>
-            )}
-            {g.notes && (
-              <span className="min-w-0 flex-1 truncate text-faint">
-                {g.phone ? `· ${g.notes}` : g.notes}
+        <Avatar
+          color={categoryColor(g.category || g.name)}
+          letter={g.name[0] || '?'}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 truncate text-[14.5px] font-bold">
+            <span className="truncate">{g.name}</span>
+            {!groupBySide && (
+              <span className="flex-none rounded-full bg-lime-soft px-2 py-0.5 text-[10.5px] font-bold text-lime-ink">
+                {sideDisplayName(gSide)}
               </span>
             )}
           </div>
-        )}
-      </Card>
+          <div className="mt-0.5 truncate text-[12.5px] text-muted">{meta}</div>
+        </div>
+        <button
+          type="button"
+          onClick={() => cycleGuestRsvp(g.id)}
+          aria-label={t('guests.cycleAria', {
+            name: g.name,
+            status: t(`status.rsvp.${g.rsvp}`),
+          })}
+          title={t('guests.cycleAria', {
+            name: g.name,
+            status: t(`status.rsvp.${g.rsvp}`),
+          })}
+          className="flex-none rounded-full transition-transform hover:-translate-y-px touch-manipulation"
+        >
+          <Chip variant={RSVP_CHIP_VARIANT[g.rsvp] as ChipVariant} dot>
+            {t(`status.rsvp.${g.rsvp}`)}
+          </Chip>
+        </button>
+        <RowActions
+          onEdit={() => openForm(guestForm(g))}
+          onDelete={() => deleteGuest(g.id)}
+          editLabel={t('guests.editAria', { name: g.name })}
+          deleteLabel={t('guests.deleteAria', { name: g.name })}
+          mobileHidden
+        />
+      </Row>
     );
   };
 
@@ -331,68 +291,70 @@ export function GuestsPage() {
         ]}
       />
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 max-[560px]:mt-3 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
-        <div className="flex flex-wrap items-center gap-2.5 max-w-full max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 max-[560px]:mt-2.5 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
+        <div className="flex min-w-0 max-w-full">
           <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
+        </div>
+        <div className="flex min-w-0 max-w-full items-center gap-2">
           <SegmentedFilter
             options={sideSegments}
             value={sideFilter}
             onChange={setSideFilter}
           />
-          <div className="flex flex-wrap items-center gap-2 max-[560px]:grid max-[560px]:grid-cols-2">
-            <Select
-              id="guestCategoryFilter"
-              variant="compact"
-              value={categoryFilter}
-              aria-label={t('guests.filterCategoryAria')}
-              options={categoryOptions}
-              containerClassName="max-[560px]:w-full"
-              className="max-[560px]:w-full max-[560px]:max-w-none"
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            />
-            <Select
-              id="guestInvitationFilter"
-              variant="compact"
-              value={invitationFilter}
-              aria-label={t('guests.filterInvitationAria')}
-              options={invitationOptions}
-              containerClassName="max-[560px]:w-full"
-              className="max-[560px]:w-full max-[560px]:max-w-none"
-              onChange={(e) =>
-                setInvitationFilter(e.target.value as GuestInvitationFilter)
-              }
-            />
-          </div>
+          <button
+            type="button"
+            aria-pressed={groupBySide}
+            onClick={() => setGroupBySide((v) => !v)}
+            title={t('guests.groupBySide')}
+            aria-label={t('guests.groupBySide')}
+            className={cn(
+              'inline-flex flex-none items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] font-semibold transition-colors max-[560px]:px-2.5 max-[560px]:py-1.5 max-[560px]:text-[12px]',
+              groupBySide
+                ? 'border-ink bg-ink text-on-ink shadow-sm'
+                : 'border-line bg-panel text-muted hover:text-ink',
+            )}
+          >
+            <Icon name="groups" size={16} />
+            <span className="max-[420px]:sr-only">{t('guests.groupBySide')}</span>
+          </button>
         </div>
-        <button
-          type="button"
-          aria-pressed={groupBySide}
-          onClick={() => setGroupBySide((v) => !v)}
-          className={cn(
-            'inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] font-semibold transition-colors max-[560px]:w-full',
-            groupBySide
-              ? 'border-ink bg-ink text-on-ink shadow-sm'
-              : 'border-line bg-panel text-muted hover:text-ink',
-          )}
-        >
-          <Icon name="groups" size={16} />
-          <span>{t('guests.groupBySide')}</span>
-        </button>
+        <div className="flex items-center gap-2 max-[560px]:grid max-[560px]:w-full max-[560px]:grid-cols-2">
+          <Select
+            id="guestCategoryFilter"
+            variant="compact"
+            value={categoryFilter}
+            aria-label={t('guests.filterCategoryAria')}
+            options={categoryOptions}
+            containerClassName="max-[560px]:w-full"
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          />
+          <Select
+            id="guestInvitationFilter"
+            variant="compact"
+            value={invitationFilter}
+            aria-label={t('guests.filterInvitationAria')}
+            options={invitationOptions}
+            containerClassName="max-[560px]:w-full"
+            onChange={(e) =>
+              setInvitationFilter(e.target.value as GuestInvitationFilter)
+            }
+          />
+        </div>
       </div>
 
       {visible.length ? (
         groupBySide ? (
-          <div className="mt-[18px] flex flex-col gap-6 max-[560px]:mt-3.5 max-[560px]:gap-4">
+          <div className="mt-[18px] flex flex-col gap-5 max-[560px]:mt-3.5 max-[560px]:gap-4">
             {groups.map(({ side, items }) => {
               const badge = sideRoleBadge(side);
               const grpPax = guestsTotalPax(items);
               return (
                 <section key={side} aria-label={sideDisplayName(side)}>
-                  <div className="mb-3 flex items-center justify-between gap-3 border-b border-line pb-2.5 max-[560px]:mb-2 max-[560px]:pb-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="mb-2 flex items-center justify-between gap-2.5">
+                    <div className="flex min-w-0 items-center gap-2">
                       {renderSideAvatar(side)}
-                      <div className="flex flex-wrap items-center gap-2 min-w-0">
-                        <h2 className="truncate text-[16px] font-bold tracking-tight">
+                      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                        <h2 className="truncate text-[15.5px] font-bold tracking-tight">
                           {sideDisplayName(side)}
                         </h2>
                         {badge && (
@@ -402,24 +364,22 @@ export function GuestsPage() {
                         )}
                       </div>
                     </div>
-                    <span className="flex-none rounded-full bg-panel px-2.5 py-1 text-xs font-bold text-muted tnum">
+                    <span className="flex-none rounded-full bg-panel px-2.5 py-0.5 text-xs font-bold text-muted tnum">
                       {t('guests.groupSummary', {
                         count: items.length,
                         pax: grpPax,
                       })}
                     </span>
                   </div>
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3.5 max-[560px]:gap-2">
-                    {items.map(renderGuestCard)}
-                  </div>
+                  <Card>{items.map(renderGuestRow)}</Card>
                 </section>
               );
             })}
           </div>
         ) : (
-          <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3.5 max-[560px]:mt-3.5 max-[560px]:gap-2">
-            {visible.map(renderGuestCard)}
-          </div>
+          <Card className="mt-[18px] max-[560px]:mt-3.5">
+            {visible.map(renderGuestRow)}
+          </Card>
         )
       ) : (
         <div className="mt-4">

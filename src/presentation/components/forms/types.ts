@@ -59,4 +59,6 @@ export interface FormDescriptor {
    * open).
    */
   submit: (values: FormValues, checks: FormChecks) => true | string;
+  /** Optional delete handler when editing an existing item. */
+  onDelete?: () => void;
 }

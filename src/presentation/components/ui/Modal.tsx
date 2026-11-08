@@ -87,11 +87,25 @@ export function Modal({ form, onClose }: ModalProps) {
             />
           ))}
       </div>
-      <div className="sticky bottom-0 z-10 flex justify-end gap-2.5 border-t border-transparent bg-app/95 px-6 pb-[22px] pt-3.5 backdrop-blur-xs max-[560px]:grid max-[560px]:grid-cols-2 max-[560px]:border-line max-[560px]:px-4 max-[560px]:pb-4">
-        <Button variant="ghost" onClick={onClose}>
+      <div className="sticky bottom-0 z-10 flex items-center justify-end gap-2.5 border-t border-transparent bg-app/95 px-6 pb-[22px] pt-3.5 backdrop-blur-xs max-[560px]:border-line max-[560px]:px-4 max-[560px]:pb-4">
+        {form.onDelete && (
+          <Button
+            variant="dangerGhost"
+            icon="delete"
+            onClick={() => {
+              form.onDelete?.();
+              onClose();
+            }}
+            aria-label={t('common.delete')}
+            className="mr-auto max-[560px]:px-3"
+          >
+            <span className="max-[420px]:hidden">{t('common.delete')}</span>
+          </Button>
+        )}
+        <Button variant="ghost" onClick={onClose} className="max-[560px]:flex-1">
           {t('common.cancel')}
         </Button>
-        <Button variant="primary" onClick={submit}>
+        <Button variant="primary" onClick={submit} className="max-[560px]:flex-1">
           {t('common.save')}
         </Button>
       </div>

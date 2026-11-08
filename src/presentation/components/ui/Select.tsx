@@ -26,7 +26,7 @@ const VARIANTS: Record<SelectVariant, string> = {
   default:
     'w-full rounded-xl border border-line-2 bg-panel pl-[13px] pr-10 py-[11px] text-[16px] sm:text-[14.5px] text-ink focus:border-ink focus:bg-app focus:ring-[3px] focus:ring-ink/10',
   compact:
-    'rounded-[10px] border border-line-2 bg-app pl-[11px] pr-7 py-2 text-[13px] font-semibold text-ink focus:border-ink max-[560px]:max-w-[116px] max-[560px]:pl-2 max-[560px]:pr-6 max-[560px]:py-[5px] max-[560px]:text-[12px]',
+    'w-full truncate rounded-[10px] border border-line-2 bg-app pl-[11px] pr-7 py-2 text-[13px] font-semibold text-ink focus:border-ink max-[560px]:pl-2.5 max-[560px]:pr-6 max-[560px]:py-1.5 max-[560px]:text-[12px]',
 };
 
 /**

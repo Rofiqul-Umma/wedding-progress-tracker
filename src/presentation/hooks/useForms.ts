@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@presentation/state/PlanStore';
+import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import type {
   FormDescriptor,
   Field,
@@ -53,6 +54,7 @@ const numOr = (v: string, fallback = 0): number => {
  */
 export function useForms() {
   const { state, setState } = usePlan();
+  const { deleteBudget, deleteContact, deleteGuest } = usePlanActions();
   const { t } = useTranslation();
 
   /**
@@ -191,6 +193,7 @@ export function useForms() {
         setState((s) => (b ? updateBudgetItem(s, b.id, data) : addBudgetItem(s, data)));
         return true;
       },
+      onDelete: b ? () => deleteBudget(b.id) : undefined,
     };
   }
 
@@ -352,6 +355,7 @@ export function useForms() {
         setState((s) => (c ? updateContact(s, c.id, data) : addContact(s, data)));
         return true;
       },
+      onDelete: c ? () => deleteContact(c.id) : undefined,
     };
   }
 
@@ -475,6 +479,7 @@ export function useForms() {
         setState((s) => (g ? updateGuest(s, g.id, data) : addGuest(s, data)));
         return true;
       },
+      onDelete: g ? () => deleteGuest(g.id) : undefined,
     };
   }
 

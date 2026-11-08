@@ -175,7 +175,7 @@ export function Topbar() {
           {sub}
         </p>
       </div>
-      <div className="ml-auto flex items-center gap-2.5">
+      <div className="ml-auto flex items-center gap-2.5 max-[560px]:gap-1.5">
         <label className="flex w-[220px] items-center gap-2 rounded-xl border border-transparent bg-panel px-[13px] py-[9px] transition-colors focus-within:border-ink focus-within:bg-app max-[860px]:w-[150px] max-[460px]:hidden">
           <Icon name="search" size={19} className="text-faint" />
           <input
@@ -210,7 +210,13 @@ export function Topbar() {
         )}
         <NotificationsPanel />
         {page !== 'reports' && (
-          <Button variant="primary" icon="add" onClick={openAdd} aria-label={addLabel}>
+          <Button
+            variant="primary"
+            icon="add"
+            onClick={openAdd}
+            aria-label={addLabel}
+            className="max-[560px]:h-9 max-[560px]:w-9 max-[560px]:px-0 max-[560px]:py-0"
+          >
             <span className="max-[560px]:hidden">{addLabel}</span>
           </Button>
         )}

@@ -231,6 +231,7 @@ export function BudgetPage() {
                   onDelete={() => deleteBudget(b.id)}
                   editLabel={t('budget.editAria', { name: b.item })}
                   deleteLabel={t('budget.deleteAria', { name: b.item })}
+                  mobileHidden
                 />
               </Row>
             ))

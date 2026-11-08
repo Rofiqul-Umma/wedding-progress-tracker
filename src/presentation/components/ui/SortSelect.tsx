@@ -25,6 +25,7 @@ export function SortSelect({ id, label, value, options, onChange }: SortSelectPr
         variant="compact"
         value={value}
         aria-label={label}
+        containerClassName="max-[560px]:max-w-[126px]"
         onChange={(e) => onChange(e.target.value)}
         options={options}
       />

@@ -209,30 +209,34 @@ function SeserahanRow({ item, onCycle, onOpen, onEdit, onDelete }: SeserahanRowP
           <Icon name="link" size={17} />
         </a>
       )}
-      {(+item.cost || 0) > 0 && (
-        <div className="mr-2 text-[15px] font-extrabold tnum">{money(item.cost)}</div>
-      )}
-      {/* A bundle's status follows its checklist, so it is shown but not
-          clickable — a button that silently does nothing is worse than none. */}
-      {progress ? (
-        <span title={t('seserahan.derivedAria', { name: item.name })}>{statusChip}</span>
-      ) : (
-        <button
-          type="button"
-          onClick={onCycle}
-          title={t('seserahan.cycleAria', {
-            name: item.name,
-            status: t(`status.ses.${status}`),
-          })}
-          aria-label={t('seserahan.cycleAria', {
-            name: item.name,
-            status: t(`status.ses.${status}`),
-          })}
-          className="rounded-full transition-transform hover:-translate-y-px"
-        >
-          {statusChip}
-        </button>
-      )}
+      <div className="flex-none text-right">
+        {(+item.cost || 0) > 0 && (
+          <div className="mb-1 text-[14.5px] font-extrabold leading-none tnum">
+            {money(item.cost)}
+          </div>
+        )}
+        {/* A bundle's status follows its checklist, so it is shown but not
+            clickable — a button that silently does nothing is worse than none. */}
+        {progress ? (
+          <span title={t('seserahan.derivedAria', { name: item.name })}>{statusChip}</span>
+        ) : (
+          <button
+            type="button"
+            onClick={onCycle}
+            title={t('seserahan.cycleAria', {
+              name: item.name,
+              status: t(`status.ses.${status}`),
+            })}
+            aria-label={t('seserahan.cycleAria', {
+              name: item.name,
+              status: t(`status.ses.${status}`),
+            })}
+            className="rounded-full transition-transform hover:-translate-y-px"
+          >
+            {statusChip}
+          </button>
+        )}
+      </div>
       <RowActions
         onEdit={onEdit}
         onDelete={onDelete}
