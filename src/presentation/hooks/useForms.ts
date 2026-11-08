@@ -435,23 +435,9 @@ export function useForms() {
           half: true,
         },
         {
-          name: 'table',
-          label: t('forms.guest.table'),
-          value: g?.table,
-          placeholder: t('forms.guest.tablePh'),
-          half: true,
-        },
-        {
           name: 'phone',
           label: t('forms.guest.phone'),
           value: g?.phone,
-          half: true,
-        },
-        {
-          name: 'dietary',
-          label: t('forms.guest.dietary'),
-          value: g?.dietary,
-          placeholder: t('forms.guest.dietaryPh'),
         },
         {
           name: 'notes',
@@ -481,9 +467,9 @@ export function useForms() {
           category: values.category.trim(),
           rsvp,
           pax: Math.max(1, Math.round(numOr(values.pax, 1))),
-          table: values.table.trim(),
+          table: g?.table ?? '',
           phone: values.phone.trim(),
-          dietary: values.dietary.trim(),
+          dietary: g?.dietary ?? '',
           notes: values.notes.trim(),
         };
         setState((s) => (g ? updateGuest(s, g.id, data) : addGuest(s, data)));

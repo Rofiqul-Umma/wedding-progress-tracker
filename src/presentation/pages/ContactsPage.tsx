@@ -59,13 +59,13 @@ export function ContactsPage() {
   return (
     <>
       <StatStrip items={[{ label: t('contacts.strip'), value: state.contacts.length }]} />
-      <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-4 max-[560px]:gap-3">
+      <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3.5 max-[560px]:mt-3.5 max-[560px]:gap-2">
         {visible.map((c) => (
           <Card
             key={c.id}
             pad
             className={cn(
-              'group relative',
+              'group relative max-[560px]:p-3.5',
               flashId === c.id && 'contact-flash',
             )}
           >
@@ -74,7 +74,16 @@ export function ContactsPage() {
                 refs.current[c.id] = el;
               }}
             >
-              <div className="absolute right-2.5 top-3">
+              <div className="flex items-start justify-between gap-2.5">
+                <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                  <Avatar color={categoryColor(c.name)} letter={c.name[0] || '?'} size={36} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14.5px] font-bold">{c.name}</div>
+                    <div className="mt-px text-xs font-bold text-lime-ink">
+                      {c.role || t('contacts.role')}
+                    </div>
+                  </div>
+                </div>
                 <RowActions
                   onEdit={() => openForm(contactForm(c))}
                   onDelete={() => deleteContact(c.id)}
@@ -82,38 +91,32 @@ export function ContactsPage() {
                   deleteLabel={t('contacts.deleteAria', { name: c.name })}
                 />
               </div>
-              <div className="flex items-center gap-3 pr-14">
-                <Avatar color={categoryColor(c.name)} letter={c.name[0] || '?'} />
-                <div className="min-w-0">
-                  <div className="truncate text-[15px] font-bold">{c.name}</div>
-                  <div className="mt-px text-xs font-bold text-lime-ink">
-                    {c.role || t('contacts.role')}
-                  </div>
-                </div>
-              </div>
-              {c.phone && (
-                <div className="mt-[9px] flex items-center gap-[9px] text-[13px] text-muted">
-                  <Icon name="call" size={17} className="text-faint" />
-                  <a href={`tel:${c.phone}`} className="hover:text-ink">
-                    {c.phone}
-                  </a>
-                </div>
-              )}
-              {c.social && (
-                <div className="mt-[9px] flex items-center gap-[9px] text-[13px] text-muted">
-                  <Icon name="public" size={17} className="text-faint" />
-                  <a
-                    href={/^https?:\/\//i.test(c.social) ? c.social : `https://${c.social}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate hover:text-ink"
-                  >
-                    {c.social}
-                  </a>
+              {(c.phone || c.social) && (
+                <div className="mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[12.5px] text-muted">
+                  {c.phone && (
+                    <a
+                      href={`tel:${c.phone}`}
+                      className="inline-flex items-center gap-1.5 hover:text-ink"
+                    >
+                      <Icon name="call" size={14} className="text-faint" />
+                      {c.phone}
+                    </a>
+                  )}
+                  {c.social && (
+                    <a
+                      href={/^https?:\/\//i.test(c.social) ? c.social : `https://${c.social}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-w-0 items-center gap-1.5 truncate hover:text-ink"
+                    >
+                      <Icon name="public" size={14} className="flex-none text-faint" />
+                      <span className="truncate">{c.social}</span>
+                    </a>
+                  )}
                 </div>
               )}
               {c.notes && (
-                <div className="mt-3 border-t border-dashed border-line-2 pt-3 text-[12.5px] text-faint">
+                <div className="mt-2 border-t border-line pt-2 text-[12px] text-faint line-clamp-1">
                   {c.notes}
                 </div>
               )}
