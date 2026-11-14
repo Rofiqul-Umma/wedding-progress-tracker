@@ -1,11 +1,11 @@
 # Evermore — Wedding Progress Tracker
 
 A wedding planner that runs entirely in the browser. Track the timeline, vendors, budget,
-tasks, shopping, seserahan (gift trays) and contacts — offline-first, installable as a PWA,
+tasks, shopping, seserahan (gift trays), guests and contacts — offline-first, installable as a PWA,
 in English or Indonesian.
 
-Everything is stored on the device by default. Cloud sync and realtime collaboration are
-optional and only appear once Firebase is configured.
+Everything is stored on the device by default. Cloud sync, realtime collaboration, and push
+notifications are optional and only appear once Firebase is configured.
 
 ---
 
@@ -19,10 +19,11 @@ optional and only appear once Firebase is configured.
 | **Tasks** | Due dates, categories, per-item icons, reference links, inline file/image attachments |
 | **Shopping** | Store, unit price, qty, status, product link, reference photo |
 | **Seserahan** | Single trays or bundles — a bundle's status is derived from its contents |
+| **Guests** | RSVP status, pax count, bride/groom/mutual side, invitation type (digital/physical), category filtering, table & dietary notes |
 | **Contacts** | Role, phone, social profile URL, notes |
 | **Reports** | Filterable table view, horizontal scroll on mobile, CSV export and print-to-PDF |
-| **Notifications** | Derived alerts (overdue tasks, unpaid vendors, budget pressure) with jump-to-page |
-| **Settings** | Currency, language, appearance, wedding details, cartoon avatars, backup export/import, sample plan, clear data |
+| **Notifications** | Derived in-app alerts (overdue tasks, unpaid vendors, budget pressure) with jump-to-page, plus optional Web Push (FCM) reminders and room activity alerts |
+| **Settings** | Currency, language, appearance, push notifications, wedding details, cartoon avatars, backup export/import, sample plan, clear data |
 
 **Cross-cutting**
 
@@ -107,20 +108,22 @@ Clean Architecture with dependencies pointing inward. Path aliases (`vite.config
 `tsconfig`) enforce the boundary at import time.
 
 ```
+api/               Vercel Serverless / Edge handlers (daily cron & room push notifications)
 src/
   domain/          @domain          entities, value objects, pure services
     entities/        PlanState and every record type
     value-objects/   status, categories, icons, avatars, theme
     services/        budget, progress, schedule — pure, no React, no I/O
-    repositories/    port interfaces (RoomRepository, AccountRepository)
+    repositories/    port interfaces (PlanRepository, RoomRepository, AccountRepository)
 
   application/     @application     use cases over the domain
+    dto/             import validation
     use-cases/       CRUD, budget, report, data import/export, sync diffing,
-                     account migration decisions
+                     account migration decisions, push notifications
 
   infrastructure/  @infrastructure  adapters to the outside world
     persistence/     localStorage plan repo, safety backups, migrate, seed
-    firebase/        Firestore room + account repositories, config, env gate
+    firebase/        Firestore room + account repositories, FCM messaging, config, env gate
     i18n/            i18next config and en/id resources
     theme/           storage + DOM application
     format/          currency and date formatting
@@ -178,7 +181,7 @@ Tailwind v4, configured in CSS via `@theme` in `src/index.css` — there is no
 
 ## Testing
 
-Vitest + Testing Library in jsdom. Current suite: **212 tests across 28 files**.
+Vitest + Testing Library in jsdom.
 
 ```bash
 npm test
@@ -188,6 +191,22 @@ Domain and application logic is tested directly as pure functions; presentation 
 through `src/test/renderWithProviders.tsx` so every context is in place. `vitest.setup.ts`
 installs a `localStorage` stand-in and a `matchMedia` stub (jsdom has neither, and
 `ThemeProvider` needs the latter).
+
+---
+
+## AI coding agents (`AGENTS.md`)
+
+This repository includes an [`AGENTS.md`](AGENTS.md) file following the
+[agents.md](https://agents.md/#examples) open format. It gives AI coding assistants
+concise, command-first context on:
+
+- **Dev environment tips** — Clean Architecture layer boundaries (`@domain`, `@application`,
+  `@infrastructure`, `@presentation`, `api/`), Tailwind v4 `@theme` rules, i18n requirements,
+  and backwards-compatible `migrate()` rules.
+- **Testing instructions** — Running the full Vitest suite (`npm test`), filtering single
+  tests, running `npm run typecheck` and `npm run lint`, and using `renderWithProviders`.
+- **PR & commit instructions** — Conventional Commits format, pre-commit verification checks,
+  and secret hygiene.
 
 ---
 

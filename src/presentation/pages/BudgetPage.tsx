@@ -4,6 +4,7 @@ import { StatStrip } from '@presentation/components/ui/StatStrip';
 import { EmptyRow } from '@presentation/components/ui/EmptyState';
 import { SegmentedFilter, type Segment } from '@presentation/components/ui/SegmentedFilter';
 import { SortSelect } from '@presentation/components/ui/SortSelect';
+import { Select } from '@presentation/components/ui/Select';
 import { Card } from '@presentation/components/ui/Card';
 import { Row } from '@presentation/components/ui/Row';
 import { Check } from '@presentation/components/ui/Check';
@@ -16,7 +17,10 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
+import {
+  useCategoryLabel,
+  useCategoryFilterOptions,
+} from '@presentation/hooks/useCategoryLabel';
 import {
   totalSpent,
   totalBudget,
@@ -86,6 +90,7 @@ export function BudgetPage() {
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<BudgetFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sort, setSort] = useState<BudgetSort>('amount-desc');
 
   const sp = totalSpent(state.budget, state.vendors, state.shopping);
@@ -126,6 +131,11 @@ export function BudgetPage() {
   // Derived rows are money already out the door, so they belong to All and Paid.
   const derivedShown = filter !== 'unpaid';
   const derivedCount = fromShopping.length + fromVendors.length;
+  const categoryOptions = useCategoryFilterOptions('budget', [
+    ...state.budget.map((b) => b.category),
+    ...fromShopping.map((r) => r.category),
+    ...fromVendors.map((r) => r.category),
+  ]);
 
   const counts: Record<BudgetFilter, number> = {
     all: state.budget.length + derivedCount,
@@ -140,6 +150,7 @@ export function BudgetPage() {
 
   const items = state.budget
     .filter((b) => filter === 'all' || (filter === 'paid' ? b.paid : !b.paid))
+    .filter((b) => categoryFilter === 'all' || (b.category?.trim() || '') === categoryFilter)
     .sort(comparators(catLabel)[sort]);
   // The translated label is searchable alongside the stored one, so "attire"
   // finds a "Busana" line while the UI is in English.
@@ -150,6 +161,10 @@ export function BudgetPage() {
   const derivedVisible = (rows: DerivedRow[]) =>
     derivedShown
       ? rows
+          .filter(
+            (r) =>
+              categoryFilter === 'all' || (r.category?.trim() || '') === categoryFilter,
+          )
           .filter((r) => matches(`${r.name} ${r.category} ${r.meta}`))
           .sort(derivedComparators(catLabel)[sort])
       : [];
@@ -175,20 +190,31 @@ export function BudgetPage() {
       />
 
       {anyRows && (
-        <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-3.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-nowrap max-[560px]:gap-2">
+        <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-2.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
           <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
-          <SortSelect
-            id="budgetSort"
-            label={t('common.sort')}
-            value={sort}
-            options={[
-              { value: 'amount-desc', label: t('budget.sortAmountDesc') },
-              { value: 'amount-asc', label: t('budget.sortAmountAsc') },
-              { value: 'name', label: t('budget.sortName') },
-              { value: 'cat', label: t('budget.sortCat') },
-            ]}
-            onChange={(v) => setSort(v as BudgetSort)}
-          />
+          <div className="flex items-center gap-2 max-[560px]:grid max-[560px]:w-full max-[560px]:grid-cols-2">
+            <Select
+              id="budgetCategoryFilter"
+              variant="compact"
+              value={categoryFilter}
+              aria-label={t('common.filterCategoryAria')}
+              options={categoryOptions}
+              containerClassName="max-[560px]:w-full"
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            />
+            <SortSelect
+              id="budgetSort"
+              label={t('common.sort')}
+              value={sort}
+              options={[
+                { value: 'amount-desc', label: t('budget.sortAmountDesc') },
+                { value: 'amount-asc', label: t('budget.sortAmountAsc') },
+                { value: 'name', label: t('budget.sortName') },
+                { value: 'cat', label: t('budget.sortCat') },
+              ]}
+              onChange={(v) => setSort(v as BudgetSort)}
+            />
+          </div>
         </div>
       )}
 

@@ -13,7 +13,7 @@ interface SortSelectProps {
 /** Labeled dropdown for list sorting. */
 export function SortSelect({ id, label, value, options, onChange }: SortSelectProps) {
   return (
-    <div className="inline-flex flex-none items-center gap-2 max-[560px]:gap-0">
+    <div className="inline-flex flex-none items-center gap-2 max-[560px]:w-full max-[560px]:gap-0">
       {/* Below 560px the control sits beside the filter pills, where the word
           "Sort" costs more width than it explains — the select still carries an
           accessible name through `aria-label`. */}
@@ -25,7 +25,7 @@ export function SortSelect({ id, label, value, options, onChange }: SortSelectPr
         variant="compact"
         value={value}
         aria-label={label}
-        containerClassName="max-[560px]:max-w-[126px]"
+        containerClassName="max-[560px]:w-full"
         onChange={(e) => onChange(e.target.value)}
         options={options}
       />

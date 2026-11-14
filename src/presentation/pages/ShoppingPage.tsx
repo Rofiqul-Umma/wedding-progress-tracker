@@ -10,13 +10,17 @@ import { Icon } from '@presentation/components/ui/Icon';
 import { Chip, type ChipVariant } from '@presentation/components/ui/Chip';
 import { ProgressBar } from '@presentation/components/ui/ProgressBar';
 import { RowActions } from '@presentation/components/ui/RowActions';
+import { Select } from '@presentation/components/ui/Select';
 import { usePlan } from '@presentation/state/PlanStore';
 import { useSearchMatch } from '@presentation/state/NavStore';
 import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
+import {
+  useCategoryLabel,
+  useCategoryFilterOptions,
+} from '@presentation/hooks/useCategoryLabel';
 import { shopBought, shopPct } from '@domain/services/progress';
 import { shoppingPaid } from '@domain/services/budget';
 import { SHOP_ORDER, categoryColor } from '@domain/value-objects/status';
@@ -43,9 +47,14 @@ export function ShoppingPage() {
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<ShopFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const items = state.shopping;
   const total = items.length;
+  const categoryOptions = useCategoryFilterOptions(
+    'shopping',
+    items.map((i) => i.category),
+  );
 
   if (!total) {
     return (
@@ -81,6 +90,7 @@ export function ShoppingPage() {
     rows: items.filter(
       (i) =>
         i.status === k &&
+        (categoryFilter === 'all' || (i.category?.trim() || '') === categoryFilter) &&
         // The translated category joins the stored one, so "uniforms" finds a
         // "Seragam" item while the UI is in English.
         matches(
@@ -100,13 +110,22 @@ export function ShoppingPage() {
         ]}
       />
 
-      {/* One row on a phone: the pills scroll and the progress bar shrinks,
-          rather than the bar wrapping onto a line of its own. */}
-      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-4 max-[560px]:mb-2 max-[560px]:flex-nowrap max-[560px]:gap-2.5">
+      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2.5 max-[560px]:mb-2 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
         <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
-        <div className="flex min-w-[180px] flex-[0_1_300px] items-center gap-3 max-[560px]:min-w-[84px] max-[560px]:flex-[0_1_110px] max-[560px]:gap-2">
-          <ProgressBar value={pct} color="var(--color-lime-2)" height={9} className="flex-1" />
-          <span className="text-[13px] font-bold tnum">{pct}%</span>
+        <div className="flex flex-1 items-center justify-end gap-3 max-[560px]:w-full max-[560px]:justify-between max-[560px]:gap-2.5">
+          <Select
+            id="shoppingCategoryFilter"
+            variant="compact"
+            value={categoryFilter}
+            aria-label={t('common.filterCategoryAria')}
+            options={categoryOptions}
+            containerClassName="max-[560px]:flex-1"
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          />
+          <div className="flex min-w-[140px] flex-[0_1_220px] items-center gap-2.5 max-[560px]:min-w-[84px] max-[560px]:flex-[0_0_96px] max-[560px]:gap-2">
+            <ProgressBar value={pct} color="var(--color-lime-2)" height={9} className="flex-1" />
+            <span className="text-[13px] font-bold tnum">{pct}%</span>
+          </div>
         </div>
       </div>
 

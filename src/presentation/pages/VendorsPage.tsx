@@ -4,6 +4,7 @@ import { StatStrip } from '@presentation/components/ui/StatStrip';
 import { EmptyState, EmptyRow } from '@presentation/components/ui/EmptyState';
 import { SegmentedFilter, type Segment } from '@presentation/components/ui/SegmentedFilter';
 import { SortSelect } from '@presentation/components/ui/SortSelect';
+import { Select } from '@presentation/components/ui/Select';
 import { Card } from '@presentation/components/ui/Card';
 import { Row } from '@presentation/components/ui/Row';
 import { Avatar } from '@presentation/components/ui/Avatar';
@@ -16,7 +17,10 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
+import {
+  useCategoryLabel,
+  useCategoryFilterOptions,
+} from '@presentation/hooks/useCategoryLabel';
 import { effectiveVendorCost, vendorsTotal } from '@domain/services/budget';
 import { vendorsBooked, vendorCategories } from '@domain/services/progress';
 import { categoryColor } from '@domain/value-objects/status';
@@ -60,7 +64,12 @@ export function VendorsPage() {
   const matches = useSearchMatch();
 
   const [filter, setFilter] = useState<VendorFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sort, setSort] = useState<VendorSort>('cost-desc');
+  const categoryOptions = useCategoryFilterOptions(
+    'vendor',
+    state.vendors.map((v) => v.category),
+  );
 
   const strip = (
     <StatStrip
@@ -105,6 +114,7 @@ export function VendorsPage() {
 
   const list = state.vendors
     .filter((v) => filter === 'all' || v.status === filter)
+    .filter((v) => categoryFilter === 'all' || (v.category?.trim() || '') === categoryFilter)
     .sort(comparators(catLabel)[sort]);
 
   const visible = list.filter((v) => {
@@ -122,23 +132,31 @@ export function VendorsPage() {
   return (
     <>
       {strip}
-      {/* `flex-wrap` dropped the sort control onto a second line on a phone,
-          costing 92px of chrome before the first vendor. Below 560px the pills
-          scroll within the row instead so the pair stays one line. */}
-      <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-3.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-nowrap max-[560px]:gap-2">
+      <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-2.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
         <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
-        <SortSelect
-          id="vendorSort"
-          label={t('common.sort')}
-          value={sort}
-          options={[
-            { value: 'cost-desc', label: t('vendors.sortCostDesc') },
-            { value: 'cost-asc', label: t('vendors.sortCostAsc') },
-            { value: 'name', label: t('vendors.sortName') },
-            { value: 'cat', label: t('vendors.sortCat') },
-          ]}
-          onChange={(v) => setSort(v as VendorSort)}
-        />
+        <div className="flex items-center gap-2 max-[560px]:grid max-[560px]:w-full max-[560px]:grid-cols-2">
+          <Select
+            id="vendorCategoryFilter"
+            variant="compact"
+            value={categoryFilter}
+            aria-label={t('common.filterCategoryAria')}
+            options={categoryOptions}
+            containerClassName="max-[560px]:w-full"
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          />
+          <SortSelect
+            id="vendorSort"
+            label={t('common.sort')}
+            value={sort}
+            options={[
+              { value: 'cost-desc', label: t('vendors.sortCostDesc') },
+              { value: 'cost-asc', label: t('vendors.sortCostAsc') },
+              { value: 'name', label: t('vendors.sortName') },
+              { value: 'cat', label: t('vendors.sortCat') },
+            ]}
+            onChange={(v) => setSort(v as VendorSort)}
+          />
+        </div>
       </div>
 
       {visible.length ? (

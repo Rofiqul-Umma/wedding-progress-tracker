@@ -264,7 +264,7 @@ describe('migrate', () => {
     expect(s.guests[0].rsvp).toBe('attending');
     expect(s.guests[0].pax).toBe(2);
     expect(s.guests[0].side).toBe('both');
-    expect(s.guests[1].rsvp).toBe('pending');
+    expect(s.guests[1].rsvp).toBe('declined');
     expect(s.guests[1].pax).toBe(1);
     expect(s.guests[1].category).toBe('');
     expect(s.guests[1].table).toBe('');

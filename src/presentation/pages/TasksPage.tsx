@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StatStrip } from '@presentation/components/ui/StatStrip';
-import { EmptyState } from '@presentation/components/ui/EmptyState';
+import { EmptyState, EmptyRow } from '@presentation/components/ui/EmptyState';
+import { SegmentedFilter, type Segment } from '@presentation/components/ui/SegmentedFilter';
+import { Select } from '@presentation/components/ui/Select';
 import { Card } from '@presentation/components/ui/Card';
 import { Row } from '@presentation/components/ui/Row';
 import { Check } from '@presentation/components/ui/Check';
@@ -13,7 +16,10 @@ import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
 import { useFormat } from '@presentation/hooks/useFormat';
-import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
+import {
+  useCategoryLabel,
+  useCategoryFilterOptions,
+} from '@presentation/hooks/useCategoryLabel';
 import { tasksDone, openTasks } from '@domain/services/progress';
 import { daysUntil } from '@domain/services/schedule';
 import { categoryColor } from '@domain/value-objects/status';
@@ -22,6 +28,8 @@ import { cn } from '@presentation/lib/cn';
 import { isImageAttachment } from '@presentation/lib/attachments';
 import { downloadAttachment } from '@presentation/lib/dataUrl';
 import type { Attachment, Task } from '@domain/entities/types';
+
+type TaskFilter = 'all' | 'open' | 'done';
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
 
@@ -34,14 +42,37 @@ export function TasksPage() {
   const catLabel = useCategoryLabel();
   const matches = useSearchMatch();
 
+  const [filter, setFilter] = useState<TaskFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const categoryOptions = useCategoryFilterOptions(
+    'task',
+    state.tasks.map((task) => task.cat),
+  );
+
+  const openCount = openTasks(state.tasks);
+  const doneCount = tasksDone(state.tasks);
   const overdue = state.tasks.filter(
     (task) => !task.done && task.due && (daysUntil(task.due) ?? 0) < 0,
   ).length;
 
-  const sorted = [...state.tasks].sort((a, b) => {
-    if (a.done !== b.done) return a.done ? 1 : -1;
-    return (a.due || '9999').localeCompare(b.due || '9999');
-  });
+  const segments: Segment<TaskFilter>[] = [
+    { value: 'all', label: t('common.all'), count: state.tasks.length },
+    { value: 'open', label: t('tasks.stripOpen'), count: openCount },
+    { value: 'done', label: t('tasks.stripCompleted'), count: doneCount },
+  ];
+
+  const sorted = [...state.tasks]
+    .filter((task) =>
+      filter === 'all' ? true : filter === 'done' ? task.done : !task.done,
+    )
+    .filter(
+      (task) =>
+        categoryFilter === 'all' || (task.cat?.trim() || '') === categoryFilter,
+    )
+    .sort((a, b) => {
+      if (a.done !== b.done) return a.done ? 1 : -1;
+      return (a.due || '9999').localeCompare(b.due || '9999');
+    });
   // The translated label is searchable alongside the stored one, so "documents"
   // finds a "Dokumen" task while the UI is in English.
   const visible = sorted.filter((task) =>
@@ -52,26 +83,46 @@ export function TasksPage() {
     <>
       <StatStrip
         items={[
-          { label: t('tasks.stripOpen'), value: openTasks(state.tasks) },
-          { label: t('tasks.stripCompleted'), value: tasksDone(state.tasks) },
+          { label: t('tasks.stripOpen'), value: openCount },
+          { label: t('tasks.stripCompleted'), value: doneCount },
           { label: t('tasks.stripTotal'), value: state.tasks.length },
           { label: t('tasks.stripOverdue'), value: overdue },
         ]}
       />
 
       {state.tasks.length ? (
-        <Card className="mt-[18px]">
-          {visible.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              onToggle={() => toggleTask(task.id)}
-              onOpen={() => openPreview({ kind: 'task', id: task.id })}
-              onEdit={() => openForm(taskForm(task))}
-              onDelete={() => deleteTask(task.id)}
+        <>
+          <div className="my-[18px] mb-1.5 flex flex-wrap items-center justify-between gap-2.5 max-[560px]:my-2.5 max-[560px]:mb-1 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-2">
+            <SegmentedFilter options={segments} value={filter} onChange={setFilter} />
+            <Select
+              id="taskCategoryFilter"
+              variant="compact"
+              value={categoryFilter}
+              aria-label={t('common.filterCategoryAria')}
+              options={categoryOptions}
+              containerClassName="max-[560px]:w-full"
+              onChange={(e) => setCategoryFilter(e.target.value)}
             />
-          ))}
-        </Card>
+          </div>
+          {visible.length ? (
+            <Card className="mt-3 max-[560px]:mt-2.5">
+              {visible.map((task) => (
+                <TaskRow
+                  key={task.id}
+                  task={task}
+                  onToggle={() => toggleTask(task.id)}
+                  onOpen={() => openPreview({ kind: 'task', id: task.id })}
+                  onEdit={() => openForm(taskForm(task))}
+                  onDelete={() => deleteTask(task.id)}
+                />
+              ))}
+            </Card>
+          ) : (
+            <div className="mt-3">
+              <EmptyRow>{t('tasks.noFilter')}</EmptyRow>
+            </div>
+          )}
+        </>
       ) : (
         <EmptyState
           icon="checklist"

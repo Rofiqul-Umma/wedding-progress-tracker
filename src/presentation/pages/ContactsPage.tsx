@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StatStrip } from '@presentation/components/ui/StatStrip';
-import { EmptyState } from '@presentation/components/ui/EmptyState';
+import { EmptyState, EmptyRow } from '@presentation/components/ui/EmptyState';
+import { Select } from '@presentation/components/ui/Select';
 import { Card } from '@presentation/components/ui/Card';
 import { Avatar } from '@presentation/components/ui/Avatar';
 import { RowActions } from '@presentation/components/ui/RowActions';
@@ -23,6 +24,7 @@ export function ContactsPage() {
   const { deleteContact } = usePlanActions();
   const matches = useSearchMatch();
 
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   const [flashId, setFlashId] = useState<string | null>(null);
   const refs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -54,13 +56,44 @@ export function ContactsPage() {
     );
   }
 
-  const visible = state.contacts.filter((c) => matches(`${c.name} ${c.role || ''}`));
+  const roleCounts = new Map<string, number>();
+  for (const c of state.contacts) {
+    const r = c.role?.trim() || '';
+    if (r) roleCounts.set(r, (roleCounts.get(r) ?? 0) + 1);
+  }
+  const roleOptions = [
+    { value: 'all', label: `${t('contacts.roleAll')} (${state.contacts.length})` },
+    ...[...roleCounts.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([role, count]) => ({
+        value: role,
+        label: `${role} (${count})`,
+      })),
+  ];
+
+  const visible = state.contacts
+    .filter((c) => roleFilter === 'all' || (c.role?.trim() || '') === roleFilter)
+    .filter((c) => matches(`${c.name} ${c.role || ''}`));
 
   return (
     <>
       <StatStrip items={[{ label: t('contacts.strip'), value: state.contacts.length }]} />
-      <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3.5 max-[560px]:mt-3.5 max-[560px]:gap-2">
-        {visible.map((c) => (
+      {roleCounts.size > 0 && (
+        <div className="mt-3.5 flex items-center justify-end max-[560px]:mt-2.5">
+          <Select
+            id="contactRoleFilter"
+            variant="compact"
+            value={roleFilter}
+            aria-label={t('contacts.filterRoleAria')}
+            options={roleOptions}
+            containerClassName="max-[560px]:w-full"
+            onChange={(e) => setRoleFilter(e.target.value)}
+          />
+        </div>
+      )}
+      {visible.length ? (
+        <div className="mt-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3.5 max-[560px]:mt-3 max-[560px]:gap-2">
+          {visible.map((c) => (
           <Card
             key={c.id}
             pad
@@ -122,8 +155,13 @@ export function ContactsPage() {
               )}
             </div>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-3">
+          <EmptyRow>{t('contacts.noFilter')}</EmptyRow>
+        </div>
+      )}
     </>
   );
 }

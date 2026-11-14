@@ -19,14 +19,15 @@ import { useSearchMatch } from '@presentation/state/NavStore';
 import { useUi } from '@presentation/state/UiStore';
 import { useForms } from '@presentation/hooks/useForms';
 import { usePlanActions } from '@presentation/hooks/usePlanActions';
-import { useCategoryLabel } from '@presentation/hooks/useCategoryLabel';
+import {
+  useCategoryLabel,
+  useCategoryFilterOptions,
+} from '@presentation/hooks/useCategoryLabel';
 import {
   guestsTotalPax,
   attendingPax,
-  pendingPax,
   declinedPax,
   guestsAttendingCount,
-  guestsPendingCount,
   guestsDeclinedCount,
   effectiveGuestSide,
   guestsBySide,
@@ -41,7 +42,6 @@ import {
   type GuestSide,
   type GuestInvitationType,
 } from '@domain/value-objects/status';
-import { BASE_CATEGORIES } from '@domain/value-objects/categories';
 import type { Guest } from '@domain/entities/types';
 import { cn } from '@presentation/lib/cn';
 
@@ -67,6 +67,10 @@ export function GuestsPage() {
 
   const guests: Guest[] = state.guests ?? [];
   const totalCount = guests.length;
+  const categoryOptions = useCategoryFilterOptions(
+    'guest',
+    guests.map((g) => g.category),
+  );
 
   if (!totalCount) {
     return (
@@ -109,18 +113,15 @@ export function GuestsPage() {
   };
 
   const attendingCount = guestsAttendingCount(guests);
-  const pendingCount = guestsPendingCount(guests);
   const declinedCount = guestsDeclinedCount(guests);
 
   const totalPax = guestsTotalPax(guests);
   const attPax = attendingPax(guests);
-  const pendPax = pendingPax(guests);
   const decPax = declinedPax(guests);
 
   const segments: Segment<GuestFilter>[] = [
     { value: 'all', label: t('common.all'), count: totalCount },
     { value: 'attending', label: t('status.rsvp.attending'), count: attendingCount },
-    { value: 'pending', label: t('status.rsvp.pending'), count: pendingCount },
     { value: 'declined', label: t('status.rsvp.declined'), count: declinedCount },
   ];
 
@@ -135,27 +136,6 @@ export function GuestsPage() {
     ...(bothGuests.length > 0 || sideFilter === 'both'
       ? [{ value: 'both' as const, label: bothLabel, count: bothGuests.length }]
       : []),
-  ];
-
-  const categoryValues = new Set<string>(
-    BASE_CATEGORIES.guest.map((c) => c.value),
-  );
-  for (const g of guests) {
-    const c = g.category?.trim();
-    if (c) categoryValues.add(c);
-  }
-  const categoryOptions = [
-    { value: 'all', label: `${t('guests.catAll')} (${totalCount})` },
-    ...[...categoryValues]
-      .map((cat) => {
-        const count = guests.filter((g) => (g.category?.trim() || '') === cat).length;
-        return {
-          value: cat,
-          label: `${catLabel(cat)} (${count})`,
-          name: catLabel(cat),
-        };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name)),
   ];
 
   const digitalCount = guestsByInvitationType(guests, 'digital').length;
@@ -279,10 +259,6 @@ export function GuestsPage() {
           {
             label: t('guests.stripAttending'),
             value: `${attendingCount} (${attPax} pax)`,
-          },
-          {
-            label: t('guests.stripPending'),
-            value: `${pendingCount} (${pendPax} pax)`,
           },
           {
             label: t('guests.stripDeclined'),

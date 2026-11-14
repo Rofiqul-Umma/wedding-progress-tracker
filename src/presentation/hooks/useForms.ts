@@ -424,7 +424,7 @@ export function useForms() {
           name: 'rsvp',
           label: t('forms.guest.rsvp'),
           type: 'select',
-          value: g?.rsvp ?? 'pending',
+          value: g?.rsvp ?? 'declined',
           options: RSVP_STATUSES.map((s) => ({
             value: s,
             label: t(`status.rsvp.${s}`),
@@ -455,7 +455,7 @@ export function useForms() {
         if (!values.name.trim()) return t('forms.guest.errName');
         const rsvp = RSVP_STATUSES.includes(values.rsvp as Guest['rsvp'])
           ? (values.rsvp as Guest['rsvp'])
-          : 'pending';
+          : 'declined';
         const side = GUEST_SIDES.includes(values.side as GuestSide)
           ? (values.side as GuestSide)
           : 'p1';

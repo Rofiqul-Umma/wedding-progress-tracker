@@ -6,7 +6,7 @@ import { TasksPage } from './TasksPage';
 
 /** Read the numeric value shown under a StatStrip label. */
 function stat(label: string): number {
-  const cell = screen.getByText(label).parentElement!;
+  const cell = screen.getByText(label, { selector: 'span' }).parentElement!;
   const value = cell.querySelector('span:last-child')!.textContent ?? '';
   return Number(value);
 }
@@ -48,5 +48,17 @@ describe('TasksPage (integration)', () => {
     await waitFor(() =>
       expect(screen.getByText('Order wedding bands')).toBeInTheDocument(),
     );
+  });
+
+  it('filters tasks by category', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TasksPage />);
+
+    const catSelect = screen.getByRole('combobox', { name: 'Filter by category' });
+    await user.selectOptions(catSelect, 'Stationery');
+
+    expect(screen.getByText('Send save-the-dates')).toBeInTheDocument();
+    expect(screen.getByText('Send formal invitations')).toBeInTheDocument();
+    expect(screen.queryByText('Order wedding bands')).not.toBeInTheDocument();
   });
 });

@@ -384,7 +384,7 @@ describe('guest use cases', () => {
     let s = addGuest(base(), {
       name: 'Sofia Rossi',
       category: 'Keluarga',
-      rsvp: 'pending',
+      rsvp: 'declined',
       pax: 2,
       table: 'Table 1',
       phone: '12345',
@@ -398,13 +398,11 @@ describe('guest use cases', () => {
     s = updateGuest(s, s.guests[0].id, { pax: 3 });
     expect(s.guests[0].pax).toBe(3);
 
-    // pending -> attending -> declined -> pending
+    // declined -> attending -> declined
     s = cycleGuestRsvp(s, s.guests[0].id);
     expect(s.guests[0].rsvp).toBe('attending');
     s = cycleGuestRsvp(s, s.guests[0].id);
     expect(s.guests[0].rsvp).toBe('declined');
-    s = cycleGuestRsvp(s, s.guests[0].id);
-    expect(s.guests[0].rsvp).toBe('pending');
   });
 
   it('deletes then restores a guest at original index (undo)', () => {

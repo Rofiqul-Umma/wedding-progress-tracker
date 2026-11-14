@@ -43,19 +43,19 @@ describe('GuestsPage (integration)', () => {
     const user = userEvent.setup();
     renderWithProviders(<GuestsPage />);
 
-    // Marcus Vance starts as 'pending'
+    // Marcus Vance starts as 'declined' (Not Invited)
     const marcusChip = screen.getByRole('button', {
-      name: /Marcus Vance RSVP: Pending/i,
+      name: /Marcus Vance RSVP: Not Invited/i,
     });
     expect(marcusChip).toBeInTheDocument();
 
     await user.click(marcusChip);
 
-    // pending -> attending
+    // declined -> attending (Invited)
     await waitFor(() => {
       expect(
         screen.getByRole('button', {
-          name: /Marcus Vance RSVP: Attending/i,
+          name: /Marcus Vance RSVP: Invited/i,
         }),
       ).toBeInTheDocument();
     });
@@ -88,15 +88,15 @@ describe('GuestsPage (integration)', () => {
     const user = userEvent.setup();
     renderWithProviders(<GuestsPage />);
 
-    // Click 'Declined' filter tab (which shows label + count badge "Declined 2")
-    const declinedTab = screen.getByRole('button', { name: /^Declined\s+2$/i });
+    // Click 'Not Invited' filter tab (which shows label + count badge "Not Invited 5")
+    const declinedTab = screen.getByRole('button', { name: /^Not Invited\s+5$/i });
     await user.click(declinedTab);
 
-    // Daniel Wu and Elena Rostova should be visible
+    // Daniel Wu, Elena Rostova, and Marcus Vance should be visible
     expect(screen.getByText('Daniel Wu')).toBeInTheDocument();
     expect(screen.getByText('Elena Rostova')).toBeInTheDocument();
+    expect(screen.getByText('Marcus Vance')).toBeInTheDocument();
     expect(screen.queryByText('Sofia & David Rossi')).not.toBeInTheDocument();
-    expect(screen.queryByText('Marcus Vance')).not.toBeInTheDocument();
   });
 
   it('groups guests by Bride 1 (p1) and Bride 2 (p2) and filters by side', async () => {

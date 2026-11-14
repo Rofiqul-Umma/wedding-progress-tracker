@@ -18,7 +18,7 @@ import {
   shopBought,
   attendingPax,
   guestsAttendingCount,
-  guestsPendingCount,
+  guestsDeclinedCount,
 } from '@domain/services/progress';
 import { vendorsTotal } from '@domain/services/budget';
 
@@ -96,7 +96,7 @@ export function Topbar() {
       sub = t('topbar.guestsSub', {
         attending: guestsAttendingCount(state.guests ?? []),
         pax: attendingPax(state.guests ?? []),
-        pending: guestsPendingCount(state.guests ?? []),
+        declined: guestsDeclinedCount(state.guests ?? []),
       });
       addLabel = t('topbar.addGuest');
       break;

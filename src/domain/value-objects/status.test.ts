@@ -13,9 +13,8 @@ import {
 
 describe('nextRsvpStatus', () => {
   it('advances through the lifecycle and wraps around', () => {
-    expect(nextRsvpStatus('pending')).toBe('attending');
     expect(nextRsvpStatus('attending')).toBe('declined');
-    expect(nextRsvpStatus('declined')).toBe('pending');
+    expect(nextRsvpStatus('declined')).toBe('attending');
   });
   it('covers every status in RSVP_ORDER', () => {
     for (const s of RSVP_ORDER) {

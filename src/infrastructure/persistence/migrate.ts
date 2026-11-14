@@ -120,10 +120,7 @@ export function migrate(input: unknown): PlanState {
     guests: Array.isArray(s.guests)
       ? (s.guests as Obj[]).map((g) => {
           const rsvpRaw = str(g.rsvp);
-          const rsvp =
-            rsvpRaw === 'attending' || rsvpRaw === 'declined'
-              ? rsvpRaw
-              : 'pending';
+          const rsvp = rsvpRaw === 'attending' ? 'attending' : 'declined';
           const sideRaw = str(g.side);
           const side =
             sideRaw === 'p1' || sideRaw === 'p2' ? sideRaw : 'both';

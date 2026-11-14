@@ -13,11 +13,9 @@ import {
   vendorCategories,
   guestsTotalPax,
   attendingPax,
-  pendingPax,
   declinedPax,
   guestsCountByRsvp,
   guestsAttendingCount,
-  guestsPendingCount,
   guestsDeclinedCount,
 } from './progress';
 
@@ -155,7 +153,7 @@ describe('guest progress', () => {
   const guests: Guest[] = [
     guest('attending', 2),
     guest('attending', 1),
-    guest('pending', 3),
+    guest('declined', 3),
     guest('declined', 1),
   ];
 
@@ -165,18 +163,15 @@ describe('guest progress', () => {
 
   it('calculates pax by rsvp status', () => {
     expect(attendingPax(guests)).toBe(3);
-    expect(pendingPax(guests)).toBe(3);
-    expect(declinedPax(guests)).toBe(1);
+    expect(declinedPax(guests)).toBe(4);
   });
 
   it('calculates counts by rsvp status', () => {
     expect(guestsAttendingCount(guests)).toBe(2);
-    expect(guestsPendingCount(guests)).toBe(1);
-    expect(guestsDeclinedCount(guests)).toBe(1);
+    expect(guestsDeclinedCount(guests)).toBe(2);
     expect(guestsCountByRsvp(guests)).toEqual({
       attending: 2,
-      pending: 1,
-      declined: 1,
+      declined: 2,
     });
   });
 });

@@ -54,11 +54,10 @@ export function nextShoppingStatus(s: ShoppingStatus): ShoppingStatus {
   return SHOP_ORDER[(i + 1) % SHOP_ORDER.length];
 }
 
-/** Guest RSVP status. */
-export type RsvpStatus = 'pending' | 'attending' | 'declined';
+/** Guest invitation status ('attending' = Diundang / Invited, 'declined' = Belum Diundang / Not Invited). */
+export type RsvpStatus = 'attending' | 'declined';
 
 export const RSVP_STATUSES: readonly RsvpStatus[] = [
-  'pending',
   'attending',
   'declined',
 ] as const;
@@ -82,14 +81,12 @@ export const GUEST_INVITATION_TYPES: readonly GuestInvitationType[] = [
 
 /** Ordered lifecycle for cycling RSVP status on click. */
 export const RSVP_ORDER: readonly RsvpStatus[] = [
-  'pending',
   'attending',
   'declined',
 ] as const;
 
 /** Chip visual variant per RSVP status. */
 export const RSVP_CHIP_VARIANT: Record<RsvpStatus, string> = {
-  pending: 'warn',
   attending: 'lime',
   declined: 'gray',
 };
